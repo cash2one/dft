@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 报表节点，整个文档只有一个，顶级节点。id是报表的唯一标识，name是报表的显示名称 -->
+<report id="fdq" name="分地区报表" totalRow="0" totalPosition="0" remoteSort="0">
+	<parameters>
+		<para name="pa_zwrq" desc="账务日期" renderType="3" dateFormat="Ymd"  dataType="int" defaultValue="20130831">
+	    </para>
+		<para name="pa_srkj" desc="收入口径" renderType="1" dataType="int" defaultRule="_first">
+			<paraDetail multi="0" sourceType="0">
+				<paraItems>
+					<item bm="0" name="地方财政收入" />
+					<item bm="1" name="财政总收入" isDefault='1'/>
+				</paraItems>
+			</paraDetail>
+		</para>
+		
+	</parameters>
+	<paraProcesses>
+		<paraPro name="zb_nian" desc="制表年" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'yyyy') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_yue" desc="制表月" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'mm') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_ri" desc="制表日" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'dd') from dual]]></sql>
+		</paraPro>
+		<paraPro name="nian" desc="年份" proMode="1">
+			<sql><![CDATA[SELECT substr({pa_zwrq},1,4) from dual]]></sql>
+		</paraPro>
+                <paraPro name="yue" desc="月份" proMode="1">
+			<sql><![CDATA[SELECT substr({pa_zwrq},5,2) from dual]]></sql>
+		</paraPro>
+	</paraProcesses>
+
+	<title>@nian@年@yue@月分地区$pa_srkj$</title>
+        <head titleInHead="1" style="headTitle">
+	<subTitle/>
+        </head>
+	<columns complex="1" sourceType="0">
+		<column  pid="" colId="xm" dataIndex="XM" colName="地区" dataType="0" width="150" isleaf="1"  isOrder="0"/>
+        <column  pid="" colId="dns" colName="当年数" dataType="0" width="150" isleaf="0"/>
+        <column  pid="" colId="sns" colName="上年数" dataType="0" width="150" isleaf="0"/>
+		<column  pid="dns" colId="dndy" dataIndex="DNDY" colName="当月" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+		<column  pid="dns" colId="dnlj" dataIndex="DNLJ" colName="累计" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+		<column  pid="sns" colId="sndy" dataIndex="SNDY" colName="当月" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+		<column  pid="sns" colId="snlj" dataIndex="SNLJ" colName="累计" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+        <column  pid="" colId="ljzj" dataIndex="LJZJ" colName="累计增减" dataType="2" width="150" isleaf="1"  isOrder="0"/>
+		<column  pid="" colId="zf" dataIndex="ZF" colName="累计增幅" dataType="2" width="150" isleaf="1"  isOrder="0"/>
+		<column  pid="" colId="bz" dataIndex="BZ" colName="累计比重" dataType="2" width="150" isleaf="1"  isOrder="0"/>
+</columns>
+	<rptData sourceType="1" canPaging="1" defaultPageSize="40" maxSize="100" >
+		<sql><![CDATA[
+	select v03 xm,n01 dndy,n02 dnlj,n03 sndy,n04 snlj,n05 ljzj,n06 zf,n07 bz
+    from  bb_data where bb_id='BB_DQ' and ny={pa_zwrq} and v08={pa_srkj}
+    order by v01
+		]]>
+		</sql>
+	</rptData>
+<foot left="制表单位:$czfpbm$" right="制表日期：@zb_nian@年@zb_yue@月@zb_ri@日" lStyle="footL" rStyle="footR" />
+</report>

@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 报表节点，整个文档只有一个，顶级节点。id是报表的唯一标识，name是报表的显示名称 -->
+<report id="jkrbb_new" name="金库日报表" totalRow="0" totalPosition="0" remoteSort="1">
+	<parameters>
+		<para name="pa_zwrq" desc="年月" renderType="3" dataType="string" defaultValue="20120831" dateFormat="Ymd">
+			
+		</para>
+		<para name="pa_jgdm" desc="收入来源" renderType="1" dataType="string" >
+			<paraDetail multi="0" sourceType="0" defaultRule="_first">
+				<paraItems>
+					<item bm="1" name="国税" isleaf="1" pid=""/>
+					<item bm="2" name="地税"/>
+                    <item bm="3" name="海关"/>
+                    <item bm="4" name="财政"/>
+                    <item bm="" name="全部"/>
+				</paraItems>
+			</paraDetail>
+		</para>
+        <para name="pa_ysjc" desc="预算级次" renderType="1" dataType="string" >
+            <paraDetail multi="0" sourceType="0" defaultRule="_first">
+				<paraItems>
+					<item bm="1" name="中央" isleaf="1" pid=""/>
+					<item bm="2" name="省级"/>
+                    <item bm="3" name="地市"/>
+                    <item bm="4" name="区县"/>
+                    <item bm="" name="全部"/>
+				</paraItems>
+            </paraDetail>	
+		</para>
+	</parameters>
+	
+	<title>金库日报表</title>
+	<columns>
+		<column colId="kmdm" dataIndex="KMDM" colName="科目代码" dataType="0" width="60" isleaf="1"  isOrder="0"/>
+		<column colId="kmmc" dataIndex="KMMC" colName="科目名称" dataType="0" width="100" isleaf="1" isOrder="0"/>
+		<column colId="rlj" dataIndex="RLJ" colName="本日发生额" dataType="2"  width="90" isleaf="1" isOrder="0"/>
+		<column colId="ylj" dataIndex="YLJ" colName="本月发生额" dataType="2"  width="90" isleaf="1" isOrder="0"/>
+        <column colId="nlj" dataIndex="NLJ" colName="本年累计" dataType="2"  width="90" isleaf="1" isOrder="0"/>
+	</columns>
+	<rptData sourceType="1" canPaging="1" defaultPageSize="40" maxSize="100" >
+		<sql><![CDATA[
+			select a.*
+			from (
+				select kmdm_jk kmdm,b.mc kmmc,sum(rlj_jk) rlj,sum(ylj_jk) ylj,sum(nlj_jk) nlj,kmdm_jk id
+				from YSSR y,(select * from bm_cont where table_bm='BM_YSKM') b
+				where to_char(y.kmdm_jk)=b.bm and zwrq_jk={pa_zwrq} and jgdm_jk like {pa_jgdm}%
+				and ysjc_jk like {pa_ysjc}%
+				group by kmdm_jk,b.mc	
+			) a
+			order by id
+		]]>
+		</sql>
+	</rptData>
+</report>

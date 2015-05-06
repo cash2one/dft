@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 报表节点，整个文档只有一个，顶级节点。id是报表的唯一标识，name是报表的显示名称 -->
+<report id="jkdz" name="金库对帐" totalRow="0" totalPosition="0" remoteSort="1">
+	<parameters>
+	    <para name="start" hidden="1" dataType="int"/>
+		<para name="limit" hidden="1" dataType="int"/>
+		<para name="pa_zwrq" desc="账务日期" renderType="3" dateFormat="Ymd"  dataType="int" defaultValue="20130831">
+			</para>
+		<para name="pa_wdly" desc="来源" renderType="1" dataType="int" >
+			<paraDetail multi="0" sourceType="0">
+				<paraItems>
+					<item bm="0" name="地税" isleaf="1" pid=""/>
+					<item bm="1" name="国税"/>
+                                        <item bm="2" name="全部"/>
+				</paraItems>
+			</paraDetail>
+		</para>
+		
+	</parameters>
+        <paraProcesses>
+		<paraPro name="zb_nian" desc="制表年" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'yyyy') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_yue" desc="制表月" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'mm') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_ri" desc="制表日" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'dd') from dual]]></sql>
+		</paraPro>
+		<paraPro name="nian" desc="年份" proMode="1">
+			<sql><![CDATA[SELECT substr({pa_zwrq},1,4) from dual]]></sql>
+		</paraPro>
+                <paraPro name="yue" desc="月份" proMode="1">
+			<sql><![CDATA[SELECT substr({pa_zwrq},5,2) from dual]]></sql>
+		</paraPro>
+	</paraProcesses>
+	
+	<title>@nian@年@yue@月金库对帐</title>
+        <head titleInHead="1" style="headTitle">
+        <subTitle/>
+        </head>
+	<!-- 列集合描述。complex：是否复杂表头，1：是，0：否（默认）。sourceType：列来源。0-默认，静态描述。1：sql；2：存储过程,3-自定义类取数(实现com.datanew.query.IColumnsService) 
+	totalCol:是否有总计列。默认0：无。1：有。该属性会将所有非字符串类型的底级列的值相加。慎用！totalPos：总计列出现位置
+	999：最后，其他正整数：出现的列序号，列序号从1开始。比如单位名称，总计，xx税种，yy税种...总计列位置为2。注意有自动小计列时
+	要把自动小计列的位置计入-->
+	<columns >
+	  <!-- 列定义是有顺序的，此处的顺序就是显示的顺序。colId：不能空，列的唯一标识。dataIndex：列与哪个记录集字段相匹配；
+	  colName：列头的显示名。width：列宽，像素。pid:列的父节点，复杂表头用，默认""。isleaf:是否底级列。复杂表头用。 
+	  calculate_mode:列计算时，计算模式。0：默认，无计算关系；1：下级节点自动小计，一般定义在某父节点上。9：其他计算关系
+	  一般定义在计算列上；colFunction：计算公式，定义在计算所得的列上，列用"r.data."+colId的形式表达(列定义如有界面，这个
+	  列名形式会自动形成)。funcPositon:计算列出现的位置，这个对自动小计的列有效（自动小计产生的列无定义，需要指明位置）。非自动小计的
+	  计算列通过其节点所在的位置确定显示位置。s
+	  renderer：列的值在显示到页面时渲染为某种形式，比如1可3000，显示成13,000。这个通过js脚本函数实现，此处填函数名。
+	  系统将根据使用频率提供固定的若干渲染函数。-->
+		<column  colId="a01" dataIndex="A01" colName="科目" width="110" isleaf="1" isOrder="0"/>
+		<column  colId="a02" dataIndex="A02" colName="科目名称" width="160" isleaf="1" isOrder="0"/>
+		<column  pid="" colId="jk" colName="金 库" dataType="0" width="150" isleaf="0"/>
+                <column  pid="" colId="gds" colName="国 地 税" dataType="0" width="150" isleaf="0"/>
+                <column  pid="" colId="cy" colName="差 额" dataType="0" width="150" isleaf="0"/>
+		<column pid="jk" colId="a11" dataIndex="A11" colName="日 报" dataType="2" width="90" isleaf="1" isOrder="0"/>
+		<column pid="jk" colId="a12" dataIndex="A12" colName="月 报" dataType="2" width="90" isleaf="1" isOrder="0"/>
+		<column pid="jk" colId="a13" dataIndex="A13" colName="年 报" dataType="2" width="90" isleaf="1" isOrder="0"/>
+		<column pid="gds" colId="a14" dataIndex="A14" colName="日 报" dataType="2" width="90" isleaf="1" isOrder="0"/>
+		<column pid="gds" colId="a15" dataIndex="A15" colName="月 报" dataType="2" width="90" isleaf="1" isOrder="0"/>
+		<column pid="gds" colId="a16" dataIndex="A16" colName="年 报" dataType="2" width="90" isleaf="1" isOrder="0"/>
+		<column pid="cy" colId="a17" dataIndex="A17" colName="日 报" dataType="2" width="90"  isleaf="1" isOrder="0"/>
+		<column pid="cy" colId="a18" dataIndex="A18" colName="月 报" dataType="2" width="90"  isleaf="1" isOrder="0"/>
+		<column pid="cy" colId="a19" dataIndex="A19" colName="年 报" dataType="2" width="90"  isleaf="1" isOrder="0"/>
+		
+	</columns>
+	<rptData sourceType="2" canPaging="1" defaultPageSize="40" maxSize="100" >
+		<procedure name="pkg_qycx.jkdz" totalIndex="1" datasetIndex="2">
+				<in referMode="1" referTo="pa_nian" />
+				<in referMode="1" referTo="pa_yue" />
+				<in referMode="1" referTo="pa_ri" />
+                                <in referMode="1" referTo="pa_wdly" />
+				<in referMode="1" referTo="start" />
+				<in referMode="1" referTo="limit" />
+				<out dataType="1"/>
+				<out dataType="3"/>
+		</procedure>
+	</rptData>
+<foot left="制表单位:$czfpbm$" right="制表日期：@zb_nian@年@zb_yue@月@zb_ri@日" lStyle="footL" rStyle="footR" />
+</report>

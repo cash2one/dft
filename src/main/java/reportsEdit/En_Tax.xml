@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="_sys_enTax" name="测试税收" >
+<parameters>
+	<para name="xh" desc="乡镇" hidden="1" bindMode="1"  bindTo="xh"/>
+</parameters>
+<title>税务</title>
+<columns complex="0" sourceType="0">
+	<column colId="czfpbm" dataIndex="CZFPBM" colName="财政分片编码" width="90" isGroup="1"/>
+	<column colId="mc" dataIndex="MC" colName="纳税单位名称" width="150" />
+	<column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="110" />
+	<column colId="fddbr" dataIndex="FDDBR" colName="法人代表" width="100" />
+</columns>
+<rptData sourceType="1" canPaging="0">
+	<sql><![CDATA[select swdjzh,mc,dz,fddbr, czfpbm from DJ_CZ 
+	where xh={xh}
+		]]>
+	</sql>
+</rptData>
+</report>
+

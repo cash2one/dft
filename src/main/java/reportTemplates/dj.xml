@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="dj" name="测试" hasChart="1" directExport="0">
+<description><![CDATA[登记清单表。</br>第二行的简介<font color="red">这里是~~</font>]]></description>
+<parameters>
+	<para name="czfpbm" desc="乡镇" hidden="0" renderType="2" dataType="string" >
+		<paraDetail multi="1" leafOnly="1" sourceType="1">
+			<sql><![CDATA[
+				SELECT BM,MC NAME, ISLEAF, PID from bm_cont where table_bm='BM_CZFP'
+				]]></sql>
+		</paraDetail>
+	</para>
+	<para name="qyzt" desc="企业状态" hidden="0" renderType="2" dataType="1" >
+		<paraDetail multi="1" sourceType="0">
+			<paraItems>
+				<item bm="0" name="非正常" pid="" isDefault="1"/>
+				<item bm="1" name="开业" pid=""/>
+			</paraItems>
+		</paraDetail>
+	</para>
+</parameters>
+<title>$czfpbm$登记清册</title>
+<head titleInHead="1" style="headTitle" height='60'>
+	<subTitle center="年月：2013年10月" cStyle="subTitleC" lStyle="subTitleL" rStyle="subTitleR"/>
+</head>
+<columns complex="0" sourceType="1">
+	<!--<column colId="czfpbm" dataIndex="CZFPBM" colName="财政分片编码" width="90" isGroup="1" dataType="int"/>
+	<column colId="mc" dataIndex="MC" colName="单位名称" width="150" linkTo="fsz_ljzbb" linkParams="SZ,ZWRQ,SRKJ" isLink="1"/>
+	<column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="110" dataType="string"/>
+	<column colId="dz" dataIndex="DZ" colName="地址" width="120" dataType="double" />		
+	<column colId="fddbr" dataIndex="FDDBR" colName="法人代表" width="100" />-->
+	<sql><![CDATA[select swdjzh,mc,dz,fddbr, czfpbm,hybm from DJ_CZ 
+		where swdjzh='331127148867911'
+			]]>
+		</sql>
+</columns>
+<rptData sourceType="3" canPaging="1" defaultPageSize="30" name="dj">
+	<!--<sql><![CDATA[select swdjzh,mc,dz,fddbr, czfpbm from DJ_CZ 
+	where qyzt in ([qyzt])
+	order by czfpbm
+		]]>
+	</sql>-->
+	<class path="com.fruit.test.TestClass"/>
+</rptData>
+<DataSets>
+	<rptData sourceType="1" name="czfp">
+		<sql><![CDATA[
+		select bm,mc from bm_cont where table_bm='BM_CZFP'
+			]]>
+		</sql>
+	</rptData>
+	<rptData sourceType="1" name="djInfo">
+		<sql><![CDATA[select swdjzh,mc,dz,fddbr, czfpbm,hybm from DJ_CZ 
+		where swdjzh='331127148867911'
+			]]>
+		</sql>
+	</rptData>
+</DataSets>
+<foot left="制表单位:$czfpbm$" cStyle="footC" lStyle="footL" rStyle="footR"/>
+<chart id="colTest" chartType="Multi-MSColumn3D" width="600" height="400" dataTemplateName="col_single_test">
+	<data sourceType="2" dataFormat="0" isMultiSeries="1" categoryIndex="CZFPBM" dataIndex="CC" seriesIndex="ISMAP">
+		<!--<sql><![CDATA[
+			select count(xh)cc,ismap,czfpbm from dj_cz where czfpbm is not null
+			group by ismap,czfpbm
+			order by czfpbm,ismap
+			]]>
+		</sql>-->
+		<procedure name="pkg_qycx.qycx" totalIndex="1" datasetIndex="2">
+			<in referMode="1" referTo="pNy"/>
+			<in referMode="1" referTo="pLxbm"/>
+			<in referMode="1" referTo="qyjh"/>
+			<in referMode="1" referTo="czfpbm"/>
+			<in referMode="1" referTo="qymc"/>
+			<in referMode="1" referTo="start"/>
+			<in referMode="1" referTo="limit"/>
+			<in referMode="1" referTo="sort"/>
+			<in referMode="1" referTo="dir"/>
+			<in referMode="1" referTo="userid"/>
+			<out dataType="1"/>
+			<out dataType="3"/>
+		</procedure>
+	</data>
+</chart>
+<!--expName:导出文件的文件名。如果没有设置expName，则使用title，如果title也未设置，则使用模板名tmp-->
+<export template="test.xls" expName="$czfpbm$登记清册"/>
+</report>
+

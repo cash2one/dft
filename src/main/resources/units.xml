@@ -1,0 +1,7 @@
+<units>
+	<unit id="original" name="原始" renderFun="renderFoo"/>
+	<unit id="yuan2Decimals" name="元(两位小数)" renderFun="rMoney"/>
+	<unit id="yuanInt" name="元(整数)" renderFun="renderInt"/>
+	<unit id="wan2Decimals" name="万元(两位小数)" renderFun="rWan2Decimals"/>
+	<unit id="wanInt" name="万元(整数)" renderFun="rWanInt"/>
+</units>

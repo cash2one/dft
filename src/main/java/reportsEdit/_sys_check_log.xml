@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="_sys_check_log" name="核定日志" >
+<parameters>
+	<para name="hid" hidden="1" bindTo="hid" bindMode="1" dataType="string"/>
+</parameters>
+<title>核定日志</title>
+<columns complex="1" sourceType="0">
+	<column colId="HID"     dataIndex="HID"     colName="流水号"    width="100" />
+	<column colId="SWDJZH"  dataIndex="SWDJZH"  colName="税号"      width="150" /> 
+	<column colId="MC"      dataIndex="MC"      colName="企业名称"  width="200" />   
+    <column colId="FLDNAME" dataIndex="FLDNAME" colName="核定属性"  width="100" /> 
+    <column colId="DOTIME"  dataIndex="DOTIME"  colName="核定日期"  width="100" /> 
+</columns>
+<rptData sourceType="1" canPaging="1" defaultPageSize="40">
+	<sql><![CDATA[
+	select h.HID,
+	       d.SWDJZH,
+		   d.MC,
+		   e.mc FLDNAME,
+		   to_char(DOTIME,'YYYY-MM-DD') DOTIME
+      from HD_INFO h,
+	       DJ_CZ d,
+		   EN_DICTIONARY e
+     where h.xh=d.xh(+) 
+	   and upper(h.fldname)=e.field(+)
+	 order by HID desc 
+		]]>
+	</sql>
+</rptData>
+</report>
+

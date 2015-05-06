@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 报表节点，整个文档只有一个，顶级节点。id是报表的唯一标识，name是报表的显示名称 -->
+<report id="qyssaly" name="税收收入列表" totalRow="0" totalPosition="0" remoteSort="1">
+	<parameters>
+		<para name="pa_ny" desc="年月" renderType="2" dataType="int" showMode="2" defaultRule="_first">
+			<paraDetail multi="0" leafOnly="1" sourceType="1" >
+				<sql><![CDATA[
+					SELECT A.*,substr(BM,1,4)||'年'||substr(bm,5,2)||'月' NAME FROM(SELECT DISTINCT(TO_CHAR(NY))BM,1 ISLEAF,'' PID FROM BB_SRQC )A ORDER BY BM DESC
+
+				]]></sql>
+			</paraDetail>
+		</para>
+		<para name="pa_wdly" desc="来源" renderType="1" dataType="int" showMode="2" defaultRule="_first">
+			<paraDetail multi="0" sourceType="0" >
+				<paraItems>
+					<item bm="0" name="地税" isleaf="1" pid=""/>
+					<item bm="1" name="国税" isleaf="1" pid=""/>
+          <item bm="0,1" name="全部" isleaf="1" pid=""/>
+				</paraItems>
+			</paraDetail>
+		</para>
+               
+        <para name="pa_czfp" desc="财政分片" filterFld="czfpbm" showMode="2" renderType="1" dataType="string" defaultRule="_first">
+			<paraDetail multi="0" leafOnly="1" sourceType="1" >
+				<sql><![CDATA[
+				select * from (
+                                  SELECT BM,MC NAME,1 ISLEAF,'' PID,bm xh FROM BM_CZFP
+                                   union
+                                   select '801,802,803,999' bm,'全部' name,1 ISLEAF,'' pid,'100' xh from dual
+                                  )ORDER BY xh
+
+
+				]]></sql>
+			</paraDetail>
+		</para>
+	</parameters>
+	
+	<title>企业清册列表</title>
+	<!-- 列集合描述。complex：是否复杂表头，1：是，0：否（默认）。sourceType：列来源。0-默认，静态描述。1：sql；2：存储过程,3-自定义类取数(实现com.datanew.query.IColumnsService) 
+	totalCol:是否有总计列。默认0：无。1：有。该属性会将所有非字符串类型的底级列的值相加。慎用！totalPos：总计列出现位置
+	999：最后，其他正整数：出现的列序号，列序号从1开始。比如单位名称，总计，xx税种，yy税种...总计列位置为2。注意有自动小计列时
+	要把自动小计列的位置计入-->
+	<columns complex="0" sourceType="0" >
+	  <!-- 列定义是有顺序的，此处的顺序就是显示的顺序。colId：不能空，列的唯一标识。dataIndex：列与哪个记录集字段相匹配；
+	  colName：列头的显示名。width：列宽，像素。pid:列的父节点，复杂表头用，默认""。isleaf:是否底级列。复杂表头用。 
+	  calculate_mode:列计算时，计算模式。0：默认，无计算关系；1：下级节点自动小计，一般定义在某父节点上。9：其他计算关系
+	  一般定义在计算列上；colFunction：计算公式，定义在计算所得的列上，列用"r.data."+colId的形式表达(列定义如有界面，这个
+	  列名形式会自动形成)。funcPositon:计算列出现的位置，这个对自动小计的列有效（自动小计产生的列无定义，需要指明位置）。非自动小计的
+	  计算列通过其节点所在的位置确定显示位置。s
+	  renderer：列的值在显示到页面时渲染为某种形式，比如1可3000，显示成13,000。这个通过js脚本函数实现，此处填函数名。
+	  系统将根据使用频率提供固定的若干渲染函数。-->
+           
+		<column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="50" isOrder="0"/>
+		<column colId="mc" dataIndex="MC" colName="名称" width="140" isleaf="1" isOrder="0"/>
+		<column colId="zse" dataIndex="ZSE" colName="财政总收入" dataType="2" width="90" isleaf="1" isOrder="1"/>
+		<column colId="czse" dataIndex="CZSE" colName="地方财政收入" dataType="2" width="90" isleaf="1" isOrder="1"/>
+		<column colId="zzs" dataIndex="ZZS" colName="增值税" dataType="2" width="90" isleaf="1" isOrder="1"/>
+        <column colId="sfs" dataIndex="SFS" colName="消费税" dataType="2" width="90" isOrder="1"/>
+		<column colId="yys" dataIndex="YYS" colName="营业税" dataType="2" width="90" isOrder="1"/>
+		<column colId="qysds" dataIndex="QYSDS" colName="企业所得税" dataType="2" width="90" isOrder="1"/>
+		<column colId="grsds" dataIndex="GRSDS" colName="个人所得税" dataType="2" width="90" isOrder="1"/>
+		<column colId="cswhs" dataIndex="CSWHS" colName="城市维护建设税" dataType="2" width="90" />
+        <column colId="tdzzs" dataIndex="TDZZS" colName="土地增值税" dataType="2" width="90" />
+		<column colId="ccs" dataIndex="CCS" colName="车船税" dataType="2" width="90" />
+		<column colId="fcs" dataIndex="FCS" colName="房产税" dataType="2" width="90" />
+        <column colId="tdsys" dataIndex="TDSYS" colName="城镇土地使用税" dataType="2" width="90" />
+		<column colId="yhs" dataIndex="YHS" colName="印花税" dataType="2" width="90" />
+		<column colId="jyffj" dataIndex="JYFFJ" colName="教育费附加" dataType="2" width="90" />
+		<column colId="fmsr" dataIndex="FMSR" colName="税务部门其他罚没" dataType="2" width="90" />
+		<column colId="ncjyffj" dataIndex="NCJYFFJ" colName="农村教育费附加" dataType="2" width="90" />
+		
+	</columns>
+	<rptData sourceType="1" canPaging="1" defaultPageSize="40" maxSize="100" >
+		<sql><![CDATA[
+		select r.swdjzh swdjzh,d.mc mc,
+                 sum(zse) zse,sum(czse) czse,
+                 sum(decode(szbm,101,zse,0)) zzs ,
+                 sum(decode(szbm,103,zse,0)) sfs ,
+                 sum(decode(szbm,102,zse,0)) yys ,
+                 sum(decode(szbm,151,zse,0)) qysds,
+                 sum(decode(szbm,105,zse,0)) grsds,
+                 sum(decode(szbm,110,se,0)) cswhs,
+                 sum(decode(szbm,108,se,0)) tdzzs,
+                 sum(decode(szbm,111,se,0)) ccs,
+                 sum(decode(szbm,112,se,0)) fcs,
+                 sum(decode(szbm,115,se,0)) tdsys,
+                 sum(decode(szbm,116,se,0)) yhs,
+                 sum(decode(szbm,161,se,0)) jyffj,
+                 sum(decode(szbm,162,se,0)) fmsr,
+                 sum(decode(szbm,181,tax_se,0)) ncjyffj
+                 from RTK r,dj_cz d where  substr(rkrq,1,4)=substr({pa_ny},1,4) and substr(rkrq,1,6)<=substr({pa_ny},1,6) and wdly in ({pa_wdly})
+                 and to_num(d.czfpbm) in ({pa_czfp})
+                 and r.swdjzh=d.swdjzh(+)
+                 group by r.swdjzh,d.mc
+                 order by zse desc
+
+		]]>
+		</sql>
+	</rptData>
+</report>

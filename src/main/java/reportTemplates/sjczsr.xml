@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="sjczsr" name="市级财政收入报表" description="分行业市级收入报表" >
+	<parameters>
+	    <para name="start" hidden="1" dataType="int"/>
+		<para name="limit" hidden="1" dataType="int"/>
+		<para name="sort" hidden="1" dataType="string"/>
+		<para name="dir" hidden="1" dataType="string"/>
+		<para name="userid" desc="" hidden="1" bindTo="userid" bindMode="2" dataType="string"/>
+		<para name="nianyue" desc="统计年月" hidden="0" renderType="1" dataType="1" validates="v_notNull" width="120">
+		<paraDetail multi="0" leafOnly="1" sourceType="0" >
+				<paraItems>
+					<item bm="201308" name="2013年8月"  isDefault='1'/>
+				</paraItems>
+			</paraDetail>
+		</para>
+		<para name="lxbm" desc="报表类型" hidden="0" renderType="1" dataType="1" validates="v_notNull" width="120">
+			<paraDetail multi="0" sourceType="0">
+				<paraItems>
+					<item bm="0" name="月报"/>
+					<item bm="1" name="累报"  isDefault='1'/>
+				</paraItems>
+			</paraDetail>
+		</para>
+	</parameters>
+	<paraProcesses>
+		<paraPro name="zb_nian" desc="制表年" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'yyyy') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_yue" desc="制表月" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'mm') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_ri" desc="制表日" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'dd') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_dp" desc="制表单位" proMode="1">
+			<sql><![CDATA[SELECT name from USERS where USERID={userid}]]></sql>
+		</paraPro>
+	</paraProcesses>
+	<title>$nianyue$市级财政收入报表</title>
+	<head titleInHead="1" style="headTitle" >
+	<subTitle/>
+    </head>
+	<columns complex="1" sourceType="0">
+		<!--><column dataType="1" renderer="" colId="autoIndex" dataIndex="autoIndex" colName="序号" width="40" pid="" isleaf="1"/>-->
+		<column colId="hymc" dataIndex="HYMC"  colName="行业名称"  width="200" isleaf="1" isOrder="1"/>
+		<column colId="dssr" dataIndex="DSSR"  colName="地税收入"  dataType="2" width="110" isleaf="1" isOrder="1" renderer="rMoney"/>
+		<column colId="gssr" dataIndex="GSSR" colName="国税收入"  dataType="2" width="110" isleaf="1" isOrder="1" renderer="rMoney"/>
+		<column colId="zsr" dataIndex="ZSR" colName="总收入" dataType="2" width="110" isleaf="1" isOrder="1" renderer="rMoney"/>
+		<column colId="zzs" dataIndex="ZZS" colName="增值税" dataType="2" width="110" isleaf="1" isOrder="1" renderer="rMoney"/>
+		<column colId="yys" dataIndex="YYS" colName="营业税" dataType="2" width="110" isleaf="1" isOrder="1" renderer="rMoney"/>
+		<column colId="xfs" dataIndex="XFS" colName="消费税" dataType="2" width="110" isleaf="1" isOrder="1" renderer="rMoney"/>
+		<column colId="grsds" dataIndex="GRSDS" colName="个人所得税" dataType="2" width="110" isleaf="1" isOrder="1" renderer="rMoney"/>	
+		<column colId="qysds" dataIndex="QYSDS" colName="企业所得税" dataType="2" width="110" isleaf="1" isOrder="1" renderer="rMoney"/>	
+	</columns>
+	<rptData sourceType="2" canPaging="1" defaultPageSize="40" maxSize="100" >
+		<procedure name="pkg_yshj.sjczsr" totalIndex="1" datasetIndex="2">
+				<in referMode="1" referTo="nianyue" />
+				<in referMode="1" referTo="lxbm" />
+				<in referMode="1" referTo="start" />
+				<in referMode="1" referTo="limit" />
+				<in referMode="1" referTo="sort" />
+				<in referMode="1" referTo="dir" />
+				<in referMode="1" referTo="userid" />
+				<out dataType="1"/>
+				<out dataType="3"/>
+		</procedure>
+	</rptData>
+	<foot left="制表单位：@zb_dp@财政局" right="制表日期：@zb_nian@年@zb_yue@月@zb_ri@日" cStyle="footC" lStyle="footL" rStyle="footR" />
+</report>

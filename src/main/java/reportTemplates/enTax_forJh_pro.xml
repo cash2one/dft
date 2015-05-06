@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 报表节点，整个文档只有一个，顶级节点。id是报表的唯一标识，name是报表的显示名称 -->
+<report id="enTax_forJh_pro" name="税收收入列表" remoteSort="1" multiUnit="1" defaultUnit="original" zeroCanHide="1">
+	<parameters>
+		<para name="start" hidden="1" dataType="int"/>
+		<para name="limit" hidden="1" dataType="int"/>
+		<para name="sort" hidden="1" dataType="string"/>
+		<para name="dir" hidden="1" dataType="string"/>
+		<para name="userid" desc="" hidden="1" bindTo="userid" bindMode="2" dataType="string"/>
+		<para name="pNy" desc="年月" renderType="1" dataType="int">
+			<paraDetail multi="0" leafOnly="1" sourceType="1">
+				<sql><![CDATA[
+					SELECT A.*,BM NAME FROM(SELECT DISTINCT(TO_CHAR(NY))BM,1 ISLEAF,'' PID FROM BB_SRQC )A ORDER BY BM DESC
+				]]></sql>
+			</paraDetail>
+		</para>
+		<para name="pLxbm" desc="类型" renderType="1" dataType="int">
+			<paraDetail multi="0" sourceType="0">
+				<paraItems>
+					<item bm="0" name="月报" isleaf="1" pid=""/>
+					<item bm="1" name="累报"/>
+				</paraItems>
+			</paraDetail>
+		</para>
+		<para name="qyjh" desc="企业集合" renderType="2" dataType="string" showMode="1">
+			<paraDetail multi="0" leafOnly="1" sourceType="1">
+				<sql><![CDATA[
+					select  bm,isleaf,pid,name from (
+					select id bm,isleaf,pid,name from QYJh where ISPRIVATE=0
+					union all
+					select id bm,isleaf,pid,name from QYJh where ISPRIVATE=1 and creator={userid})
+					order by bm
+				]]></sql>
+			</paraDetail>
+		</para>
+		<para name="czfpbm" desc="财政分片" showMode="1" renderType="2" dataType="string" autoAll="0">
+			<paraDetail multi="1" leafOnly="1" sourceType="1" >
+				<sql><![CDATA[
+					SELECT BM,MC NAME,1 ISLEAF,'' PID FROM BM_CZFP where bm in (select czfpbm from USER_XZ where userid={userid}) ORDER BY BM
+				]]></sql>
+			</paraDetail>
+		</para>
+		<para name="qymc" desc="企业名称" renderType="0" dataType="string" showMode="1"/>
+	</parameters>
+	<title>分户税收</title>
+	<!-- 列集合描述。complex：是否复杂表头，1：是，0：否（默认）。sourceType：列来源。0-默认，静态描述。1：sql；2：存储过程,3-自定义类取数(实现com.datanew.query.IColumnsService) 
+	totalCol:是否有总计列。默认0：无。1：有。该属性会将所有非字符串类型的底级列的值相加。慎用！totalPos：总计列出现位置
+	999：最后，其他正整数：出现的列序号，列序号从1开始。比如单位名称，总计，xx税种，yy税种...总计列位置为2。注意有自动小计列时
+	要把自动小计列的位置计入-->
+	<columns complex="0" sourceType="0">
+		<!-- 列定义是有顺序的，此处的顺序就是显示的顺序。colId：不能空，列的唯一标识。dataIndex：列与哪个记录集字段相匹配；
+	  colName：列头的显示名。width：列宽，像素。pid:列的父节点，复杂表头用，默认""。isleaf:是否底级列。复杂表头用。 
+	  calculate_mode:列计算时，计算模式。0：默认，无计算关系；1：下级节点自动小计，一般定义在某父节点上。9：其他计算关系
+	  一般定义在计算列上；colFunction：计算公式，定义在计算所得的列上，列用"r.data."+colId的形式表达(列定义如有界面，这个
+	  列名形式会自动形成)。funcPositon:计算列出现的位置，这个对自动小计的列有效（自动小计产生的列无定义，需要指明位置）。非自动小计的
+	  计算列通过其节点所在的位置确定显示位置。s
+	  renderer：列的值在显示到页面时渲染为某种形式，比如1可3000，显示成13,000。这个通过js脚本函数实现，此处填函数名。
+	  系统将根据使用频率提供固定的若干渲染函数。-->
+		<column colId="mc" dataIndex="MC" colName="名称" width="160" isleaf="1" isOrder="1"/>
+		<column colId="v002" dataIndex="V002" colName="税收收入" defaultHide="1" dataType="2" width="90" isleaf="1" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="v002_S" dataIndex="V002_S" colName="上年税收收入" defaultHide="1" dataType="2" width="90" isleaf="1" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="v004" dataIndex="V004" colName="地方财政收入" defaultHide="1" dataType="2" width="90" isleaf="1" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="v004_S" dataIndex="V004_S" colName="上年地方财政收入" dataType="2" width="90" isleaf="1" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="v101" dataIndex="V101" colName="增值税" dataType="2" width="90" isleaf="1" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="v101_S" dataIndex="V101_S" colName="上年增值税" dataType="2" width="90" isleaf="1" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V102" dataIndex="V102" colName="营业税" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V102_S" dataIndex="V102_S" colName="上年营业税" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V103" dataIndex="V103" colName="消费税" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V103_S" dataIndex="V103_S" colName="上年消费税" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V151_G" dataIndex="V151_G" colName="企业所得税(国)" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V151_G_S" dataIndex="V151_G_S" colName="上年企业所得税(国)" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V151_D" dataIndex="V151_D" colName="企业所得税(地)" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V151_D_S" dataIndex="V151_D_S" colName="上年企业所得税(地)" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V105_G" dataIndex="V105_G" colName="个人所得税(国)" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V105_G_S" dataIndex="V105_G_S" colName="上年个人所得税(国)" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V105_D" dataIndex="V105_D" colName="个人所得税(地)" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V105_D_S" dataIndex="V105_D_S" colName="上年个人所得税(地)" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+		<column colId="V110" dataIndex="V110" colName="城市维护建设税" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>
+	    <column colId="V110_S" dataIndex="V110_S" colName="上年城市维护建设税" dataType="2" width="90" isOrder="1" isMultiUnit="1" hideZero="1"/>	
+	    <column colId="dz" dataIndex="DZ" colName="地址" width="150" isleaf="1" hideZero="1"/>
+	    <column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="110" isOrder="1" hideZero="1"/>
+	</columns>
+	<rptData sourceType="2" canPaging="1" defaultPageSize="40" maxSize="100">
+		<procedure name="pkg_qycx.qycx" totalIndex="1" datasetIndex="2">
+			<in referMode="1" referTo="pNy"/>
+			<in referMode="1" referTo="pLxbm"/>
+			<in referMode="1" referTo="qyjh"/>
+			<in referMode="1" referTo="czfpbm"/>
+			<in referMode="1" referTo="qymc"/>
+			<in referMode="1" referTo="start"/>
+			<in referMode="1" referTo="limit"/>
+			<in referMode="1" referTo="sort"/>
+			<in referMode="1" referTo="dir"/>
+			<in referMode="1" referTo="userid"/>
+			<out dataType="1"/>
+			<out dataType="3"/>
+		</procedure>
+	</rptData>
+</report>

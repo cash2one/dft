@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 报表节点，整个文档只有一个，顶级节点。id是报表的唯一标识，name是报表的显示名称 -->
+<report id="jkrbb" name="金库日报表" totalRow="0" totalPosition="0" remoteSort="0">
+	<parameters>
+		<para name="pa_zwrq" desc="账务日期" renderType="3" dateFormat="Ymd"  dataType="int" defaultValue="20130831">
+			
+		</para>
+		<para name="pa_jgdm" desc="收入来源" renderType="1" dataType="string" >
+			<paraDetail multi="0" sourceType="0" defaultRule="_first">
+				<paraItems>
+					<item bm="1" name="国税" isleaf="1" pid=""/>
+					<item bm="2" name="地税"/>
+                                        <item bm="3" name="海关"/>
+
+                                        <item bm="4" name="财政"/>
+                                        <item bm="" name="全部"/>
+				</paraItems>
+			</paraDetail>
+		</para>
+                <para name="pa_ysjc" desc="预算级次" renderType="1" dataType="string" >
+                       <paraDetail multi="0" sourceType="0" defaultRule="_first">
+		<paraItems>
+					<item bm="1" name="中央" isleaf="1" pid=""/>
+					<item bm="2" name="省级"/>
+                                        <item bm="3" name="地市"/>
+
+                                        <item bm="4" name="区县"/>
+                                        <item bm="" name="全部"/>
+				</paraItems>
+                  </paraDetail>	
+		</para>
+	</parameters>
+	 <paraProcesses>
+		<paraPro name="zb_nian" desc="制表年" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'yyyy') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_yue" desc="制表月" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'mm') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_ri" desc="制表日" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'dd') from dual]]></sql>
+		</paraPro>
+		<paraPro name="nian" desc="年份" proMode="1">
+			<sql><![CDATA[SELECT substr({pa_zwrq},1,4) from dual]]></sql>
+		</paraPro>
+                <paraPro name="yue" desc="月份" proMode="1">
+			<sql><![CDATA[SELECT substr({pa_zwrq},5,2) from dual]]></sql>
+		</paraPro>
+	</paraProcesses>
+	<title>@nian@年@yue@月金库日报表</title>
+        <head titleInHead="1" style="headTitle">
+        <subTitle/>
+        </head>
+	<columns>
+		<column colId="kmdm" dataIndex="KMDM" colName="科目代码" dataType="0" width="100" isleaf="1"  isOrder="0"/>
+		<column colId="kmmc" dataIndex="KMMC" colName="科目名称" dataType="0" width="200" isleaf="1" isOrder="0"/>
+		<column colId="rlj" dataIndex="RLJ" colName="本日发生额" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+		<column colId="ylj" dataIndex="YLJ" colName="本月发生额" dataType="2"  width="140" isleaf="1" isOrder="0"/>
+                <column colId="nlj" dataIndex="NLJ" colName="本年累计" dataType="2"  width="150" isleaf="1" isOrder="0"/>
+		
+	</columns>
+	<rptData sourceType="1" canPaging="1" defaultPageSize="40" maxSize="100" >
+		<sql><![CDATA[
+			select a.*
+from (
+select to_char(kmdm_jk) kmdm,b.mc kmmc,sum(rlj_jk) rlj,sum(ylj_jk) ylj,sum(nlj_jk) nlj,to_char(kmdm_jk) id
+ from YSSR y,bm_yskm b
+ where y.kmdm_jk=b.bm and
+ zwrq_jk={pa_zwrq}
+ and jgdm_jk like {pa_jgdm}%
+ and ysjc_jk like {pa_ysjc}%
+group by to_char(kmdm_jk),b.mc
+
+
+union
+select substr(kmdm_jk,1,7) kmdm,b.mc kmmc,sum(rlj_jk) rlj,sum(ylj_jk) ylj,sum(nlj_jk) nlj,substr(kmdm_jk,1,7) id
+ from YSSR y,(select substr(bm,2,7) bm,mc from bm_yskm_zl) b
+ where substr(kmdm_jk,1,7)=bm and
+  zwrq_jk={pa_zwrq}
+  and jgdm_jk like {pa_jgdm}%
+ and ysjc_jk like {pa_ysjc}%
+group by substr(kmdm_jk,1,7),b.mc
+
+union
+select substr(kmdm_jk,1,5) kmdm,b.mc kmmc,sum(rlj_jk) rlj,sum(ylj_jk) ylj,sum(nlj_jk) nlj,substr(kmdm_jk,1,5) id
+ from YSSR y,bm_yskm_dl b
+ where substr(kmdm_jk,1,5)=substr(b.bm,2,5) and
+ zwrq_jk={pa_zwrq}
+  and jgdm_jk like {pa_jgdm}%
+ and ysjc_jk like {pa_ysjc}%
+group by substr(kmdm_jk,1,5),b.mc
+
+union
+select substr(kmdm_jk,1,3) kmdm,
+decode(substr(kmdm_jk,1,3),'101','税收税入','102','基金收入','103','非税收入','110','转移性收入') kmmc,
+sum(rlj_jk) rlj,sum(ylj_jk) ylj,sum(nlj_jk) nlj,substr(kmdm_jk,1,3)
+ from YSSR
+where  zwrq_jk={pa_zwrq}
+  and jgdm_jk like {pa_jgdm}%
+ and ysjc_jk like {pa_ysjc}%
+group by substr(kmdm_jk,1,3)
+
+union
+select '','一般预算收入合计',sum(case when kmdm_jk like '103%' and ysjc_jk in ('4','5') then rlj_jk
+            when kmdm_jk not like '103%' and substr(kmdm_jk,1,5) not in('10101','10104')  then rlj_jk
+            when kmdm_jk like '10101%' and ysjc_jk in ('4','5') then rlj_jk*4
+             when kmdm_jk like '10101%' and ysjc_jk not in ('4','5') then 0
+            when kmdm_jk like '10104%' and ysjc_jk in ('4','5') then rlj_jk*2.5
+            when kmdm_jk like '10104%' and ysjc_jk not in ('4','5') then 0  end)  as vrlj ,
+sum(case when kmdm_jk like '103%' and ysjc_jk in ('4','5') then ylj_jk
+            when kmdm_jk not like '103%' and substr(kmdm_jk,1,5) not in('10101','10104')  then ylj_jk
+            when kmdm_jk like '10101%' and ysjc_jk in ('4','5') then ylj_jk*4
+             when kmdm_jk like '10101%' and ysjc_jk not in ('4','5') then 0
+            when kmdm_jk like '10104%' and ysjc_jk in ('4','5') then ylj_jk*2.5
+            when kmdm_jk like '10104%' and ysjc_jk not in ('4','5') then 0  end) as vylj,
+sum(case when kmdm_jk like '103%' and ysjc_jk in ('4','5') then nlj_jk
+            when kmdm_jk not like '103%' and substr(kmdm_jk,1,5) not in('10101','10104')  then nlj_jk
+            when kmdm_jk like '10101%' and ysjc_jk in ('4','5') then nlj_jk*4
+             when kmdm_jk like '10101%' and ysjc_jk not in ('4','5') then 0
+            when kmdm_jk like '10104%' and ysjc_jk in ('4','5') then nlj_jk*2.5
+            when kmdm_jk like '10104%' and ysjc_jk not in ('4','5') then 0  end) as vnlj ,'999999990' as id
+from yssr
+where substr(kmdm_jk,1,3) not in ('102','110')
+and substr(kmdm_jk,1,5) not in ('10301','10116')
+and substr(kmdm_jk,1,7) not in ('1010103','1010203','1010922','1010442','1010443')
+and kmdm_jk not in ('101060101')
+ and zwrq_jk={pa_zwrq}
+  and jgdm_jk like {pa_jgdm}%
+ and ysjc_jk like {pa_ysjc}%
+
+union
+select '','社会保险基金预算收入合计',sum(rlj_jk) as vrlj ,sum(ylj_jk) as
+vylj,sum(nlj_jk) as vnlj ,'999999991' as id
+from yssr where substr(kmdm_jk,1,3)='102'
+ and zwrq_jk={pa_zwrq}
+  and jgdm_jk like {pa_jgdm}%
+ and ysjc_jk like {pa_ysjc}%
+
+union
+select '','其他基金预算收入合计',sum(rlj_jk) as vrlj ,sum(ylj_jk) as
+vylj,sum(nlj_jk) as vnlj ,'999999992' as id
+from yssr where substr(kmdm_jk,1,5)='10301'
+ and zwrq_jk={pa_zwrq}
+  and jgdm_jk like {pa_jgdm}%
+ and ysjc_jk like {pa_ysjc}%
+
+union
+select '','转移性收入合计',sum(rlj_jk) as vrlj ,sum(ylj_jk) as
+vylj,sum(nlj_jk) as vnlj ,'999999993' as id
+from yssr where substr(kmdm_jk,1,3)='110'
+ and zwrq_jk={pa_zwrq}
+  and jgdm_jk like {pa_jgdm}%
+ and ysjc_jk like {pa_ysjc}%
+
+union
+select '' kmdm,
+'合计' kmmc,
+sum(rlj_jk) rlj,sum(ylj_jk) ylj,sum(nlj_jk) nlj,'999999995' as id
+ from YSSR
+where  zwrq_jk={pa_zwrq}
+  and jgdm_jk like {pa_jgdm}%
+ and ysjc_jk like {pa_ysjc}%
+
+) a
+order by id
+		]]>
+		</sql>
+	</rptData>
+<foot left="制表单位:$czfpbm$" right="制表日期：@zb_nian@年@zb_yue@月@zb_ri@日" lStyle="footL" rStyle="footR" />
+</report>

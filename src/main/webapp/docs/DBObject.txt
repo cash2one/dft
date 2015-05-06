@@ -1,0 +1,278 @@
+--企业分成
+create or replace procedure p_rtk_qyfc_hd
+(
+    in_ruleid   IN  VARCHAR2,  --规则号
+    
+    out_result  OUT NUMBER, -- 操作结果
+    out_resultMsg OUT VARCHAR2
+ )IS
+     --变量声明
+     v_err_code NUMBER;   
+     v_err_info VARCHAR2(200);   
+     tmpstr varchar(1000);
+     tmpSwdjzh varchar(100);
+     tmpXh number(2);
+     tmpNum number(2);
+     tmpSebl number(10,5);
+ BEGIN
+    tmpSwdjzh:='0';
+    tmpSebl:=0;
+    tmpXh:=0;
+    v_err_code := SQLCODE;   
+    v_err_info := substr(SQLERRM, 1, 200);   
+ --重新打上分成标志.
+   update RULES set qybj='1' where ruleid=in_ruleid;
+   FOR rec IN (select distinct q.swdjzh,r.begindate,r.enddate from RULES r,QYFCXX q
+     where  r.ruleid=q.ruleid and r.ruleid=in_ruleid order by swdjzh) LOOP
+       if tmpSwdjzh='0' then
+          tmpSwdjzh:=rec.swdjzh;
+       end if;
+       update RTK set fcbj=1 where swdjzh=rec.swdjzh and rkrq>=rec.begindate and rkrq<=rec.enddate ;
+   END LOOP; 
+   --根据分成信息进行拆分.
+   FOR rec IN (select distinct q.swdjzh,q.czfpbm,q.sebl,r.begindate, r.enddate from RULES r,QYFCXX q
+     where  r.ruleid=q.ruleid   and r.ruleid=in_ruleid order by swdjzh) LOOP
+      if tmpSwdjzh=rec.swdjzh then
+        tmpXh:=tmpXh+1;
+      else
+        tmpXh:=1;
+      end if;
+      SELECT numswdjzh INTO tmpNum FROM (select swdjzh,count(*) as numswdjzh from RULES r,QYFCXX q
+       where  r.ruleid=q.ruleid and r.ruleid=in_ruleid  group by swdjzh ) 
+       WHERE swdjzh=rec.swdjzh;
+     --
+     if tmpxh<tmpNum then 
+       tmpSebl:=tmpSebl+(rec.sebl/100);
+       tmpstr:='insert into rtk_qyfc
+       (KEY,XH,QYNM,WDLY,SWDJZH,rkrq,RTKBJ,SPH,SE,JKBM,SZBM,RTKSXBM,YSJCBM,CZFPBM,YSKMBM,KJYD,swbmbm )
+       (
+        select KEY,'||tmpXH||',QYNM, WDLY,SWDJZH,rkrq,RTKBJ,SPH,SE*'||rec.sebl||'/100,JKBM,SZBM,RTKSXBM,YSJCBM,'''||rec.CZFPBM||''',YSKMBm,KJYD,swbmbm 
+        from rtk where swdjzh='||chr(39)||rec.swdjzh||chr(39)||' and rkrq>='||rec.begindate||' and rkrq<='||rec.enddate||')';  
+       execute immediate tmpstr;
+      else
+       tmpstr:='insert into rtk_qyfc
+       (KEY,XH,QYNM,WDLY,SWDJZH,rkrq,RTKBJ,SPH,SE,JKBM,SZBM,RTKSXBM,YSJCBM,CZFPBM,YSKMBM,KJYD,swbmbm )
+       (
+        select KEY,'||tmpXH||',QYNM, WDLY,SWDJZH,rkrq,RTKBJ,SPH,SE*(1-'||tmpSebl||'),JKBM,SZBM,RTKSXBM,YSJCBM,'''||rec.CZFPBM||''',YSKMBm,KJYD,swbmbm 
+        from rtk where swdjzh='||chr(39)||rec.swdjzh||chr(39)||' and rkrq>='||rec.begindate||' and rkrq<='||rec.enddate||')';  
+   
+      --  insert into rtk_qyfc
+     --  (KEY,XH,QYNM,WDLY,SWDJZH,rkrq,RTKBJ,SPH,SE,JKBM,SZBM,RTKSXBM,YSJCBM,CZFPBM,YSKMBM,KJYD,swbmbm )
+      -- (
+      --  select KEY,tmpXH,QYNM, WDLY,SWDJZH,rkrq,RTKBJ,SPH,SE*(1-tmpSebl),JKBM,SZBM,RTKSXBM,YSJCBM,rec.CZFPBM,YSKMBm,KJYD,swbmbm 
+      --  from rtk where swdjzh=rec.swdjzh and  rkrq>=rec.begindate and rkrq<=rec.enddate
+      -- );  
+       execute immediate tmpstr;
+       tmpSebl:=0;
+       tmpXh:=0;
+      end if ;
+       tmpSwdjzh:=rec.swdjzh;  
+   END LOOP;   
+     commit; 
+      out_result:=0;
+  EXCEPTION
+   WHEN OTHERS THEN
+        out_result := -1;
+        out_resultMsg :='ORA-'||v_err_code||':'||v_err_info;
+        RETURN;
+
+end p_rtk_qyfc_hd;
+/
+
+--工具包。将逗号分隔的字符串构造为数组
+create or replace package ArrayUtil is
+   type strArr_type is table of varchar(100) INDEX BY BINARY_INTEGER;  --- 定义数组
+   function toArray(arrstr in varchar, arr out strArr_type) return number;
+END ArrayUtil;
+/
+create or replace package body ArrayUtil is
+    function toArray(arrstr in varchar, arr out strArr_type) return number is
+        TmpStr varchar(32);
+        str    varchar(4000);
+        j      number;
+    begin
+        str := arrstr;
+        j   := 0;
+        IF Instr(arrstr, ',', 1, 1) = 0 THEN
+           j := j + 1;
+           arr(j) := arrstr;         
+        else
+           While Instr(str, ',', 1, 1) > 0 Loop
+             TmpStr := Substr(str, 1, Instr(str, ',', 1, 1) - 1);
+             j := j + 1;
+             arr(j) := TmpStr;
+             str := SubStr(Str, Instr(str, ',', 1, 1) + 1, length(str));
+           end loop;
+           if not str is null then
+           --将最后一个保存
+            j := j + 1;
+            arr(j) := str;           
+          end if;
+        end if;
+        return j;
+    EXCEPTION
+  WHEN OTHERS THEN
+      dbms_output.put_line('sqlerrm:'||sqlerrm);
+  end;
+end ArrayUtil;
+/
+
+--核定
+CREATE OR REPLACE PACKAGE PKG_CHECK
+AS
+PROCEDURE en_check(
+          v_exeType in number,
+          v_swdjzh in varchar2,
+          v_fld in varchar2,
+          v_newval in varchar2,
+          v_affect in number,
+          v_from in number,
+          v_to in number,
+          v_affectMode in number,
+          v_userid in varchar2,
+          v_ip in varchar2,
+          v_remark in varchar2,
+          r_flag out varchar2,
+          r_info out varchar2);
+
+PROCEDURE ENS_AUTOMAP(
+          r_flag out varchar2,
+          r_count out varchar2);
+PROCEDURE UNDO_MAP(
+          v_xhs in varchar2,
+          r_flag out varchar2,
+          r_info out varchar2);
+PROCEDURE DO_MAP(
+          v_dsxh in number,
+          v_gsxh in number,
+          r_flag out varchar2,
+          r_info out varchar2); 
+PROCEDURE DELETE_VEN(
+          v_xhs in number,
+          r_flag out varchar2,
+          r_info out varchar2
+);     
+END PKG_CHECK;
+/
+CREATE OR REPLACE PACKAGE BODY PKG_CHECK
+AS
+   PROCEDURE EN_CHECK(
+          v_exeType in number,
+          v_swdjzh in varchar2,
+          v_fld in varchar2,
+          v_newval in varchar2,
+          v_affect in number,
+          v_from in number,
+          v_to in number,
+          v_affectMode in number,
+          v_userid in varchar2,
+          v_ip in varchar2,
+          v_remark in varchar2,
+          r_flag out varchar2,
+          r_info out varchar2)
+   is
+       QuerySql long;
+    
+   BEGIN
+        r_flag := '0'; 
+        EXCEPTION WHEN OTHERS THEN
+             dbms_output.put_line(sqlerrm);
+   END EN_CHECK;
+   
+   PROCEDURE ENS_AUTOMAP(
+          r_flag out varchar2,
+          r_count out varchar2)
+   is
+       QuerySql long;
+   BEGIN
+       QuerySql := '';
+       QuerySql := QuerySql||'';
+       
+       execute immediate 'SELECT TO_CHAR(COUNT(*)) COUNT FROM ' INTO r_count;
+     
+       r_flag := '0'; 
+       EXCEPTION WHEN OTHERS THEN
+           dbms_output.put_line(sqlerrm);
+   END ENS_AUTOMAP;
+     
+   PROCEDURE UNDO_MAP(
+          v_xhs in varchar2,
+          r_flag out varchar2,
+          r_info out varchar2)
+   is
+       QuerySql varchar2(2000);
+       strArr  arrayutil.strArr_type;
+       cc number; 
+       tmpXh varchar2(32);   
+   BEGIN
+   --先将多个税号按逗号分隔
+       cc := arrayutil.toArray(v_xhs,strArr);
+       for i in 1..cc LOOP  
+           tmpXh:= strArr(i);
+           --先插入一条ismap=1的国税未映射记录，某些内容从被操作记录获取，一部分字段从DJ_GS取。
+           QuerySql := 'insert into dj_cz(xh,qynm,dzdah,swdjzh,mc,dz,fddbr,bgrq,qyzt,ismap,qysx,ztbm,jjxzbm,hybm,czfpbm)';
+           QuerySql :=QuerySql||' select SQ_CZ_DJ.nextval xh,0 qynm,g.dzdah,g.swdjzh_gs,g.mc,g.dz,g.fddbr,to_char(sysdate,';
+           QuerySql :=QuerySql||'''YYYYMMDD'''||') bgrq,c.qyzt,1 ismap,c.qysx,g.ztbm,g.jjxzbm,g.hybm,g.czfpbm';
+           QuerySql :=QuerySql|| ' from dj_gs g,dj_cz c where g.dzdah=c.dzdah and c.xh='||tmpXh;
+           execute immediate QuerySql;
+
+           --将原记录的ismap标记置为0
+           QuerySql := 'update dj_cz set ismap=0,dzdah=0 where xh= '||tmpXh;
+           execute immediate QuerySql;
+       end LOOP;
+       r_flag := '1';
+       EXCEPTION WHEN OTHERS THEN
+           dbms_output.put_line(sqlerrm); 
+           r_flag := '9';          
+   END UNDO_MAP;
+   
+   PROCEDURE DO_MAP(
+          v_dsxh in number,
+          v_gsxh in number,
+          r_flag out varchar2,
+          r_info out varchar2)
+   is
+       QuerySql long;
+    
+   BEGIN
+        r_flag := '0'; 
+        --将国税记录的dzdah写入地税记录的dzdah,将地税记录的ismap设置为3
+        QuerySql :='update dj_cz set (dzdah,ismap) = (select dzdah,3 from dj_cz where xh='||v_gsxh;
+        QuerySql := QuerySql||') where xh='||v_dsxh;
+        execute immediate QuerySql;
+        
+        --删除国税记录
+        QuerySql := 'delete from dj_cz where xh= '||v_gsxh;
+        execute immediate QuerySql;
+        r_flag := '1';
+        EXCEPTION WHEN OTHERS THEN
+             dbms_output.put_line(sqlerrm); 
+             r_flag := '9'; 
+   END DO_MAP;
+PROCEDURE DELETE_VEN(
+          v_xhs in number,
+          r_flag out varchar2,
+          r_info out varchar2)
+   is
+       QuerySql long;
+       strArr  arrayutil.strArr_type;
+       cc number; 
+       tmpXh varchar2(32);   
+   BEGIN
+   --先将多个税号按逗号分隔
+       cc := arrayutil.toArray(v_xhs,strArr);
+       for i in 1..cc LOOP  
+           tmpXh:= strArr(i);
+           --删除凭证
+           
+           --删除记录
+           QuerySql := 'delete from dj_cz where xh = '||tmpXh;
+           execute immediate QuerySql;
+       end LOOP;
+        r_flag := '1';
+        EXCEPTION WHEN OTHERS THEN
+             dbms_output.put_line(sqlerrm); 
+             r_flag := '9'; 
+   END DELETE_VEN; 
+END PKG_CHECK;
+/

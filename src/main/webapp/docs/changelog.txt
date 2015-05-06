@@ -1,0 +1,3 @@
+--20130812 增加报表审核菜单
+insert into MODULES (MODULEID, NAME, PID, HREF, TARGET, QYBJ, ISLEAF, DORDER)
+values ('0108', '报表审核', '01', 'reportsManage/reportsAudit.jsp', 'mid_right', 1, 1,8);

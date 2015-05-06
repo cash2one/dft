@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report id="qydjcx" name="企业登记查询" description="选取企业集合中按分片的企业登记查询">
+<parameters>
+    <para name="userid" desc="" hidden="1" bindTo="userid" bindMode="2" dataType="string"/>
+</parameters>
+<parametersForFilter>
+		<!--<para name="pNy" desc="年月" filterFld="ny" showMode="2" renderType="0" dataType="int" defaultValue="" defaultRule="_first"/>
+		<para name="pLxbm" desc="类型" filterFld="lxbm" showMode="2" renderType="1" dataType="int" defaultValue="0">
+			<paraDetail multi="0" sourceType="0">
+				<paraItems>
+					<item bm="0" name="月报" isleaf="1" pid=""/>
+					<item bm="1" name="累报"/>
+				</paraItems>
+			</paraDetail>
+		</para>-->
+		 <para name="czfpbm" desc="财政分片" filterFld="czfp" showMode="1" renderType="1" dataType="string" autoAll="0">
+			<paraDetail multi="1" leafOnly="1" sourceType="1" >
+				<sql><![CDATA[
+					SELECT BM,MC NAME,1 ISLEAF,'' PID FROM BM_CZFP where bm in (select czfpbm from USER_XZ where userid={userid}) ORDER BY BM
+				]]></sql>
+			</paraDetail>
+		</para>
+		<para name="pqymc" desc="企业名称" filterFld="mc" showMode="1" renderType="0" dataType="string" />
+		<para name="pqyzt" desc="企业状态" filterFld="qyzt" showMode="1" renderType="1" dataType="string" >
+			<paraDetail multi="0" leafOnly="1" sourceType="1" >
+				<sql><![CDATA[
+					SELECT BM,MC NAME,1 ISLEAF,'' PID FROM BM_QYZT ORDER BY BM
+				]]></sql>
+			</paraDetail>
+		</para>
+		<!--<para name="pSh" filterFld="swdjzh" showMode="2" desc="税号" renderType="0" dataType="string" valueOprator="like"/>
+		<para name="pQymc" filterFld="mc" showMode="2" desc="企业名称" renderType="0" dataType="string" valueOprator="like"/>-->
+</parametersForFilter>
+<paraProcesses>
+		<paraPro name="zb_nian" desc="制表年" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'yyyy') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_yue" desc="制表月" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'mm') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_ri" desc="制表日" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'dd') from dual]]></sql>
+		</paraPro>
+		<!-->
+		<paraPro name="sh_mc2" proMode="2">
+			<procedure name="PKG_DNFT_PJB.P_CZFP_QX" outPutInfoIndex="1">
+				<in referMode="1" referTo="userid"/>
+			</procedure>
+		</paraPro>
+		<paraPro name="sh_mc" proMode="3">
+			<class path="com.datanew.query.ParaProcessImp"/>	
+		</paraPro>-->
+	</paraProcesses>
+<title>登记信息</title>
+<columns complex="0" sourceType="0">
+	<column colId="czfpbm" dataIndex="CZFPBM" colName="财政分片" width="90" isGroup="1"/>
+	<column colId="ename" dataIndex="MC" colName="单位名称" width="150" />
+	<column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="110" />
+	<column colId="dz" dataIndex="DZ" colName="地址" width="120" />		
+	<column colId="fddbr" dataIndex="FDDBR" colName="法人代表" width="100" />
+</columns>
+<rptData sourceType="1" canPaging="1" defaultPageSize="40" >
+	<sql><![CDATA[SELECT b.mc czfpbm,d.mc,d.swdjzh,d.dz,d.fddbr,d.qyzt,b.bm czfp
+FROM dj_Cz d,bm_czfp b where d.czfpbm=b.bm and d.czfpbm in (select czfpbm from user_xz where userid={userid})
+order by b.mc
+		]]>
+	</sql>
+</rptData>
+</report>
+

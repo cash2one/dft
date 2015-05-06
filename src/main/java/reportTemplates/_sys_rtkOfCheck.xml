@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="_sys_rtkOfCheck" name="税款明细" >
+<parameters>
+	<para name="hid" hidden="1" bindTo="hid" bindMode="1" dataType="string"/>
+</parameters>
+<title>税款明细</title>
+<columns complex="0" sourceType="0">
+	<column colId="mc"      dataIndex="MC"      colName="企业名称" width="200" />
+	<column colId="wdly"    dataIndex="WDLY"    colName="征收部门" width="70" />
+	<column colId="fldname" dataIndex="FLDNAME" colName="核定属性" width="100" />
+	<column colId="newval"  dataIndex="NEWVAL"  colName="核定后"   width="100" />
+	<column colId="oldval"  dataIndex="OLDVAL"  colName="核定前"   width="100" />
+	<column colId="rkrq"    dataIndex="RKRQ"    colName="入库日期" width="100" />
+	<column colId="szbm"    dataIndex="SZBM"    colName="税种"     width="150"/>
+	<column colId="se"      dataIndex="SE"      colName="金额"     width="80" dataType="2"/>
+	<column colId="czfpbm"  dataIndex="CZFPBM"  colName="财政分片" width="100" />
+</columns>
+<rptData sourceType="1" canPaging="1" defaultPageSize="40">
+	<sql><![CDATA[
+        select x.mc,x.wdly,e.mc fldname,x.newval,x.oldval,x.rkrq,s.mc szbm,se,c.mc czfpbm 
+          from
+             (
+               select d.mc,'地税' wdly,m.fldname,m.newval,m.oldval,r.rkrq,r.szbm,r.se,r.czfpbm
+                 from dj_cz d,rtk r,hd_zsmx m
+                where r.p_id=m.p_id and r.rkrq=m.rkrq and r.wdly=m.wdly and r.key=m.key
+                  and m.wdly=0 and d.qynm=m.p_id and m.hid={hid}
+            union all
+               select d.mc,'国税' wdly,m.fldname,m.newval,m.oldval,r.rkrq,r.szbm,r.se,r.czfpbm
+                 from dj_cz d,rtk r,hd_zsmx m
+                where r.p_id=m.p_id and r.rkrq=m.rkrq and r.wdly=m.wdly and r.key=m.key
+                  and m.wdly=1 and d.dzdah=m.p_id and m.hid={hid}
+             ) x,
+			    EN_DICTIONARY e,
+                ( select bm,mc from bm_cont where table_bm='BM_SZ' ) s,
+                ( select bm,mc from bm_cont where table_bm='BM_CZFP' ) c
+         where 
+               x.szbm=s.bm(+) and x.czfpbm=c.bm(+) and upper(x.fldname)=e.field(+)
+	     order by x.rkrq,x.szbm
+		]]>
+	</sql>
+</rptData>
+</report>

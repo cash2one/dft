@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="qysssr" name="企业税收收入" description="企业税收收入" >
+	<parameters>
+	    <para name="userid" desc="" hidden="1" bindTo="userid" bindMode="2" dataType="string"/>
+		<para name="nian" desc="年度" hidden="0" renderType="1" dataType="1" validates="v_notNull">
+		<paraDetail multi="0" sourceType="0">
+			<paraItems>
+			    <item bm="2008" name="2008年" pid=""/>
+				<item bm="2009" name="2009年" pid=""/>
+				<item bm="2010" name="2010年" pid=""/>
+                <item bm="2011" name="2011年" pid=""/>
+				<item bm="2012" name="2012年" pid=""/>
+				<item bm="2013" name="2013年" pid=""/>
+				<item bm="2014" name="2014年" pid="" isDefault='1'/>
+			</paraItems>
+		</paraDetail>
+		</para>
+		<para name="yue" desc="月份" hidden="0" renderType="1" dataType="1" validates="v_notNull">
+			<paraDetail multi="0" sourceType="0">
+				<paraItems>
+					<item bm="01" name="一月" pid=""  isDefault='1'/>
+					<item bm="02" name="二月" pid=""/>
+					<item bm="03" name="三月" pid=""/>
+					<item bm="04" name="四月" pid=""/>
+					<item bm="05" name="五月" pid=""/>
+					<item bm="06" name="六月" pid=""/>
+					<item bm="07" name="七月" pid=""/>
+					<item bm="08" name="八月" pid=""/>
+					<item bm="09" name="九月" pid=""/>
+					<item bm="10" name="十月" pid=""/>
+					<item bm="11" name="十一月" pid=""/>
+					<item bm="12" name="十二月" pid=""/>
+				</paraItems>
+			</paraDetail>
+		</para>
+
+		 <para name="bblx" desc="报表类型" hidden="0" renderType="1" dataType="1" validates="v_notNull">
+			<paraDetail multi="0" sourceType="0">
+				<paraItems>
+					<item bm="0" name="月报"/>
+					<item bm="1" name="累报"  isDefault='1'/>
+				</paraItems>
+			</paraDetail>
+		</para>
+
+		<para name="swdjzh" desc="税号" hidden="0" renderType="0" dataType="0"/>
+		<para name="qymc" desc="企业名称" hidden="0" renderType="0" dataType="0"/>
+
+		<para name="isgt" desc="是否个体" hidden="0" renderType="1" dataType="0" validates="v_notNull">
+			<paraDetail multi="0" sourceType="0">
+				<paraItems>
+				    <item bm="0,1" name="全部" isDefault='1'/>
+					<item bm="0" name="企业"/>
+					<item bm="1" name="个体"/>
+				</paraItems>
+			</paraDetail>
+		</para>
+
+         <para name="czfpbm" desc="财政分片" renderType="2" dataType="string" validates="v_notNull">
+			<paraDetail multi="1" leafOnly="0" sourceType="1" >
+				<sql><![CDATA[
+					 select distinct bm,name,pid,isleaf from(
+                     select bm,mc name,pid,isleaf from  (select * from bm_cont where table_bm='BM_CZFP')
+                     connect by prior pid=bm start with BM IN (select czfpbm from user_xz where userid={userid})
+)                    order by bm
+				]]></sql>
+			</paraDetail>
+		</para>
+
+		<para name="hybm" desc="行业" renderType="2" dataType="string" validates="v_notNull">
+			<paraDetail multi="1" leafOnly="0" sourceType="1" >
+				<sql><![CDATA[
+					select  bm,isleaf,pid,mc name from bm_cont_xs where table_bm='BM_HY'   order by bm
+				]]></sql>
+			</paraDetail>
+		</para>
+
+	</parameters>
+	<paraProcesses>
+		<paraPro name="zb_nian" desc="制表年" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'yyyy') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_yue" desc="制表月" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'mm') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_ri" desc="制表日" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'dd') from dual]]></sql>
+		</paraPro>
+		<!-->
+		<paraPro name="sh_mc2" proMode="2">
+			<procedure name="PKG_DNFT_PJB.P_CZFP_QX" outPutInfoIndex="1">
+				<in referMode="1" referTo="userid"/>
+			</procedure>
+		</paraPro>
+		<paraPro name="sh_mc" proMode="3">
+			<class path="com.datanew.query.ParaProcessImp"/>	
+		</paraPro>-->
+	</paraProcesses>
+	<title>$nian$$yue$企业税收收入</title>
+	<head titleInHead="1" style="headTitle" height='60' >
+	<subTitle right="单位:万元" cStyle="subTitleC" lStyle="subTitleL" rStyle="subTitleR"/>
+    </head>
+	<columns complex="1" sourceType="0">
+		
+		<column dataType="1" renderer="" colId="autoIndex" dataIndex="autoIndex" colName="序号" width="40" pid="" isleaf="1"/>
+		<column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="110" isleaf="1" isOrder="1"/>
+		<column colId="mc" dataIndex="MC" colName="名称" width="160" isleaf="1" isOrder="1"/>
+		<column colId="czzsr" dataIndex="CZZSR" colName="财政总收入" dataType="2" width="120" isleaf="1" isOrder="1"/>
+		<column colId="dfczsr" dataIndex="DFCZSR" colName="地方财政收入" dataType="2" width="120" isleaf="1" isOrder="1"/>
+		<column colId="zjdfczsr" dataIndex="ZJDFCZSR" colName="镇街地方财政收入" dataType="2" width="120" isleaf="1" isOrder="1"/>
+		<column  pid="" colId="dsbmsr" colName="地税部门收入" dataType="0"  isleaf="0"/>
+		<column  pid="dsbmsr" colId="dshj" dataIndex="DSHJ" colName="合计" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmsr" colId="s102" dataIndex="S102" colName="营业税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmsr" colId="s151_ds" dataIndex="S151_DS" colName="企业所得税" dataType="2" width="100" isleaf="1" isOrder="1"/>	
+		<column  pid="dsbmsr" colId="s105_ds" dataIndex="S105_DS" colName="个人所得税" dataType="2" width="100" isleaf="1" isOrder="1"/>	
+		<column  pid="dsbmsr" colId="s110" dataIndex="S110" colName="城市维护建设税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmsr" colId="s108" dataIndex="S108" colName="土地增值税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmsr" colId="s111" dataIndex="S111" colName="车船使用税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmsr" colId="s106" dataIndex="S106" colName="房产税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmsr" colId="s115" dataIndex="S115" colName="城镇土地使用税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmsr" colId="s116" dataIndex="S116" colName="印花税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmsr" colId="s114" dataIndex="S114" colName="资源税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmsr" colId="s174" dataIndex="S174" colName="契税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmsr" colId="s173" dataIndex="S173" colName="耕地占用税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="" colId="gsbmsr" colName="国税部门收入" dataType="0"  isleaf="0"/>
+		<column  pid="gsbmsr" colId="gshj" dataIndex="GSHJ" colName="合计" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="gsbmsr" colId="zzs" colName="增值税" dataType="0"  isleaf="0"/>
+		<column  pid="zzs" colId="s101" dataIndex="S101" colName="小计" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="zzs" colId="s1010101" dataIndex="S1010101" colName="增值税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="zzs" colId="s1010104" dataIndex="S1010104" colName="改征增值税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="gsbmsr" colId="s151_gs" dataIndex="S151_GS" colName="企业所得税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="gsbmsr" colId="s103" dataIndex="S103" colName="消费税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="" colId="dsbmqtsr" colName="地税部门其他收入" dataType="0"  isleaf="0"/>
+		<column  pid="dsbmqtsr" colId="dsqthj" dataIndex="DSQTHJ" colName="合计" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmqtsr" colId="s161" dataIndex="S161" colName="教育费附加" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmqtsr" colId="s181" dataIndex="S181" colName="地方教育费附加" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmqtsr" colId="s421" dataIndex="S421" colName="水利建设基金" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmqtsr" colId="s418" dataIndex="S418" colName="农业发展基金" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmqtsr" colId="s162" dataIndex="S162" colName="税务部门罚没收入" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmqtsr" colId="s281" dataIndex="S281" colName="残疾人保障金" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="dsbmqtsr" colId="s321" dataIndex="S321" colName="其他政府性基金" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="" colId="shbxjjsr" colName="社会保险基金收入" dataType="0"  isleaf="0"/>
+		<column  pid="shbxjjsr" colId="jjhj" dataIndex="JJHJ" colName="合计" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="shbxjjsr" colId="s294" dataIndex="S294" colName="基本养老保险" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="shbxjjsr" colId="s284" dataIndex="S284" colName="失业保险" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="shbxjjsr" colId="s283" dataIndex="S283" colName="基本医疗保险" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="shbxjjsr" colId="s285" dataIndex="S285" colName="工伤保险" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="shbxjjsr" colId="s286" dataIndex="S286" colName="生育保险" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="shbxjjsr" colId="s298" dataIndex="S298" colName="其他社保基金" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column colId="xszhj" dataIndex="XSZHJ" colName="附：小税种合计" dataType="2" width="120" isleaf="1" isOrder="1"/>
+		<column  pid="" colId="gtjjss" colName="附录：个体经济税收" dataType="0"  isleaf="0"/>
+		<column  pid="gtjjss" colId="gthj" dataIndex="GTHJ" colName="小计" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="gtjjss" colId="gts101" dataIndex="GTS101" colName="增值税25%" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="gtjjss" colId="gts102" dataIndex="GTS102" colName="营业税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="gtjjss" colId="gts105" dataIndex="GTS105" colName="个人所得税40%" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="gtjjss" colId="gts110" dataIndex="GTS110" colName="城市维护建设税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="" colId="ckts" colName="附录：出口退税" dataType="0"  isleaf="0"/>
+		<column  pid="ckts" colId="tshj" dataIndex="TSHJ" colName="小计" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="ckts" colId="s101010301" dataIndex="S101010301" colName="出口退税" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="ckts" colId="s101010302" dataIndex="S101010302" colName="免抵调" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="" colId="jrbxy" colName="附录：金融保险业" dataType="0"  isleaf="0"/>
+		<column  pid="jrbxy" colId="jrhj" dataIndex="JRHJ" colName="小计" dataType="2" width="100" isleaf="1" isOrder="1"/>
+		<column  pid="jrbxy" colId="jrs102" dataIndex="JRS102" colName="营业税40%" dataType="2" width="100" isleaf="1" isOrder="1"/>
+	    <column  pid="jrbxy" colId="jrs151" dataIndex="JRS151" colName="企业所得税40%" dataType="2" width="100" isleaf="1" isOrder="1"/>
+	    <column colId="xssr" dataIndex="XSSR" colName="销售收入" dataType="2" width="120" isleaf="1" isOrder="1"/>
+	    <column colId="jzc" dataIndex="JZC" colName="净资产" dataType="2" width="120" isleaf="1" isOrder="1"/>
+	    <column colId="jlr" dataIndex="JLR" colName="净利润" dataType="2" width="120" isleaf="1" isOrder="1"/>
+	    <column colId="czfp" dataIndex="CZFP" colName="财政分片"  width="120" isleaf="1" isOrder="1"/>
+	    <column colId="hydl" dataIndex="HYDL" colName="行业大类"  width="120" isleaf="1" isOrder="1"/>
+
+	</columns>
+	<rptData sourceType="1" canPaging="1" defaultPageSize="40" >
+		<sql><![CDATA[
+            select * from (select * from
+            (
+            select
+            SWDJZH,a.MC,round(sum(CZZSR/10000),2) CZZSR,round(sum(DFCZSR/10000),2) DFCZSR,round(sum(ZJDFCZSR/10000),2) ZJDFCZSR,
+            round(sum(DSHJ/10000),2) DSHJ,round(sum(S102/10000),2) S102,round(sum(S151_DS/10000),2) S151_DS,round(sum(S105_DS/10000),2) S105_DS,
+			round(sum(S110/10000),2) S110,round(sum(S108/10000),2) S108,round(sum(S111/10000),2) S111,round(sum(S106/10000),2) S106,round(sum(S115/10000),2) S115,
+			round(sum(S116/10000),2) S116,round(sum(S114/10000),2) S114,round(sum(S174/10000),2) S174,round(sum(S173/10000),2) S173,round(sum(GSHJ/10000),2) GSHJ,
+			round(sum(S101/10000),2) S101,round(sum(S1010101/10000),2) S1010101,round(sum(S1010104/10000),2) S1010104,round(sum(S151_GS/10000),2) S151_GS,
+			round(sum(S103/10000),2) S103,round(sum(DSQTHJ/10000),2) DSQTHJ,round(sum(S161/10000),2) S161,round(sum(S181/10000),2) S181,
+			round(sum(S421/10000),2) S421,round(sum(S418/10000),2) S418,round(sum(S162/10000),2) S162,round(sum(S281/10000),2) S281,
+			round(sum(S321/10000),2) S321,round(sum(JJHJ/10000),2) JJHJ,round(sum(S294/10000),2) S294,round(sum(S284/10000),2) S284,
+			round(sum(S283/10000),2) S283,round(sum(S285/10000),2) S285,round(sum(S286/10000),2) S286,round(sum(S298/10000),2) S298,
+			round(sum(XSZHJ/10000),2) XSZHJ,round(sum(GTHJ/10000),2) GTHJ,round(sum(GTS101/10000),2) GTS101,round(sum(GTS102/10000),2) GTS102,
+			round(sum(GTS105/10000),2) GTS105,round(sum(GTS110/10000),2) GTS110,round(sum(TSHJ/10000),2) TSHJ,round(sum(S101010301/10000),2) S101010301,
+			round(sum(S101010302/10000),2) S101010302,round(sum(JRHJ/10000),2) JRHJ,round(sum(JRS102/10000),2) JRS102,round(sum(JRS151/10000),2) JRS151,
+            round(sum(XSSR/10000),2) XSSR,round(sum(JZC/10000),2) JZC,round(sum(JLR/10000),2) JLR,
+            decode(substr(jjxzbm,1,1),4,1,0) isgt,0 ylbj,C.MC CZFP,H.MC HYDL,a.hybm_dj hybm,a.czfpbm czfpbm
+            from dnft4.bb_srpm_2013 a,BM_CZFP_XS C,BM_HY_XS Y,BM_HY_ZL_XS H
+            where nian={nian} and yue={yue} AND a.czfpbm=c.bm and a.hybm_dj=y.bm and y.zlbm=h.bm
+            group by SWDJZH,a.MC,decode(substr(jjxzbm,1,1),4,1,0),C.MC,H.MC,a.hybm_dj,a.czfpbm
+            union all
+            select
+            SWDJZH,a.MC,
+            round(sum(CZZSR/10000),2) CZZSR,round(sum(DFCZSR/10000),2) DFCZSR,round(sum(ZJDFCZSR/10000),2) ZJDFCZSR,
+            round(sum(DSHJ/10000),2) DSHJ,round(sum(S102/10000),2) S102,round(sum(S151_DS/10000),2) S151_DS,round(sum(S105_DS/10000),2) S105_DS,
+			round(sum(S110/10000),2) S110,round(sum(S108/10000),2) S108,round(sum(S111/10000),2) S111,round(sum(S106/10000),2) S106,
+			round(sum(S115/10000),2) S115,round(sum(S116/10000),2) S116,round(sum(S114/10000),2) S114,round(sum(S174/10000),2) S174,round(sum(S173/10000),2) S173,
+            round(sum(GSHJ/10000),2) GSHJ,round(sum(S101/10000),2) S101,round(sum(S1010101/10000),2) S1010101,round(sum(S1010104/10000),2) S1010104,
+            round(sum(S151_GS/10000),2) S151_GS,round(sum(S103/10000),2) S103,round(sum(DSQTHJ/10000),2) DSQTHJ,round(sum(S161/10000),2) S161,
+			round(sum(S181/10000),2) S181,round(sum(S421/10000),2) S421,round(sum(S418/10000),2) S418,round(sum(S162/10000),2) S162,round(sum(S281/10000),2) S281,
+			round(sum(S321/10000),2) S321,round(sum(JJHJ/10000),2) JJHJ,round(sum(S294/10000),2) S294,round(sum(S284/10000),2) S284,round(sum(S283/10000),2) S283,
+			round(sum(S285/10000),2) S285,round(sum(S286/10000),2) S286,round(sum(S298/10000),2) S298,round(sum(XSZHJ/10000),2) XSZHJ,round(sum(GTHJ/10000),2) GTHJ,
+            round(sum(GTS101/10000),2) GTS101,round(sum(GTS102/10000),2) GTS102,round(sum(GTS105/10000),2) GTS105,round(sum(GTS110/10000),2) GTS110,
+            round(sum(TSHJ/10000),2) TSHJ,round(sum(S101010301/10000),2) S101010301,round(sum(S101010302/10000),2) S101010302,round(sum(JRHJ/10000),2) JRHJ,
+		    round(sum(JRS102/10000),2) JRS102,round(sum(JRS151/10000),2) JRS151,round(sum(XSSR/10000),2) XSSR,round(sum(JZC/10000),2) JZC,
+			round(sum(JLR/10000),2) JLR,
+            decode(substr(jjxzbm,1,1),4,1,0) isgt,1 ylbj,C.MC CZFP,H.MC HYDL,a.hybm_dj hybm,a.czfpbm czfpbm
+            from dnft4.bb_srpm_2013 a,BM_CZFP_XS C,BM_HY_XS Y,BM_HY_ZL_XS H
+            where nian={nian} and yue<={yue} AND a.czfpbm=c.bm and a.hybm_dj=y.bm and y.zlbm=h.bm
+            group by SWDJZH,a.MC,decode(substr(jjxzbm,1,1),4,1,0),C.MC,H.MC,a.hybm_dj,a.czfpbm)
+            where ylbj={bblx} and swdjzh like '%%' and mc like '%%' and czfpbm in ([czfpbm])
+            and hybm in (select distinct bm from
+            (
+            select a.*,level from (select * from  bm_cont_xs  where table_bm='BM_HY') a connect by prior bm =pid start with (pid in ([hybm]) or bm in ([hybm])))
+            where isleaf='1'))
+            where  isgt in ([isgt]) order by CZZSR desc
+
+
+
+
+		]]>
+		</sql>
+	</rptData>
+	<foot  right="制表日期：@zb_nian@年@zb_yue@月@zb_ri@日"  cStyle="footC" lStyle="footL" rStyle="footR"/>
+</report>

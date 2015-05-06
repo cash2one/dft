@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 报表节点，整个文档只有一个，顶级节点。id是报表的唯一标识，name是报表的显示名称 -->
+<report id="yszxqkb" name="预算执行情况表" totalRow="0" totalPosition="0" remoteSort="0">
+	<parameters>
+		<para name="pa_zwrq" desc="账务日期" renderType="3" dateFormat="Ymd"  dataType="int" defaultValue="20130831">
+			
+		</para>
+		
+	</parameters>
+
+        <paraProcesses>
+		<paraPro name="zb_nian" desc="制表年" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'yyyy') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_yue" desc="制表月" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'mm') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_ri" desc="制表日" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'dd') from dual]]></sql>
+		</paraPro>
+		<paraPro name="nian" desc="年份" proMode="1">
+			<sql><![CDATA[SELECT substr({pa_zwrq},1,4) from dual]]></sql>
+		</paraPro>
+                <paraPro name="yue" desc="月份" proMode="1">
+			<sql><![CDATA[SELECT substr({pa_zwrq},5,2) from dual]]></sql>
+		</paraPro>
+	</paraProcesses>
+	<title>@nian@年@yue@月预算执行情况表</title>
+        <head titleInHead="1" style="headTitle">
+        <subTitle/>
+        </head>
+	<columns complex="1" sourceType="0">
+		<column  pid="" colId="mc" dataIndex="MC" colName="收    入    项    目" dataType="0" width="200" isleaf="1"  isOrder="0"/>
+                <column  pid="" colId="yfs" colName="月  份  数" dataType="0" width="150" isleaf="0"/>
+                <column  pid="" colId="ljs" colName="累  计  数" dataType="0" width="150" isleaf="0"/>
+		<column pid="yfs" colId="ylj" dataIndex="YLJ" colName="本月累计" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+		<column pid="yfs" colId="sylj" dataIndex="SYLJ" colName="上年同月" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+		<column pid="yfs" colId="wsy" dataIndex="WSY" colName="为上年%" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+                <column pid="ljs" colId="nlj" dataIndex="NLJ" colName="本年累计" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+		<column pid="ljs" colId="tbs" dataIndex="TBS" colName="预   算" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+                <column pid="ljs" colId="snlj" dataIndex="SNLJ" colName="上年同期" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+                <column pid="ljs" colId="wys" dataIndex="WYS" colName="为预算%" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+                <column pid="ljs" colId="wsn" dataIndex="WSN" colName="为上年%" dataType="2"  width="130" isleaf="1" isOrder="0"/>
+	</columns>
+	<rptData sourceType="1" canPaging="1" defaultPageSize="40" maxSize="100" >
+		<sql><![CDATA[
+
+select mc,round(nlj/10000,2) nlj,round(snlj/10000,2) snlj,round(ylj/10000,2) ylj,round(sylj/10000,2) sylj,
+b.tbs,round(decode(snlj,'0','',nlj/snlj*100),2) wsn,
+round(decode(sylj,'0','',ylj/sylj*100),2) wsy, round(decode(tbs,'0','',nlj/10000/tbs*100),2) wys
+from (
+select v01 xh,v02 mc,n01 nlj,n02 snlj,n03 ylj,n04 sylj
+ from BB_DATA
+ where bb_id='BB_YSZXJD' and ny={pa_zwrq} )a,
+ (select xh,tbs from BB_TB where bb_id='BB_YSZXJD' and nian=substr({pa_zwrq},1,4)) b
+ where a.xh=b.xh
+order by a.xh
+
+		]]>
+		</sql>
+	</rptData>
+<foot left="制表单位:$czfpbm$" right="制表日期：@zb_nian@年@zb_yue@月@zb_ri@日" lStyle="footL" rStyle="footR"/>
+</report>

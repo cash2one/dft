@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report id="jk_daily" name="金库日报表" totalRow="0" totalPosition="0" totalLabelIndex="" totalFields="" >
+<!-- 报表的参数，集中定义。-->
+	<parameters>
+		<para name="start" hidden="1" dataType="int"/>
+		<para name="limit" hidden="1" dataType="int"/> 	
+	  	<para name="skgkdm" desc="国库来源" hidden="0"  renderType="1" autoAll="0" affectCallBack="setZwrq">
+	  		<paraDetail multi="0" leafOnly="1" sourceType="1" >
+				<sql><![CDATA[
+					SELECT TO_CHAR(SKGKDM) BM,MC NAME,1 ISLEAF,'' PID FROM JK
+				]]></sql>
+			</paraDetail>
+	  	</para>
+	  	<para name="zwrq" desc="账务日期" hidden="0"  renderType="2" autoAll="0" affectedByParas="skgkdm">
+	  		<paraDetail multi="0" leafOnly="1" sourceType="1" >
+				<sql><![CDATA[
+					SELECT ZWRQ_YEAR BM,ZWRQ_YEAR||'年' NAME,'' PID,0 ISLEAF FROM YSSR_LOG WHERE SKGKDM_JK={skgkdm}
+					UNION
+					SELECT ZWRQ_MON BM,ZWRQ_MON||'月' NAME,TO_CHAR(ZWRQ_YEAR) PID,0 ISLEAF FROM YSSR_LOG WHERE SKGKDM_JK={skgkdm}
+					UNION
+					SELECT ZWRQ_JK BM,ZWRQ_DAY||'日' NAME,TO_CHAR(ZWRQ_MON) PID,1 ISLEAF FROM YSSR_LOG WHERE SKGKDM_JK={skgkdm}
+				]]></sql>
+			</paraDetail>
+	  	</para>
+	  	<para name="srly" desc="收入来源"  hidden="0"  renderType="1" autoAll="0">	
+	  		<paraDetail multi="0" leafOnly="0" sourceType="1" >
+				<sql><![CDATA[
+					SELECT BM,MC NAME,1 ISLEAF,'' PID FROM BM_CONT WHERE TABLE_BM='BM_JGDM'
+				]]></sql>
+			</paraDetail>
+	  	</para>
+	  	<para name="ysjc" desc="预算级次"  hidden="0"  renderType="1" autoAll="0">	
+	  		<paraDetail multi="0" leafOnly="0" sourceType="1" >
+				<sql><![CDATA[
+					SELECT BM,MC NAME,ISLEAF,PID FROM BM_CONT WHERE TABLE_BM='BM_YSJC_JK'
+				]]></sql>
+			</paraDetail>
+	  	</para>
+	</parameters>	
+
+	<title>国家金库 $skgkdm$ $ysjc$预算收入日报表</title>
+	<columns complex="1" sourceType="0" >
+		<column colId="KMDM" colName="科目代码" dataIndex="KMDM" width="120" />
+	    <column colId="KMMC" colName="科目名称" dataIndex="KMMC" width="180" />
+		<column colId="RLJ" colName="本日发生额" dataIndex="RLJ"  width="100" />
+		<column colId="YLJ" colName="本月发生额" dataIndex="YLJ" width="100" />
+		<column colId="NLJ" colName="本年累计" dataIndex="NLJ" width="100" />
+	</columns>
+		
+	<rptData sourceType="1" canPaging="1" defaultPageSize="40" maxSize="100" pagingMode="0" >
+		<sql><![CDATA[
+		select a.*
+		from (
+		 select kmdm_jk kmdm,b.mc kmmc,sum(rlj_jk) rlj,sum(ylj_jk) ylj,sum(nlj_jk) nlj,kmdm_jk id
+		 from YSSR y,(select * from bm_cont where table_bm='BM_YSKM' and codelevel=4 ) b
+		 where y.kmdm_jk=b.bm
+		   and zwrq_jk= 20130228
+		   and jgdm_jk in ('330127','0' )
+		   --and ysjc_jk in ('1','2')
+		 group by kmdm_jk,b.mc
+		
+		 union
+		  select substr(kmdm_jk,1,5) kmdm,b.mc kmmc,sum(rlj_jk) rlj,sum(ylj_jk) ylj,sum(nlj_jk) nlj,substr(kmdm_jk,1,5) id
+		 from YSSR y,(select * from bm_cont where table_bm='BM_YSKM' and codelevel=3 ) b
+		 where substr(kmdm_jk,1,5)=substr(b.bm,2,5)
+		   and zwrq_jk= 20130228
+		   and jgdm_jk in ('330127','0' )
+		   --and ysjc_jk in ('1','2')
+		 group by substr(kmdm_jk,1,5),b.mc
+		
+		union
+		 select substr(kmdm_jk,1,3) kmdm,
+		    decode(substr(kmdm_jk,1,3),'101','税收税入','102','基金收入','103','非税收入','110','转移性收入') kmmc,
+		    sum(rlj_jk) rlj,sum(ylj_jk) ylj,sum(nlj_jk) nlj,substr(kmdm_jk,1,3) as id
+		 from YSSR
+		 where zwrq_jk= 20130228
+		   and jgdm_jk in ('330127','0')
+		   --and ysjc_jk in ('1','2')
+		 group by substr(kmdm_jk,1,3)
+		
+		union
+		 select '','一般预算收入合计',sum(rlj_jk) as vrlj ,sum(ylj_jk) as vylj,sum(nlj_jk) as vnlj ,'999999990' as id -- 虚拟序位
+		 from yssr
+		 where substr(kmdm_jk,1,3) not in ('102','110')
+		   and zwrq_jk= 20130228
+		   and jgdm_jk in ('330127','0' )
+		   --and ysjc_jk in ('1','2')
+		
+		union
+		 select '','社会保险基金预算收入合计',sum(rlj_jk) as vrlj ,sum(ylj_jk) as vylj,sum(nlj_jk) as vnlj ,'999999991' as id
+		 from yssr
+		 where substr(kmdm_jk,1,3)='102'
+		   and zwrq_jk= 20130228
+		   and jgdm_jk in ('330127','0' )
+		  -- and ysjc_jk in ('1','2')
+		
+		union
+		 select '','其他基金预算收入合计',sum(rlj_jk) as vrlj ,sum(ylj_jk) as vylj,sum(nlj_jk) as vnlj ,'999999992' as id
+		 from yssr
+		 where substr(kmdm_jk,1,5)='10301'
+		   and zwrq_jk= 20130228
+		   and jgdm_jk in ('330127','0' )
+		   --and ysjc_jk in ('1','2')
+		
+		union
+		 select '','转移性收入合计',sum(rlj_jk) as vrlj ,sum(ylj_jk) as vylj,sum(nlj_jk) as vnlj ,'999999993' as id
+		 from yssr
+		 where substr(kmdm_jk,1,3)='110'
+		   and zwrq_jk= 20130228
+		   and jgdm_jk in ('330127','0' )
+		  -- and ysjc_jk in ('1','2')
+		
+		union
+		 select '' kmdm,'合计' kmmc,sum(rlj_jk) rlj,sum(ylj_jk) ylj,sum(nlj_jk) nlj,'999999995' as id
+		 from YSSR
+		 where zwrq_jk= 20130228
+		   and jgdm_jk in ('330127','0' )
+		   --and ysjc_jk in ('1','2')
+		) a
+		order by id
+		]]>
+		</sql>
+	</rptData>
+</report>

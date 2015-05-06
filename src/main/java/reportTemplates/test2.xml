@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="test2" name="测试被链接">
+<parameters>
+	<para name="LFHALFYEAR" hidden="1" bindMode="1" dataType="string"/>
+	<para name="LSHALFYEAR" hidden="1" bindMode="1" dataType="string"/>
+</parameters>
+
+<title>测试链接表</title>
+<columns complex="1" sourceType="0">
+<!-- autoIndex是一个特殊的列，顺序号，由引擎自动生成 --> 
+	<column dataType="1" renderer="" colId="autoIndex" dataIndex="autoIndex" colName="序号" width="40" pid="" isleaf="1"/> 
+	<column dataType="2" renderer="regMoney" colId="FHalf" dataIndex="FHALFYEAR" colName="去年上半年税收" width="80" />
+	<column dataType="2" renderer="regMoney" colId="SHalf" dataIndex="SHALFYEAR" colName="去年下半年税收" width="80" />
+</columns>
+<rptData sourceType="1" canPaging="0" defaultPageSize="30" >
+	<sql><![CDATA[select {LFHALFYEAR} FHALFYEAR,{LSHALFYEAR} SHALFYEAR from dual
+		]]>
+	</sql>
+</rptData>
+</report>
+

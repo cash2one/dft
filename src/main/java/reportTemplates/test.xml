@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="test" name="测试" description="税收收入列表，按月统计各种税种收入及财政贡献。" multiUnit="1" defaultUnit="wan2Decimals" supportUnits='wan2Decimals,yi2Decimals'>
+<parameters>
+	
+	<para name="czfpbm" desc="乡镇" hidden="0" renderType="2" dataType="string">
+		<paraDetail multi="1" leafOnly="0" sourceType="1">
+			<sql><![CDATA[
+				SELECT A.BM,MC NAME,PID,ISLEAF FROM BM_CONT A   WHERE A.TABLE_BM='BM_CZFP'
+				]]></sql>
+		</paraDetail>
+	</para>
+
+</parameters>
+
+<title>$czfpbm$测试表一{year}</title>
+<columns complex="1" sourceType="0">
+<!-- autoIndex是一个特殊的列，顺序号，由引擎自动生成 --> 
+	<column dataType="1" renderer="" colId="autoIndex" dataIndex="autoIndex" colName="序号" width="40" pid="" isleaf="1"/> 
+	<column colId="ename" dataIndex="ENAME" colName="单位名称" width="120" pid=""/>
+	<column colId="cYear" colName="当年税收收入" width="120" pid="" isleaf="0"/>
+	<column dataType="2" renderer="regMoney" colId="cFHalf" dataIndex="CFHALFYEAR" colName="上半年税收" width="80" pid="cYear" isMultiUnit="1" isLink="1" linkParams="LFHALFYEAR,LSHALFYEAR" linkTo="test2"/>
+	<column dataType="2" renderer="regMoney" colId="cSHalf" dataIndex="CSHALFYEAR" colName="下半年税收" width="80" pid="cYear" isMultiUnit="1"/>
+	<column colId="lYear" colName="去年税收收入" width="120" pid="" isleaf="0" isMultiUnit="1"/>
+	<column dataType="2" renderer="regMoney" colId="lFHalf" dataIndex="LFHALFYEAR" colName="去年上半年税收" width="80" pid="lYear"/>		
+	<column dataType="2" renderer="regMoney" colId="lSHalf" dataIndex="LSHALFYEAR" colName="去年下半年税收" width="80" pid="lYear"/>
+	<column colId="growRace" colName="增长比例" width="120" pid="" isleaf="0"/>
+	<column dataType="2" renderer="reg2Decimal" colId="fhGR" colName="上半年同比增长" width="80" pid="growRace" calculate_mode="9" colFunction="(r.data.CFHALFYEAR-r.data.LFHALFYEAR)*100/r.data.LFHALFYEAR"/>		
+	<column dataType="2" renderer="reg2Decimal" colId="lhGR" colName="下半年同比增长" width="80" pid="growRace" calculate_mode="9" colFunction="(r.data.CSHALFYEAR-r.data.LSHALFYEAR)*100/r.data.LSHALFYEAR"/>		
+</columns>
+<rptData sourceType="1" canPaging="1" defaultPageSize="30" >
+	<sql><![CDATA[select cf.swdjzh,cf.ename,cf.ee as cFhalfYear,cs.ee as cShalfYear,lf.ee as lFhalfYear,ls.ee as lShalfYear from
+		(select a.swdjzh,b.mc as ename,sum(se) as ee from RTK a,dj_cz b
+		where a.czfpbm='0801' and  rkrq>=20130101 and rkrq<=20130131 and a.swdjzh=b.swdjzh
+		group by a.swdjzh,b.mc)cf,(select c.swdjzh,d.mc as ename,sum(se) as ee from RTK c,dj_cz d
+		where c.czfpbm='0801' and  rkrq>=20130201 and rkrq<=20130231 and c.swdjzh=d.swdjzh
+		group by c.swdjzh,d.mc)cs,
+		(select e.swdjzh,f.mc as ename,sum(se) as ee from RTK e,dj_cz f
+		where e.czfpbm='0801' and  rkrq>=20120101 and rkrq<=20120131 and e.swdjzh=f.swdjzh
+		group by e.swdjzh,f.mc)lf,
+		(select r.swdjzh,t.mc as ename,sum(se) as ee from RTK r,dj_cz t
+		where r.czfpbm='0801' and  rkrq>=20120201 and rkrq<=20120231 and r.swdjzh=t.swdjzh
+		group by r.swdjzh,t.mc)ls
+		where cf.swdjzh=cs.swdjzh and cf.swdjzh=lf.swdjzh and cf.swdjzh=ls.swdjzh
+		]]>
+	</sql>
+</rptData>
+</report>
+

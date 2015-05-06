@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="aidTotal" name="财政局企业财务与国资管理科拨款登记表">
+<description><![CDATA[财政局企业财务与国资管理科拨款登记表。]]></description>
+<parameters>
+	<para name="start" hidden="1" dataType="int"/>
+	<para name="limit" hidden="1" dataType="int"/>
+	<para name="iid" desc="项目" hidden="0" renderType="2" dataType="string" >
+		<paraDetail multi="1" leafOnly="1" sourceType="1">
+			<sql><![CDATA[
+				SELECT ID BM,MC NAME, ISLEAF, PID from items order by id
+				]]></sql>
+		</paraDetail>
+	</para>
+	<para name="zjtype" desc="资金类型" hidden="0" renderType="1" defaultRule="_first">
+		<paraDetail multi="0" sourceType="1">
+			<sql><![CDATA[
+				select '' BM,'全部' NAME from dual union
+				select BM,MC NAME from BM_CONT where table_bm='BM_ZJTYPE'
+				order by bm desc
+				]]></sql>
+		</paraDetail>
+	</para>
+	<para name="dep" desc="主管部门" hidden="0" renderType="1" defaultRule="_first">
+		<paraDetail multi="0" sourceType="1">
+			<sql><![CDATA[
+				select '' BM,'全部' NAME from dual union
+				select BM,MC NAME  from BM_CONT where table_bm='BM_DEP'
+				order by bm desc
+				]]></sql>
+		</paraDetail>
+	</para>
+	<para name="lzqd" desc="列支渠道" hidden="0" renderType="2" defaultRule="_first">
+		<paraDetail multi="1" sourceType="1">
+			<sql><![CDATA[
+				select '-1' BM,'全部' NAME,1 isleaf,'' pid from dual union
+				select BM,MC NAME,ISLEAF,PID  from BM_CONT where table_bm='BM_LZQD'
+				order by bm asc
+				]]></sql>
+		</paraDetail>
+	</para>
+	<para name="pfileno" desc="支付依据" renderType="0" dataType="string"/>
+	<para name="pdate" desc="支付日期" renderType="3" dateFormat="Y-m-d"/>
+</parameters>
+<title>财政局企业财务与国资管理科拨款登记表</title>
+<columns complex="0" sourceType="0">
+	<column colId="iname" dataIndex="INAME" colName="项目名称" width="150" isGroup="1"/>
+	<column colId="zjtype" dataIndex="ZJTYPE" colName="资金类型" width="110" isGroup="1"/>
+	<column colId="dep" dataIndex="DEP" colName="主管部门" width="120" isGroup="1"/>		
+	<column colId="pfileno" dataIndex="PFILENO" colName="支付依据" width="100" isGroup="1"/>
+	<column colId="qymc" dataIndex="QYMC" colName="受款单位" width="120" />		
+	<column colId="lzqdmc" dataIndex="LZQDMC" colName="列支渠道" width="120" isGroup="1"/>	
+	<column colId="je" dataIndex="JE" colName="金额" width="100" dataType="2"/>
+	<column colId="hj" dataIndex="HJ" colName="合计" width="120" dataType="2" isGroup="1"/>		
+	<column colId="pdate" dataIndex="PDATE" colName="支付日期" width="100" isGroup="1"/>
+	<column colId="kmmc" dataIndex="KMMC" colName="科目" width="120" isGroup="1"/>
+		
+</columns>
+<rptData sourceType="2" canPaging="1" defaultPageSize="40" maxSize="100" >
+	<procedure name="PKG_AID.QUERYAIDTOTAL" totalIndex="1" datasetIndex="2">
+		<in referMode="1" referTo="iid"/>
+		<in referMode="1" referTo="zjtype"/>
+        <in referMode="1" referTo="dep"/>
+		<in referMode="1" referTo="pfileno"/>
+        <in referMode="1" referTo="pdate"/>
+        <in referMode="1" referTo="lzqd"/>
+		<in referMode="1" referTo="start"/>
+		<in referMode="1" referTo="limit"/>
+		<out dataType="1"/>
+		<out dataType="3"/>
+	</procedure>
+</rptData>
+</report>
+

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+<display-name>DNFT</display-name>
+
+<context-param>
+	<param-name>contextConfigLocation</param-name>
+	<param-value>classpath*:conf/applicationContext*.xml</param-value>
+</context-param>
+
+<filter>
+    <filter-name>encodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+        <param-name>encoding</param-name>
+        <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+        <param-name>forceEncoding</param-name>
+        <param-value>true</param-value>
+    </init-param>
+</filter>
+<filter-mapping>
+    <filter-name>encodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
+
+<listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+</listener>
+<listener>  
+    <listener-class>com.ifugle.dft.utils.AppContextListener</listener-class>  
+</listener> 
+<listener> 
+	<listener-class>com.fruit.query.util.InitTemplatesListener</listener-class> 
+</listener>
+<servlet>
+	<servlet-name>query</servlet-name>
+	<servlet-class>com.fruit.query.servlet.QueryReportServlet</servlet-class>
+</servlet>
+<servlet>
+	<servlet-name>design</servlet-name>
+	<servlet-class>com.fruit.query.servlet.DesignReportServlet</servlet-class>
+</servlet>
+<servlet>  
+    <servlet-name>baseServlet</servlet-name>  
+    <servlet-class>com.ifugle.dft.servlet.BaseServlet</servlet-class>  
+</servlet>
+<servlet>  
+    <servlet-name>DjnServlet</servlet-name>  
+    <servlet-class>com.softwarementors.extjs.djn.servlet.DirectJNgineServlet</servlet-class>  
+    <init-param>  
+        <param-name>debug</param-name>  
+        <param-value>true</param-value>  
+    </init-param>  
+    <init-param>  
+        <param-name>minify</param-name>  
+        <param-value>true</param-value>  
+    </init-param>  
+    <init-param>  
+        <param-name>providersUrl</param-name>  
+        <param-value>djn/directprovider</param-value>  
+    </init-param>  
+    <init-param>  
+        <param-name>batchRequestsMultithreadingEnabled</param-name>  
+        <param-value>false</param-value>  
+    </init-param>  
+	<init-param>
+		<param-name>apis</param-name>  
+        <param-value>check,sys,treasury,utils,query,datapro</param-value>  
+    </init-param>  
+    <init-param>  
+        <param-name>check.apiFile</param-name>  
+        <param-value>js/check.js</param-value>  
+    </init-param> 
+    <init-param>  
+        <param-name>sys.apiFile</param-name>  
+        <param-value>js/sys.js</param-value>  
+    </init-param> 
+    <init-param>  
+        <param-name>treasury.apiFile</param-name>  
+        <param-value>js/treasury.js</param-value>  
+    </init-param> 
+    <init-param>  
+        <param-name>utils.apiFile</param-name>  
+        <param-value>js/utils.js</param-value>  
+    </init-param> 
+    <init-param>  
+        <param-name>query.apiFile</param-name>  
+        <param-value>js/query.js</param-value>  
+    </init-param> 
+    <init-param>  
+        <param-name>datapro.apiFile</param-name>  
+        <param-value>js/datapro.js</param-value>  
+    </init-param> 
+    <init-param>  
+        <param-name>check.apiNamespace</param-name>  
+        <param-value>Ext.ck</param-value>  
+    </init-param>
+    <init-param>  
+        <param-name>sys.apiNamespace</param-name>  
+        <param-value>Ext.sys</param-value>  
+    </init-param> 
+    <init-param>  
+        <param-name>treasury.apiNamespace</param-name>  
+        <param-value>Ext.treasury</param-value>  
+    </init-param>
+    <init-param>  
+        <param-name>utils.apiNamespace</param-name>  
+        <param-value>Ext.utils</param-value>  
+    </init-param>
+    <init-param>  
+        <param-name>query.apiNamespace</param-name>  
+        <param-value>Ext.query</param-value>  
+    </init-param>
+    <init-param>  
+        <param-name>datapro.apiNamespace</param-name>  
+        <param-value>Ext.datapro</param-value>  
+    </init-param>
+    <init-param>  
+        <param-name>check.classes</param-name>  
+        <param-value>
+        	com.ifugle.dft.check.handler.CheckHandler,
+        	com.ifugle.dft.check.handler.EnHandler,
+        	com.ifugle.dft.income.handler.IncomeHandler
+        </param-value>
+    </init-param>
+    <init-param>  
+        <param-name>sys.classes</param-name>  
+        <param-value>
+        com.ifugle.dft.system.handler.MaintainHandler,
+        com.ifugle.dft.system.handler.CodeHandler
+        </param-value>
+    </init-param> 
+    <init-param>  
+        <param-name>treasury.classes</param-name>  
+        <param-value>
+        	com.ifugle.dft.treasury.handler.TreasuryHandler
+        </param-value>
+    </init-param> 
+    <init-param>  
+        <param-name>utils.classes</param-name>  
+        <param-value>
+        	com.ifugle.dft.check.handler.EnCollectionHandler
+        </param-value>
+    </init-param> 
+    <init-param>  
+        <param-name>query.classes</param-name>  
+        <param-value>
+        	com.ifugle.dft.query.handler.QueryHandler
+        </param-value>
+    </init-param> 
+    <init-param>  
+        <param-name>datapro.classes</param-name>  
+        <param-value>
+        	com.ifugle.dft.datapro.handler.DataHandler
+        </param-value>
+    </init-param>    
+    <load-on-startup>1</load-on-startup>  
+</servlet>  
+<servlet-mapping>  
+    <servlet-name>DjnServlet</servlet-name>  
+    <url-pattern>/djn/directprovider/*</url-pattern>  
+</servlet-mapping>
+<servlet-mapping>  
+    <servlet-name>baseServlet</servlet-name>  
+    <url-pattern>*.mt</url-pattern>  
+</servlet-mapping>  
+<servlet-mapping >
+	<servlet-name>query</servlet-name>
+	<url-pattern>*.query</url-pattern>
+</servlet-mapping>
+<servlet-mapping >
+	<servlet-name>design</servlet-name>
+	<url-pattern>*.design</url-pattern>
+</servlet-mapping>
+<welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+</welcome-file-list>
+<session-config>  
+    <session-timeout>0</session-timeout>  
+</session-config> 
+</web-app>

@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 报表节点，整个文档只有一个，顶级节点。id是报表的唯一标识，name是报表的显示名称 -->
+<report id="dfczsrafpfltjb" name="地方财政收入按财政分片统计" totalRow="0" totalPosition="0" remoteSort="0" multiUnit="1" defaultUnit="yuan2Decimals">
+	<parameters>
+		<para name="pa_ny" desc="年月" renderType="2" dataType="int" defaultRule="_first">
+			<paraDetail multi="0" leafOnly="1" sourceType="1"  >
+				<sql><![CDATA[
+					SELECT A.*,substr(BM,1,4)||'年'||substr(bm,5,2)||'月' NAME FROM(SELECT DISTINCT(TO_CHAR(NY))BM,1 ISLEAF,'' PID FROM BB_SRTJ )A ORDER BY BM DESC
+
+				]]></sql>
+			</paraDetail>
+		</para>
+		<para name="pa_lx" desc="类型" renderType="1" dataType="int" defaultRule="_first">
+			<paraDetail multi="0" sourceType="0" >
+				<paraItems>
+					<item bm="0" name="月报" isleaf="1" pid=""/>
+					<item bm="1" name="累报"/>
+				</paraItems>
+			</paraDetail>
+		</para>
+         <para name="pDw" desc="单位" renderType="1" dataType="int" defaultRule="_first">
+			<paraDetail multi="0" sourceType="0"  >
+				<paraItems>
+					<item bm="1" name="元" isleaf="1" pid=""/>
+					<item bm="10000" name="万元"/>
+				</paraItems>
+			</paraDetail>
+		</para>
+         </parameters>
+         <paraProcesses>
+		<paraPro name="zb_nian" desc="制表年" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'yyyy') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_yue" desc="制表月" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'mm') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_ri" desc="制表日" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'dd') from dual]]></sql>
+		</paraPro>
+	</paraProcesses>
+	<title>$pa_ny$地方财政收入按财政分片统计</title>
+          <head titleInHead="1" style="headTitle" height='60' >
+	<subTitle right=" " cStyle="subTitleC" lStyle="subTitleL" rStyle="subTitleR"/>
+        </head>
+	<columns >
+		<column colId="mc" dataIndex="MC" colName="税种" dataType="0" width="160" isleaf="1"  isOrder="0"/>
+        <column  pid="" colId="hjs" colName="合       计" dataType="0" width="150" isleaf="0"/>
+        <column  pid="" colId="kfq" colName="开发区本级" dataType="0" width="150" isleaf="0"/>
+        <column  pid="" colId="xx" colName="下沙街道" dataType="0" width="150" isleaf="0"/>
+        <column  pid="" colId="by" colName="白杨街道" dataType="0" width="150" isleaf="0"/>
+		<column  pid="hjs" colId="hj" dataIndex="HJ" colName="本年数" dataType="2"  width="100" isleaf="1" isOrder="0" isMultiUnit="1"/>
+		<column  pid="hjs" colId="snhj" dataIndex="SNHJ" colName="上年同期" dataType="2"  width="100" isleaf="1" isOrder="0" isMultiUnit="1"/>
+		<column  pid="hjs" colId="hjzf" dataIndex="HJZF" colName="增减额" dataType="2"  width="100" isleaf="1" isOrder="0" />
+        <column  pid="kfq" colId="bj" dataIndex="BJ" colName="本年数" dataType="2"  width="100" isleaf="1" isOrder="0" isMultiUnit="1"/>
+		<column  pid="kfq" colId="snbj" dataIndex="SNBJ" colName="上年同期" dataType="2"  width="100" isleaf="1" isOrder="0" isMultiUnit="1"/>
+		<column  pid="kfq" colId="bjzf" dataIndex="BJZF" colName="增减额" dataType="2"  width="100" isleaf="1" isOrder="0" isMultiUnit="1"/>
+        <column  pid="xx" colId="xxjd" dataIndex="XXJD" colName="本年数" dataType="2"  width="100" isleaf="1" isOrder="0" isMultiUnit="1"/>
+		<column  pid="xx" colId="snxxjd" dataIndex="SNXXJD" colName="上年同期" dataType="2"  width="100" isleaf="1" isOrder="0"/>
+		<column  pid="xx" colId="xxjdzf" dataIndex="XXJDZF" colName="增减额" dataType="2"  width="100" isleaf="1" isOrder="0" />
+        <column  pid="by" colId="byjd" dataIndex="BYJD" colName="本年数" dataType="2"  width="100" isleaf="1" isOrder="0" />
+		<column  pid="by" colId="snbyjd" dataIndex="SNBYJD" colName="上年同期" dataType="2"  width="100" isleaf="1" isOrder="0" />
+		<column  pid="by" colId="byjdzf" dataIndex="BYJDZF" colName="增减额" dataType="2"  width="100" isleaf="1" isOrder="0" />
+                
+	</columns>
+	<rptData sourceType="1" canPaging="1" defaultPageSize="40" maxSize="100" >
+		<sql><![CDATA[
+          select a.*,round(decode(snhj,0,0,(hj-snhj)/snhj*100),2) HJZF , round(decode(SNBJ,0,0,(BJ-SNBJ)/SNBJ*100),2) BJZF,
+   round(decode(SNXXJD,0,0,(XXJD-SNXXJD)/SNXXJD*100),2) XXJDZF,  round(decode(SNBYJD,0,0,(BYJD-SNBYJD)/SNBYJD*100),2) BYJDZF
+       FROM(
+       select 
+         szbm,mc,round(sum(hj/{pDw}),2) HJ , round(sum(snhj/{pDw}),2) SNHJ,round(sum(bj/{pDw}),2) BJ,round(sum(snbj/{pDw}),2) SNBJ,round(sum(xxjd/{pDw}),2) XXJD,round(sum(snxxjd/{pDw}),2) SNXXJD,round(sum(byjd/{pDw}),2) BYJD,round(sum(snbyjd/{pDw}),2) SNBYJD
+
+       from(
+
+
+               select a.szbm szbm,b.mc mc,sum(v003) hj,0 snhj,sum(decode(czfpbm,'801',v003,'0')) bj,0 snbj,
+               sum(decode(czfpbm,'802',v003,'0')) xxjd,0 snxxjd,sum(decode(czfpbm,'803',v003,'0')) byjd,0 snbyjd
+               from bb_srtj a,bm_sz b
+               where ny={pa_ny} and lxbm={pa_lx} and a.szbm=b.bm
+               group by a.szbm, b.mc
+               union all
+               select a.szbm szbm,b.mc mc,0 hj,sum(v003) snhj,0 bj,sum(decode(czfpbm,'801',v003,'0')) snbj,
+               0 xxjd,sum(decode(czfpbm,'802',v003,'0')) snxxjd,0 byjd,sum(decode(czfpbm,'803',v003,'0')) snbyjd
+               from bb_srtj a,bm_sz b
+               where ny={pa_ny}-10000 and lxbm={pa_lx} and a.szbm=b.bm
+               group by a.szbm, b.mc
+               union all
+               select  9999 szbm,'合计' mc,sum(v003) hj,0 snhj,sum(decode(czfpbm,'801',v003,'0')) bj,0 snbj,
+               sum(decode(czfpbm,'802',v003,'0')) xxjd,0 snxxjd,sum(decode(czfpbm,'803',v003,'0')) byjd,0 snbyjd
+               from bb_srtj a,bm_sz b
+               where ny={pa_ny} and lxbm={pa_lx} and a.szbm=b.bm
+               union all
+               select 9999 szbm,'合计' mc,0 hj,sum(v003) snhj,0 bj,sum(decode(czfpbm,'801',v003,'0')) snbj,
+               0 xxjd,sum(decode(czfpbm,'802',v003,'0')) snxxjd,0 byjd,sum(decode(czfpbm,'803',v003,'0')) snbyjd
+               from bb_srtj a,bm_sz b
+               where ny={pa_ny}-10000 and lxbm={pa_lx} and a.szbm=b.bm
+                 )
+                   group by szbm,mc
+                 order by szbm,mc
+                 )
+                 a
+
+               order by a.szbm,a.mc desc
+        ]]>
+		</sql>
+	</rptData>
+<foot  right="制表日期：@zb_nian@年@zb_yue@月@zb_ri@日"  cStyle="footC" lStyle="footL" rStyle="footR"/>
+</report>

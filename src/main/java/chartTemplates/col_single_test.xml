@@ -1,0 +1,10 @@
+<chart caption='各分片核定情况' xAxisName='分片' yAxisName='户数' showValues='0' numberPrefix=''>
+    <styles>
+    	<definition>
+    		<style name='CanvasAnim' type='animation' param='_xScale' start='0' duration='1'/>
+    	</definition>
+    	<application>
+        	<apply toObject='Canvas' styles='CanvasAnim'/>
+        </application>   
+    </styles>
+</chart> 

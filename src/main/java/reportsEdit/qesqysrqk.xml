@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="qesqysrqk" name="开发区财政收入前20位企业收入情况" description="开发区财政收入前20位企业收入情况" >
+	<parameters>
+		<para name="nian" desc="年度" hidden="0" renderType="1" dataType="1" validates="v_notNull">
+		<paraDetail multi="0" sourceType="0">
+			<paraItems>
+				<item bm="2013" name="2013年" pid="" isDefault='1'/>
+				<item bm="2014" name="2014年" pid=""/>
+			</paraItems>
+		</paraDetail>
+		</para>
+		<para name="yue" desc="月份" hidden="0" renderType="1" dataType="1" validates="v_notNull">
+			<paraDetail multi="0" sourceType="0">
+				<paraItems>
+					<item bm="1" name="一月" pid=""  isDefault='1'/>
+					<item bm="2" name="二月" pid=""/>
+					<item bm="3" name="三月" pid=""/>
+					<item bm="4" name="四月" pid=""/>
+					<item bm="5" name="五月" pid=""/>
+					<item bm="6" name="六月" pid=""/>
+					<item bm="7" name="七月" pid=""/>
+					<item bm="8" name="八月" pid=""/>
+					<item bm="9" name="九月" pid=""/>
+					<item bm="10" name="十月" pid=""/>
+					<item bm="11" name="十一月" pid=""/>
+					<item bm="12" name="十二月" pid=""/>
+				</paraItems>
+			</paraDetail>
+		</para>
+	</parameters>
+	<paraProcesses>
+		<paraPro name="zb_nian" desc="制表年" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'yyyy') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_yue" desc="制表月" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'mm') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_ri" desc="制表日" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'dd') from dual]]></sql>
+		</paraPro>
+		<!-->
+		<paraPro name="sh_mc2" proMode="2">
+			<procedure name="PKG_DNFT_PJB.P_CZFP_QX" outPutInfoIndex="1">
+				<in referMode="1" referTo="userid"/>
+			</procedure>
+		</paraPro>
+		<paraPro name="sh_mc" proMode="3">
+			<class path="com.datanew.query.ParaProcessImp"/>	
+		</paraPro>-->
+	</paraProcesses>
+	<title>$nian$$yue$开发区财政收入前20位企业收入情况</title>
+	<head titleInHead="1" style="headTitle" height='60' >
+	<subTitle right="单位:万元" cStyle="subTitleC" lStyle="subTitleL" rStyle="subTitleR"/>
+    </head>
+	<columns complex="1" sourceType="0">
+		<!--><column dataType="1" renderer="" colId="autoIndex" dataIndex="autoIndex" colName="序号" width="40" pid="" isleaf="1"/>-->
+		<column colId="xh" dataIndex="XH" colName="序号"  width="100" isleaf="1" isOrder="1"/>
+		<column colId="mc" dataIndex="MC" colName="企业名称" dataType="0" width="200" isleaf="1" isOrder="1"/>
+		<column colId="dl" dataIndex="DL" colName="本年财政收入" dataType="0" width="100" isleaf="1" isOrder="1"/>
+		<column colId="sl" dataIndex="SL" colName="去年同期数" dataType="0" width="100" isleaf="1" isOrder="1"/>
+		<column colId="zje" dataIndex="ZJE" colName="增减额" dataType="0" width="100" isleaf="1" isOrder="1"/>
+		<column colId="zf" dataIndex="ZF" colName="增幅" dataType="0" width="100" isleaf="1" isOrder="1"/>
+	</columns>
+	<rptData sourceType="1" canPaging="1" defaultPageSize="40" >
+	<sql><![CDATA[
+select * from (
+select r.xh,d.mc,r.dl,r.sl,r.zje,r.zf from (
+select d.xh,d.swdjzh,d.czzsr dl,s.czzsr sl,d.czzsr-s.czzsr zje,round(decode(s.czzsr,0,0,(d.czzsr-s.czzsr)/s.czzsr*100),2)||'%' zf
+from(
+select rownum xh,swdjzh,czzsr
+from (select swdjzh,sum(czzsr) czzsr
+from rtk_ylb
+where nian={nian} and yue={yue} and ylbj=1 and mc is not null
+group by swdjzh
+order by czzsr desc)
+where rownum<21) d,
+(select swdjzh,sum(czzsr) czzsr from rtk_ylb where nian={nian}-1 and yue={yue} and ylbj=1 and mc is not null group by swdjzh) s
+where d.swdjzh=s.swdjzh(+)
+ ) r,tmp_dj d
+where r.swdjzh=d.swdjzh
+union all
+select 21 xh,'合计' mc,sum(dl) dl,sum(sl) sl,sum(dl)-sum(sl) zje,round(decode(sum(sl),0,0,(sum(dl)-sum(sl))/sum(sl)*100),2)||'%' zf
+from(
+select r.xh,d.mc,r.dl,r.sl,r.zje,r.zf from (
+select d.xh,d.swdjzh,d.czzsr dl,s.czzsr sl,d.czzsr-s.czzsr zje,round(decode(s.czzsr,0,0,(d.czzsr-s.czzsr)/s.czzsr*100),2)||'%' zf
+from(
+select rownum xh,swdjzh,czzsr
+from (select swdjzh,sum(czzsr) czzsr
+from rtk_ylb
+where nian={nian} and yue={yue} and ylbj=1 and mc is not null
+group by swdjzh
+order by czzsr desc)
+where rownum<21) d,
+(select swdjzh,sum(czzsr) czzsr from rtk_ylb where nian={nian}-1 and yue={yue} and ylbj=1 and mc is not null group by swdjzh) s
+where d.swdjzh=s.swdjzh(+)
+ ) r,tmp_dj d
+where r.swdjzh=d.swdjzh) )
+order by xh
+		]]>
+	</sql>
+</rptData>
+	<foot  right="制表日期：@zb_nian@年@zb_yue@月@zb_ri@日"  cStyle="footC" lStyle="footL" rStyle="footR"/>
+</report>

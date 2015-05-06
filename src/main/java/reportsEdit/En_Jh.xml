@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="_sys_enJh" name="集合测试" >
+<parameters>
+	<para name="xh" desc="乡镇" hidden="1" bindMode="1"  bindTo="xh"/>
+</parameters>
+<title>集合</title>
+<columns complex="0" sourceType="0">
+	<column colId="mc" dataIndex="MC" colName="集合单位名称" width="150" />
+	<column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="110" />
+	<column colId="dz" dataIndex="DZ" colName="地址" width="120" />		
+</columns>
+<rptData sourceType="1" canPaging="0">
+	<sql><![CDATA[select swdjzh,mc,dz,fddbr, czfpbm from DJ_CZ 
+	where xh={xh}
+	]]>
+	</sql>
+</rptData>
+</report>
+

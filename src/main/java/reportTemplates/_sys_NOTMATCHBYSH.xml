@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report id="_sys_NOTMATCHBYSH" name="税号未匹配企业" >
+<parameters>
+	<para name="userid" hidden="1" bindTo="userid" bindMode="2" dataType="string"/>
+</parameters>
+<title>税号未匹配企业</title>
+<columns complex="0" sourceType="0">
+	<column colId="xh" dataIndex="XH" colName="原始行号" width="100" />
+	<column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="150" />
+</columns>
+<rptData sourceType="1" canPaging="0">
+	<sql><![CDATA[
+	select swdjzh,xh from match_enterprise where s_id={userid} and qymc is null
+	order by xh  
+		]]>
+	</sql>
+</rptData>
+</report>
+

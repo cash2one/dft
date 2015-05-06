@@ -1,0 +1,12 @@
+mvn install:install-file -DgroupId=com.oracle -DartifactId=ojdbc14 -Dversion=9.0.2.0.0 -Dpackaging=jar -Dfile=ojdbc.jar -DgeneratePom=true
+mvn install:install-file -DgroupId=com.oracle -DartifactId=ojdbc5 -Dversion=11.2.0.1.0 -Dpackaging=jar -Dfile=ojdbc5.jar -DgeneratePom=true
+mvn install:install-file -DgroupId=com.google -DartifactId=gson -Dversion=1.3 -Dpackaging=jar -Dfile=gson.jar -DgeneratePom=true
+mvn install:install-file -DgroupId=com.yahoo.platform -DartifactId=yuicompressor -Dversion=2.4.2 -Dpackaging=jar -Dfile=yuicompressor.jar -DgeneratePom=true
+mvn install:install-file -DgroupId=com.softwarementors.extjs -DartifactId=directjngine -Dversion=1.3 -Dpackaging=jar -Dfile=directjngine.jar -DgeneratePom=true
+
+mvn install:install-file -DgroupId=jargs.gun -DartifactId=jargs -Dversion=1.0 -Dpackaging=jar -Dfile=jargs.jar -DgeneratePom=true
+mvn install:install-file -DgroupId=org.mozilla -DartifactId=rhino -Dversion=1.6R7 -Dpackaging=jar -Dfile=rhino.jar -DgeneratePom=true
+mvn install:install-file -DgroupId=org.json -DartifactId=json -Dversion=1.0 -Dpackaging=jar -Dfile=json.jar -DgeneratePom=true
+
+mvn install:install-file -DgroupId=com.lowagie -DartifactId=itextasian -Dversion=1.0 -Dpackaging=jar -Dfile=iTextAsianCmaps.jar -DgeneratePom=true
+mvn install:install-file -DgroupId=com.itextpdf -DartifactId=itextpdf -Dversion=5.0.4 -Dpackaging=jar -Dfile=itextpdf.jar -DgeneratePom=true
