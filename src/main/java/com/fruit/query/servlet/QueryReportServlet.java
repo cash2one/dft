@@ -104,6 +104,17 @@ public class QueryReportServlet extends HttpServlet{
 					rpt=TemplatesLoader.getTemplatesLoader().getReportTemplate(rptID);
 					if(rpt!=null){
 						Map paraVals=(Map)request.getSession().getAttribute("paraVals");
+						//如果远程排序，还有排序参数
+						if(rpt.getRemoteSort()==1){
+							String sVal=request.getParameter("sort");
+							if(sVal!=null&&!"".equals(sVal)){
+								paraVals.put("sort",  new ParaValue(sVal,sVal));
+							}
+							sVal=request.getParameter("dir");
+							if(sVal!=null&&!"".equals(sVal)){				
+								paraVals.put("dir", new ParaValue(sVal,sVal));
+							}
+						}
 						DataDefine df=rpt.getDefaultDataDef();
 						DataSet ds=null;
 						RptDataJsonParser parser=RptDataJsonParser.getRptDataParser();

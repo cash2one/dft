@@ -1,4 +1,5 @@
 package com.fruit.query.view;
+import org.apache.commons.lang.StringUtils;
 import org.json.*;
 
 import java.sql.Connection;
@@ -308,7 +309,7 @@ public class RptDataJsonParser {
 			
 			for(int i=0;i<items.size();i++){
 				OptionItem oi=(OptionItem)items.get(i);
-				if("".equals(oi.getPid())){
+				if(StringUtils.isEmpty(oi.getPid())){
 					jItems.put(parseOptionItem(items,oi));
 				}
 			}

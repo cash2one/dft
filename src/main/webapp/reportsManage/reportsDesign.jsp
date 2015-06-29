@@ -183,6 +183,25 @@ var grid = new Ext.grid.GridPanel({
         handler : function(){
         	productWin.show();
 		}
+	},{
+		text: '导入',
+		iconCls: 'icon-down',
+        handler : function(){
+			excelWin.show();
+		}
+	},{
+		text: '导出',
+		iconCls: 'icon-up',
+        handler : function(){
+			var records = grid.getSelectionModel().getSelections();
+		    if(!records||records.length<1){
+				Ext.Msg.alert("提示","请先选择要导出的报表设计模板!");
+				return;
+			}
+		    cRid = records[0].get("id");
+		    var expUrl='getRptTemplate.design?doType=export&rptId='+cRid;
+	        window.open(expUrl,"","scrollbars=auto,toolbar=yes,location=no,directories=no,status=no,menubar=yes,resizable=yes,width=780,height=500,left=10,top=50");
+		}
 	}],
 	bbar: new Ext.PagingToolbar({
         pageSize: 20,
@@ -607,6 +626,88 @@ edtWin.on("show",function(){
 	loadChartForm();
 	loadExportForm();
 });
+//报表模板导入
+var impForm = new Ext.FormPanel({    
+	frame: true,
+	labelWidth: 80,
+	border: false,
+	layout : 'form',
+	fileUpload : true,
+	buttonAlign: 'center',
+	items:[
+	{ 
+		fieldLabel: 'Excel文件',
+		inputType:'file',
+		width:190,
+		height:25,
+		xtype: 'textfield',
+		name: 'filepath'
+	}]
+});
+var excelWin = new Ext.Window({
+    title : '报表模板文件导入',
+    width : 300,
+    height : 250,
+    layout : 'fit',
+    items : [impForm],
+    closeAction:'hide',
+    buttons : [
+    {
+    	text : "关闭",
+	    handler:function(){
+    		excelWin.hide();
+	    }
+    },{
+		name: 'import',
+		id: 'import',
+		text: '导入',
+		handler : function() {
+	    	var x=document.getElementById('filepath').value;
+			if(!x||x==""){
+	  			Ext.Msg.alert("提示","请选择要导入的文件!");
+	  			return;
+	  		}
+	  		if(x.substr(x.lastIndexOf(".")).toUpperCase()!='.XML'){
+	  			Ext.Msg.alert("提示","请选择XML格式的文件导入！");
+	  			return;
+			}  
+	  		if (impForm.getForm().isValid()) {  
+				Ext.Msg.wait("正在导入...");
+				impForm.getForm().doAction('submit', {
+		       		timeout: 10*60*1000,
+		       		url: 'upload.design?doType=import',
+		       		success: function(form, action) {
+		       			Ext.Msg.hide();
+						var jsonData = action.result;	
+				        if(jsonData.impResult=="success"){
+				           	Ext.Msg.show({title:'成功',
+			   					msg: "导入成功",
+			   					buttons: Ext.Msg.OK,
+			   					icon: Ext.MessageBox.INFO});
+				           	ds.load({params:{start:0, limit:<%=Configuration.getConfig().getString("pageSize","40")%>}});
+						}else{
+				        	Ext.Msg.hide();
+				           	Ext.Msg.alert('信息','发生错误，异常信息:'+jsonData.info);
+				        }
+		       		},
+					failure: function(form, action) {
+						var jsonData = action.result;	
+						Ext.Msg.hide();
+						Ext.Msg.alert('错误', '上传文件失败，异常信息:'+jsonData.info);
+				    },
+					exceptionHandler : function(msg){
+						Ext.Msg.hide();
+						Ext.Msg.alert('提示',msg);
+						return ; 
+					}
+		       	});
+			}
+    	}
+	}]
+});
+excelWin.on("show",function(){
+	document.getElementById('filepath').value="";
+});
 function loadReportPart(partName,cbfun){
 	Ext.Ajax.request({
 		url : 'getData.design?doType=loadReportPart',
@@ -653,7 +754,7 @@ Ext.onReady(function(){
 		layout:'fit',
         items:[grid]
 	});
-	ds.load({params:{start:0,limit:20}});
+	ds.load({params:{start:0,limit:<%=cg.getString("pageSize","40")%>}});
 }); 
 </script>
 </head>

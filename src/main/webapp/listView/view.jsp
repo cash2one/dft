@@ -787,6 +787,7 @@ var paramWin = new Ext.Window({
 	height : 320,
 	title : "参数",
 	layout : 'fit',
+	autoScroll: true,
 	closeAction :"hide",
 	items : [
 	],
@@ -1278,7 +1279,7 @@ grid.getStore().on("beforeload",function(ds,op){
 	tmpCdts.loadDefaultMeata = cLoadDefaultMeata;
 	tmpCdts.loadUserMeata = cLoadUserMeata;
 	tmpCdts.moneyUnit = showUnit>0?unitsCombo.getValue():"";
-	tmpCdts.QPid = cQPid
+	tmpCdts.QPid = cQPid;
 	Ext.copyTo(tmpCdts,op.params,'sort,dir');
 	delete op.params.sort;
 	delete op.params.dir;

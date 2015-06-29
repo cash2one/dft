@@ -285,5 +285,12 @@ App.rpt.Renders = {
 				return renderLink(value,col,record);
 			}
 			return value;
+		},
+		searchMap: function (v,p,r){
+			var aStr = "<a target='_blank' href='";
+			var url="http://map.baidu.com/?newmap=1&ie=utf-8&s=s%26wd%3D";
+			var addr = encodeURI(v);
+			aStr =aStr+url+addr+"'>"+v+"</a>";
+			return aStr;
 		}
 };

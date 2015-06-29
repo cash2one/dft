@@ -9,7 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.dom4j.*;
@@ -25,6 +27,8 @@ import com.fruit.query.parser.TemplatesToEditLoader;
 import com.fruit.query.report.Parameter;
 import com.fruit.query.report.Report;
 import com.fruit.query.report.ReportBase;
+import com.fruit.query.util.QueryConfig;
+import com.jspsmart.upload.SmartUpload;
 import com.softwarementors.extjs.djn.StringUtils;
 
 public class RptDesignService {
@@ -495,7 +499,7 @@ public class RptDesignService {
 		//如果目标库已经有该id的文件，删除之
 		if(exist){
 			String delPath = destRoot+destRpt.getSaveFileName();
-			File file = new File(delPath.toString());  
+			File file = new File(delPath);  
 		    if(file.exists()&&file.isFile()){
 		       file.delete();   
 		    }
@@ -515,6 +519,7 @@ public class RptDesignService {
 					fs.write(buffer, 0, byteread); 
 				} 
 				inStream.close(); 
+				fs.close();
 			} 
 		}catch (Exception e) { 
 			result[0]="9";
@@ -529,4 +534,118 @@ public class RptDesignService {
 		rpts = tl.getRptTemplates();
 		return rpts;
 	}
+	
+	public String saveUploadedFile(SmartUpload mySmartUpload,ServletConfig svlConfig,HttpServletRequest request,HttpServletResponse response){
+		String trace=QueryConfig.getConfig().getString("rptEditRepositoryPath", "");
+		com.jspsmart.upload.File myFile=null;
+		try{
+		    mySmartUpload.upload();
+		    myFile = mySmartUpload.getFiles().getFile(0);
+		    if (myFile.isMissing()){
+		    	throw new Exception(); 
+		    }
+		    //取得上载的文件的文件名
+		    String myFileName=myFile.getFileName();
+		    myFileName=new String(myFileName.getBytes("GBK"), "UTF-8");
+		    //如果编辑库里已经有同名的文件，检查旧文件的模板ID，从缓存中去除该id的模板（因为模板文件要被覆盖掉了）
+		    Report oldRpt = loadTemplateByFileName(myFileName);
+		    if(oldRpt!=null){
+		    	deleteFromCache(oldRpt.getId());
+		    }
+		    //保存新模板
+		    if(StringUtils.isEmpty(rptRoot)){
+				TemplatesToEditLoader ltmp=TemplatesToEditLoader.getTemplatesToEditLoader();
+				rptRoot = ltmp.getReportRepositoryAbsolutePath();
+			}
+		    trace = (rptRoot==null?"":rptRoot)+(rptRoot.endsWith("/")?"":"/")+myFileName;
+		    myFile.saveAs(trace,SmartUpload.SAVE_PHYSICAL);
+		    //解析新上传的模板
+		    Report newRpt = loadTemplateByFileName(myFileName);
+			if(newRpt==null){
+				throw new Exception("上传文件的格式不正确，无法解析为报表模板！");
+			}else{
+				newRpt.setSaveFileName(myFileName);
+				String nrid = newRpt.getId();
+				boolean exist = allRptsMap!=null&&allRptsMap.containsKey(nrid);
+				Report orpt = null;
+				if(exist){
+					orpt = (Report)allRptsMap.get(nrid);
+					for(int i=0;i<allRpts.size();i++){
+						Report trpt = (Report)allRpts.get(i);
+						if(trpt.getId().equals(nrid)){
+							allRpts.set(i, newRpt);
+							break;
+						}
+					}
+					//如果目标库同id的文件不同名，删除旧有文件。同名则不需处理，上传时已经覆盖。
+					if(!myFileName.equals(orpt.getSaveFileName())){
+						String delPath = rptRoot+orpt.getSaveFileName();
+						File file = new File(delPath);  
+					    if(file.exists()&&file.isFile()){
+					       file.delete();   
+					    }
+					}
+				}else{
+					allRpts.add(newRpt);
+				}
+				allRptsMap.put(nrid, newRpt);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return trace;
+	}
+	
+	private void deleteFromCache(String rptid){
+		allRptsMap.remove(rptid);
+		for(int i=0;i<allRpts.size();i++){
+			Report trpt = (Report)allRpts.get(i);
+			if(trpt.getId().equals(rptid)){
+				allRpts.remove(i);
+				break;
+			}
+		}
+	}
+	//根据文件名加载模板
+	private Report loadTemplateByFileName(String fname){
+		Report rpt = null;
+		TemplatesToEditLoader ltmp=TemplatesToEditLoader.getTemplatesToEditLoader();
+	    if(StringUtils.isEmpty(rptRoot)){
+			rptRoot = ltmp.getReportRepositoryAbsolutePath();
+		}
+	    String absPath = (rptRoot==null?"":rptRoot)+(rptRoot.endsWith("/")?"":"/")+fname;
+	    try{
+		    File tmpFile=new File(absPath); 
+		    if(tmpFile.exists()&&tmpFile.isFile()){
+		    	InputStream is=new FileInputStream(tmpFile) ;
+				long contentLength = tmpFile.length();
+				byte[] ba = new byte[(int)contentLength];
+				is.read(ba);
+				String rptDesignInfo = new String(ba,"utf-8");
+				is.close();
+				try{
+					rpt=ltmp.loadTemplate(rptDesignInfo);
+				}catch(Exception e){
+					System.out.println(e.toString());
+				} 
+			}
+	    }catch(Exception e){
+	    	log.error(e.toString());
+	    }
+		return rpt;
+	}
+	public File findTemplateFile(String rptid) {
+		File file =null;
+		if(allRptsMap.containsKey(rptid)){
+			Report rpt = (Report)allRptsMap.get(rptid);
+			if(StringUtils.isEmpty(rptRoot)){
+				TemplatesToEditLoader ltmp=TemplatesToEditLoader.getTemplatesToEditLoader();
+				rptRoot = ltmp.getReportRepositoryAbsolutePath();
+			}
+			String absPath = (rptRoot==null?"":rptRoot)+(rptRoot.endsWith("/")?"":"/")+rpt.getSaveFileName();
+			file= new File(absPath); 
+		}
+		return file;
+	}
+	
 }

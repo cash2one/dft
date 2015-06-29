@@ -35,12 +35,12 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'toggleRuleQybj'/*(int, int) => String */,
+        name: 'deletePRulesOfEn'/*(String, String) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'deletePRulesOfEn'/*(String, String) => String */,
+        name: 'toggleRuleQybj'/*(int, int) => String */,
         len: 2,
         formHandler: false
       },
@@ -77,13 +77,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'checkChangeEn'/*(int, String, String) => String */,
-        len: 3,
+        name: 'getEnDjInfo'/*(int, int) => String */,
+        len: 2,
         formHandler: false
       },
       {
-        name: 'getEnDjInfo'/*(int, int) => String */,
-        len: 2,
+        name: 'checkChangeEn'/*(int, String, String) => String */,
+        len: 3,
         formHandler: false
       },
       {
@@ -107,13 +107,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getComboBms'/*(String) => java.util.List */,
-        len: 1,
+        name: 'getBmCodesTree'/*(String, String, String) => java.util.List */,
+        len: 3,
         formHandler: false
       },
       {
-        name: 'getBmCodesTree'/*(String, String, String) => java.util.List */,
-        len: 3,
+        name: 'getComboBms'/*(String) => java.util.List */,
+        len: 1,
         formHandler: false
       },
       {

@@ -54,7 +54,7 @@
 <title>登记信息</title>
 <columns complex="0" sourceType="0">
 	<column colId="czfpbm" dataIndex="CZFPBM" colName="财政分片" width="90" isGroup="1"/>
-	<column colId="ename" dataIndex="MC" colName="单位名称" width="150" />
+	<column colId="ename" dataIndex="MC" colName="单位名称" width="150" renderer="searchMap"/>
 	<column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="110" />
 	<column colId="dz" dataIndex="DZ" colName="地址" width="120" />		
 	<column colId="fddbr" dataIndex="FDDBR" colName="法人代表" width="100" />

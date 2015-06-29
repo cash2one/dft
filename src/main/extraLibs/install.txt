@@ -10,3 +10,4 @@ mvn install:install-file -DgroupId=org.json -DartifactId=json -Dversion=1.0 -Dpa
 
 mvn install:install-file -DgroupId=com.lowagie -DartifactId=itextasian -Dversion=1.0 -Dpackaging=jar -Dfile=iTextAsianCmaps.jar -DgeneratePom=true
 mvn install:install-file -DgroupId=com.itextpdf -DartifactId=itextpdf -Dversion=5.0.4 -Dpackaging=jar -Dfile=itextpdf.jar -DgeneratePom=true
+mvn install:install-file -DgroupId=com.jspsmart -DartifactId=jspsmart -Dversion=1.0.0 -Dpackaging=jar -Dfile=jspsmartupload.jar -DgeneratePom=true

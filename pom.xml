@@ -9,6 +9,7 @@
 
 	<name>DNFT</name>
 	<url>http://</url>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -41,6 +42,7 @@
 		<itext.version>2.1.0</itext.version>
 		<itextAsian.version>5.1.0</itextAsian.version>
 		<itextpdf>5.0.6</itextpdf>
+		<jspsmart>1.0.0</jspsmart>
 		<!-- 缺省数据库设置，如需修改请在 maven 配置文件 settings.xml 添加 profile 并激活 -->
 		<jdbc.groupId>com.oracle</jdbc.groupId>
 		<jdbc.artifactId>ojdbc5</jdbc.artifactId>
@@ -214,7 +216,11 @@
   			<artifactId>itextpdf</artifactId>
 			<version>${itextpdf}</version>
 		</dependency>
-              
+        <dependency>
+			<groupId>com.jspsmart</groupId>
+  			<artifactId>jspsmart</artifactId>
+			<version>${jspsmart}</version>
+		</dependency>       
 	</dependencies>
 	
 	<pluginRepositories>

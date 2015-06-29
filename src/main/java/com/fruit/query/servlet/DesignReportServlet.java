@@ -1,11 +1,16 @@
 package com.fruit.query.servlet;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,13 +25,26 @@ import com.fruit.query.report.ReportBase;
 import com.fruit.query.service.RptDesignService;
 import com.fruit.query.util.JsonHelper;
 import com.fruit.query.view.RptDataJsonParser;
+import com.jspsmart.upload.SmartUpload;
 import com.softwarementors.extjs.djn.StringUtils;
 
 public class DesignReportServlet extends HttpServlet{
 	protected void doGet(HttpServletRequest request, HttpServletResponse respond)throws ServletException, IOException {
 		doPost(request,respond);
 	}
-	
+	private ServletConfig svlConfig;
+    /**
+     * Init the servlet
+     */
+    final public void init(ServletConfig config) throws ServletException
+    {
+        this.svlConfig = config;
+    }
+
+    final public ServletConfig getServletConfig()
+    {
+        return svlConfig;
+    }
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 		throws ServletException, IOException {
 		String action = request.getParameter("doType");
@@ -240,6 +258,7 @@ public class DesignReportServlet extends HttpServlet{
 				out.close();
 				return;
 			}else if("updateParam".equals(action)){
+				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter out = response.getWriter();
 				StringBuffer json=new StringBuffer("{success:");
 				String rptid = request.getParameter("rptId");
@@ -256,6 +275,7 @@ public class DesignReportServlet extends HttpServlet{
 				out.close();
 				return;
 			}else if("commitRpt".equals(action)){
+				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter out = response.getWriter();
 				StringBuffer json=new StringBuffer("{success:");
 				String rptid = request.getParameter("rptId");
@@ -308,6 +328,7 @@ public class DesignReportServlet extends HttpServlet{
 				out.close();
 				return;
 			}else if("pullRptsFromProduct".equals(action)){
+				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter out = response.getWriter();
 				StringBuffer json=new StringBuffer("{success:");
 				String rptid = request.getParameter("rptId");
@@ -325,6 +346,63 @@ public class DesignReportServlet extends HttpServlet{
 				out.print(json);
 				out.close();
 				return;
+			}else if("import".equals(action)){
+				response.setContentType("text/html;charset=UTF-8");
+				PrintWriter out = response.getWriter();
+				StringBuffer strResult = null;
+				String filePath = "";
+				SmartUpload mySmartUpload=new SmartUpload();
+				mySmartUpload.initialize(svlConfig,request,response);
+				RptDesignService rs = RptDesignService.getRptDesignService();
+				try {
+					filePath=rs.saveUploadedFile(mySmartUpload,svlConfig, request, response);
+				} catch (Exception e) {
+					strResult=new StringBuffer("{success:true,impResult:'failed',info:'");
+			    	strResult.append(e.toString());
+			    	strResult.append("'}");
+			    	out.print(strResult.toString());
+					out.close();
+					return;
+				}
+				strResult = new StringBuffer("{success:true,impResult:'success',info:'");
+				strResult.append("导入成功！'}");
+				out.print(strResult.toString());
+				out.close();
+				return;
+			}else if("export".equals(action)){
+				String rptid = request.getParameter("rptId");
+				String path = "";
+				RptDesignService rs = RptDesignService.getRptDesignService();
+				File file = rs.findTemplateFile(rptid);
+				BufferedInputStream bis = null;
+				BufferedOutputStream bos = null;
+				if(file!=null&&file.exists()){
+					try {
+						bos = new BufferedOutputStream(response.getOutputStream());
+						response.setHeader("Content-type:", "application/octet-stream");
+						response.setHeader("Accept-Ranges:", "bytes");
+						response.setContentLength((int) file.length());   
+						response.setHeader("Content-Disposition", "attachment; filename=" + new String(file.getName().getBytes("GB2312"), "ISO8859_1"));   
+						bis = new BufferedInputStream(new FileInputStream(file));	 
+						byte[] b = new byte[1024];    
+						int i = 0;    
+					    while((i = bis.read(b)) > 0){
+							bos.write(b, 0 ,i);
+					    }
+					    bis.close();
+					    bos.flush();
+					    bos.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					return;
+				}
+				response.setContentType("text/html;charset=UTF-8");
+				PrintWriter out = response.getWriter();
+				out.print("<p>文件不存在！</p>");
+				out.close();
+				return;
+				
 			}
 		}catch(Exception e) {
 			destination = "/failed.jsp?source=design";
