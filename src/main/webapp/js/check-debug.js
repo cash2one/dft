@@ -35,12 +35,12 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'deletePRulesOfEn'/*(String, String) => String */,
+        name: 'toggleRuleQybj'/*(int, int) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'toggleRuleQybj'/*(int, int) => String */,
+        name: 'deletePRulesOfEn'/*(String, String) => String */,
         len: 2,
         formHandler: false
       },
@@ -127,13 +127,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getEns'/*(int, int, int, String) => java.util.Map */,
-        len: 4,
+        name: 'getBatchCheckFields'/*() => java.util.List */,
+        len: 0,
         formHandler: false
       },
       {
-        name: 'getBatchCheckFields'/*() => java.util.List */,
-        len: 0,
+        name: 'getEns'/*(int, int, int, String) => java.util.Map */,
+        len: 4,
         formHandler: false
       }
     ],

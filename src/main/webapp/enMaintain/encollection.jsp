@@ -717,12 +717,14 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 	    items : [{   
 	        boxLabel : '税号',   
 	        inputValue : "sh",      
-	        name : "d_type"
+	        name : "d_type",
+	        id:"d_sh"
 	    },{   
 	        boxLabel : '名称',   
 	        name : "d_type",   
-	        checked:true,
-	        inputValue : "mc"  
+	        checked: true,
+	        inputValue : "mc" ,
+	        id:"d_mc" 
 	    }]   
 	}); 
 	var excelForm = new Ext.FormPanel({    
@@ -959,8 +961,8 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 				excel_grid_ds.each(function(rs){ 		
 					var row=new Object();
 				    var fields=rs.data;
-				    if(!fields["swdjzh"]|| fields["swdjzh"]==''){
-				    	Ext.Msg.alert('系统提示','企业税号不能为空！请删除空税号的记录或手工匹配之！');
+				    if(fields["ismatch"]!=1){
+				    	Ext.Msg.alert('系统提示','添加本批次下属企业前，请先删除未匹配记录或手工匹配之！');
 				    	block = true;
 			   	    }
 				    xhs.push(fields["showorder"]);
@@ -1044,7 +1046,12 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 	    }]
 	});
 	excelWin.on("show",function(){
-		excel_grid_ds.load({params:{ start:0, limit:<%=cg.getString("pageSize","40")%>}});
+		excelForm.getForm().getEl().dom.reset(); 
+		excelForm.getForm().findField("matchCol").setValue(1); 
+		excelForm.getForm().findField("beginRow").setValue(2);
+		Ext.getCmp("d_mc").setValue(true);
+		Ext.getCmp("d_sh").setValue(false);
+		excel_grid_ds.removeAll();
 	});
 	var matchRecord;
 	function matchFn(pXh){
