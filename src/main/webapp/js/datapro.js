@@ -1,7 +1,7 @@
 /**********************************************************************
  * 
  * Code generated automatically by DirectJNgine
- * Copyright (c) 2009, Pedro Agull¨® Soliveres
+ * Copyright (c) 2009, Pedro AgullÃ³ Soliveres
  * 
  * DO NOT MODIFY MANUALLY!!
  * 
@@ -40,13 +40,13 @@ Ext.datapro.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getFormalAppData'/*(int, int, int) => java.util.Map */,
-        len: 3,
+        name: 'matchEnOfTmpAid'/*(int, String, int, String) => String */,
+        len: 4,
         formHandler: false
       },
       {
-        name: 'matchEnOfTmpAid'/*(int, String, int, String) => String */,
-        len: 4,
+        name: 'getFormalAppData'/*(int, int, int) => java.util.Map */,
+        len: 3,
         formHandler: false
       },
       {
@@ -60,12 +60,12 @@ Ext.datapro.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getAppTemplate'/*(int) => String */,
+        name: 'CheckTemplateDownload'/*(int) => String */,
         len: 1,
         formHandler: false
       },
       {
-        name: 'CheckTemplateDownload'/*(int) => String */,
+        name: 'getAppTemplate'/*(int) => String */,
         len: 1,
         formHandler: false
       },
@@ -140,12 +140,12 @@ Ext.datapro.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'saveTempApps'/*(int, String) => String */,
+        name: 'deleteImportedApps'/*(int, String) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'deleteImportedApps'/*(int, String) => String */,
+        name: 'saveTempApps'/*(int, String) => String */,
         len: 2,
         formHandler: false
       },
