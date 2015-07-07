@@ -198,3 +198,5 @@ String.prototype.replaceAll = function(regexp, replacement) {
 	var result = str.replace(regexp, replacement);
 	return result;
 };
+
+

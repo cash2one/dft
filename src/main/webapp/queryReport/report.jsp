@@ -85,7 +85,7 @@
 				strHead.append(stLeft);
 				strHead.append("</span></td><td width='33%' align='center'><span id='headSCenter' class='").append(st.getcStyle()).append("'>");
 				strHead.append(stCenter);
-				strHead.append("</span></td><td width='33%' align='right'><span id='headSRight' class='>").append(st.getrStyle()).append("'>");
+				strHead.append("</span></td><td width='33%' align='right'><span id='headSRight' class='").append(st.getrStyle()).append("'>");
 				strHead.append(stRight).append("</span></td></tr></table>");
 			}
 		}
@@ -370,13 +370,13 @@ var RPTROOT="doQuery.query?doType=getReport";
 				,linkParams: '<%=col.getLinkParams()==null?"":col.getLinkParams()%>'
 				,target: '<%=col.getTarget()==null?"":col.getTarget()%>'
 				,linkTo: '<%=col.getLinkTo()==null?"":col.getLinkTo()%>'
+				,sortable: <%=col.getIsOrder()==1%>
 			}
 			  <%
 			    	tcount++;
 			  		if(tcount<header.getLeafCount()){out.print(",");}
 			  	}%>
-				],
-				defaultSortable: false
+				]
 				<%//如果复杂表头
 				if(header.getMaxLevel()>1){
 					//复杂表头写为二维数组，为方便、动态、用list。除叶子列外，每个level构造列头的一行
@@ -460,6 +460,7 @@ var RPTROOT="doQuery.query?doType=getReport";
     // 创建 Data Store
     var store = new Ext.data.Store({
     	proxy: mProxy, 
+    	remoteSort: <%=rpt.getRemoteSort()==1?"true":"false"%>,
         reader: new Ext.data.JsonReader({
         	 <%if(rpt.getDefaultDataDef()!=null&&rpt.getDefaultDataDef().getCanPaging()==1){%>
                root: 'rptData',

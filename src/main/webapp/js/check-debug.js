@@ -77,13 +77,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'checkChangeEn'/*(int, String, String) => String */,
-        len: 3,
+        name: 'getEnDjInfo'/*(int, int) => String */,
+        len: 2,
         formHandler: false
       },
       {
-        name: 'getEnDjInfo'/*(int, int) => String */,
-        len: 2,
+        name: 'checkChangeEn'/*(int, String, String) => String */,
+        len: 3,
         formHandler: false
       },
       {
@@ -107,13 +107,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getComboBms'/*(String) => java.util.List */,
-        len: 1,
+        name: 'getBmCodesTree'/*(String, String, String) => java.util.List */,
+        len: 3,
         formHandler: false
       },
       {
-        name: 'getBmCodesTree'/*(String, String, String) => java.util.List */,
-        len: 3,
+        name: 'getComboBms'/*(String) => java.util.List */,
+        len: 1,
         formHandler: false
       },
       {
@@ -127,13 +127,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getEns'/*(int, int, int, String) => java.util.Map */,
-        len: 4,
+        name: 'getBatchCheckFields'/*() => java.util.List */,
+        len: 0,
         formHandler: false
       },
       {
-        name: 'getBatchCheckFields'/*() => java.util.List */,
-        len: 0,
+        name: 'getEns'/*(int, int, int, String) => java.util.Map */,
+        len: 4,
         formHandler: false
       }
     ],

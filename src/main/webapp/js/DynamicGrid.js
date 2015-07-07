@@ -348,6 +348,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 				        bodyStyle:'padding:5px',
 				        width: 450,
 				        height: 320,
+				        autoScroll: true,
 				        layout: 'form'
 					});
 				}

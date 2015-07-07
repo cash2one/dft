@@ -51,7 +51,7 @@ import com.ifugle.dft.system.entity.User;
 
 @Transactional
 public class QueryDao extends BaseDao{
-	private static Logger log = Logger.getLogger(IncomeDao.class);
+	private static Logger log = Logger.getLogger(QueryDao.class);
 	@Autowired
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
 		this.jdbcTemplate = jdbcTemplate;
