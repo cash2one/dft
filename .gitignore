@@ -2,4 +2,6 @@
 target/
 .svn/
 *.DS_Store
-*.settings
+.settings/
+.classpath
+.project
