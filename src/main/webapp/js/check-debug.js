@@ -1,7 +1,7 @@
 /**********************************************************************
  * 
  * Code generated automatically by DirectJNgine
- * Copyright (c) 2009, Pedro AgullÃ³ Soliveres
+ * Copyright (c) 2009, Pedro Agull¨® Soliveres
  * 
  * DO NOT MODIFY MANUALLY!!
  * 
@@ -35,23 +35,23 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
+        name: 'deletePRulesOfEn'/*(String, String) => String */,
+        len: 2,
+        formHandler: false
+      },
+      {
         name: 'toggleRuleQybj'/*(int, int) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'deletePRulesOfEn'/*(String, String) => String */,
+        name: 'getPRuleEns'/*(int, int) => java.util.Map */,
         len: 2,
         formHandler: false
       },
       {
         name: 'getEnsToAddPRules'/*(int, int, String) => java.util.Map */,
         len: 3,
-        formHandler: false
-      },
-      {
-        name: 'getPRuleEns'/*(int, int) => java.util.Map */,
-        len: 2,
         formHandler: false
       }
     ],
@@ -77,13 +77,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getEnDjInfo'/*(int, int) => String */,
-        len: 2,
+        name: 'checkChangeEn'/*(int, String, String) => String */,
+        len: 3,
         formHandler: false
       },
       {
-        name: 'checkChangeEn'/*(int, String, String) => String */,
-        len: 3,
+        name: 'getEnDjInfo'/*(int, int) => String */,
+        len: 2,
         formHandler: false
       },
       {
@@ -127,13 +127,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getBatchCheckFields'/*() => java.util.List */,
-        len: 0,
+        name: 'getEns'/*(int, int, int, String) => java.util.Map */,
+        len: 4,
         formHandler: false
       },
       {
-        name: 'getEns'/*(int, int, int, String) => java.util.Map */,
-        len: 4,
+        name: 'getBatchCheckFields'/*() => java.util.List */,
+        len: 0,
         formHandler: false
       }
     ],
@@ -169,9 +169,9 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'saveVirtualEn'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
-        len: 1,
-        formHandler: true
+        name: 'getNewPzDetail'/*() => java.util.List */,
+        len: 0,
+        formHandler: false
       },
       {
         name: 'savePzDetail'/*(String, String, String, String, String) => String */,
@@ -179,9 +179,9 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getNewPzDetail'/*() => java.util.List */,
-        len: 0,
-        formHandler: false
+        name: 'saveVirtualEn'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
+        len: 1,
+        formHandler: true
       },
       {
         name: 'getEnPzhBySwdjzh'/*(String) => java.util.List */,

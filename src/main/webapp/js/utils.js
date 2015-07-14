@@ -1,7 +1,7 @@
 /**********************************************************************
  * 
  * Code generated automatically by DirectJNgine
- * Copyright (c) 2009, Pedro AgullÃ³ Soliveres
+ * Copyright (c) 2009, Pedro Agull¨® Soliveres
  * 
  * DO NOT MODIFY MANUALLY!!
  * 
@@ -45,23 +45,23 @@ Ext.utils.REMOTING_API = {
         formHandler: true
       },
       {
+        name: 'saveEnOrder'/*(String, String) => String */,
+        len: 2,
+        formHandler: false
+      },
+      {
         name: 'checkCode'/*(String, String) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'saveEnOrder'/*(String, String) => String */,
+        name: 'removeEn'/*(String, String) => String */,
         len: 2,
         formHandler: false
       },
       {
         name: 'deleteEnCollection'/*(String) => String */,
         len: 1,
-        formHandler: false
-      },
-      {
-        name: 'removeEn'/*(String, String) => String */,
-        len: 2,
         formHandler: false
       },
       {
