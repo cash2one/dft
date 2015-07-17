@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <report id="test1" name="测试" description="税收收入列表，按月统计各种税种收入及财政贡献。" >
 <parameters>
 	

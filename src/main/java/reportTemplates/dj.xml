@@ -1,6 +1,6 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <report id="dj" name="测试" hasChart="1" directExport="0">
-<description><![CDATA[登记清单表。</br>第二行的简介<font color="red">这里是~~</font>]]></description>
+<description><![CDATA[ 登记清单表。</br>第二行的简介<font color="red">这里是~~</font>]]></description>
 <parameters>
 	<para name="czfpbm" desc="乡镇" hidden="0" renderType="2" dataType="string" >
 		<paraDetail multi="1" leafOnly="1" sourceType="1">
