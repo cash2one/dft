@@ -1,7 +1,0 @@
-*.class
-target/
-.svn/
-*.DS_Store
-.settings/
-.classpath
-.project
