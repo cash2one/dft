@@ -45,6 +45,7 @@
  */
 Ext.BLANK_IMAGE_URL = '../libs/ext-3.4.0/resources/images/default/s.gif';
 
+
 </script>
 </head>
 <body>
