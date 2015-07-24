@@ -350,6 +350,20 @@ public class QueryReportServlet extends HttpServlet{
 			    	}
 				}
 				return;
+			}else if("loadPortlets".equals(action)){
+				response.setContentType("text/json;charset=UTF-8");
+				PrintWriter out=response.getWriter();
+				String jpls="";
+				String portalID=request.getParameter("portalID");
+				if(portalID!=null&&!"".equals(portalID)){
+					PortalService ps = PortalService.getPortalService();
+					jpls=ps.loadPortlets(portalID); 
+				}else{
+					jpls = "{result:false,info:'portalID为空！'}";
+				}
+				out.print(jpls);
+	    		out.close();
+	    		return;
 			}
 		}catch(Exception e) {
 			destination = "/failed.jsp?source=query";

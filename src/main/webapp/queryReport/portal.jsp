@@ -44,8 +44,30 @@
  * http://extjs.com/license
  */
 Ext.BLANK_IMAGE_URL = '../libs/ext-3.4.0/resources/images/default/s.gif';
-
-
+Ext.onReady(function(){
+	var viewport = new Ext.Viewport({
+    	layout:'fit',
+    	xtype:'portal',
+    	items:[{}]
+	});
+	Ext.Ajax.request({
+		url : 'rpt.query?doType=loadPortlets',
+		params : {portalID: 'test'},
+		success : function(response, options) {
+			if(response.responseText!=null&&response.responseText!=""){
+				var result = Ext.util.JSON.decode(response.responseText);
+				if(result){
+					var desc = result.desc;
+				}else{
+					Ext.Msg.alert("失败","加载Portal信息时发生错误："+result.info);	
+				}
+			}
+		},
+		failure : function(response,option) {
+			Ext.Msg.alert("失败","加载Portal信息失败！");		
+        }
+	});
+});
 </script>
 </head>
 <body>
