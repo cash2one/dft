@@ -50,30 +50,30 @@ public class ExportPdfView {
 			document.open();
 			
 			buildTitle(document,title);
-			// Ìí¼ÓÒ»ÕÅ±í¸ñ£¬Ê¹ÓÃPdfPTable
+			// æ·»åŠ ä¸€å¼ è¡¨æ ¼ï¼Œä½¿ç”¨PdfPTable
 			int colCount = columns==null?0:columns.size();
 			PdfPTable table = new PdfPTable(colCount);
 			table.setWidthPercentage((float)90);
 			table.setWidths(getWidthPercentages(columns));
 			List<List<Column>> groupRows = (List<List<Column>>) model.get("groupRows");
 			buildHeader(table, groupRows,columns);
-	        //ÕûÀíµ×¼¶ÁĞ¶¨Òå
+	        //æ•´ç†åº•çº§åˆ—å®šä¹‰
 		    List leafCols=new ArrayList();
 		    for(int j=0;j<columns.size();j++){
 	    		Column col=(Column)columns.get(j);
 	    			leafCols.add(col);
 	    	}
-		    //----------------------------------------¿ªÊ¼Êä³öÊı¾İ--------------------------------------
-		    //»ñÈ¡±¨±íµÄÊı¾İ
+		    //----------------------------------------å¼€å§‹è¾“å‡ºæ•°æ®--------------------------------------
+		    //è·å–æŠ¥è¡¨çš„æ•°æ®
 		    List ds = (List) model.get("records");
-			//°´µ×¼¶ÁĞÊı´´½¨µ¥Ôª¸ñ£¬²»ÄÜ³¬¹ı255ÁĞ
+			//æŒ‰åº•çº§åˆ—æ•°åˆ›å»ºå•å…ƒæ ¼ï¼Œä¸èƒ½è¶…è¿‡255åˆ—
 		    int leafCounts=leafCols.size();
 		    if(ds!=null&&ds.size()>0){
 		    	BaseFont bfChinese = BaseFont.createFont("STSong-Light","UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
 		    	Font fontChinese = new Font(bfChinese, 14, Font.NORMAL);
 			    for(int i=0;i<ds.size();i++){
 			    	Map cells=(Map)ds.get(i);
-					//¸÷¸öĞĞÊı¾İ
+					//å„ä¸ªè¡Œæ•°æ®
 				    for(int j=0;j<leafCounts;j++){
 				    	Column col=(Column)leafCols.get(j);
 				    	String val=(String)cells.get(col.getDataIndex());
@@ -96,7 +96,7 @@ public class ExportPdfView {
 	       e.printStackTrace();
 	    }
 	}
-	//¹¹Ôì±íÍ·
+	//æ„é€ è¡¨å¤´
 	@SuppressWarnings("unchecked")
 	private void buildHeader(PdfPTable table,List groupRows,List columns){
 		try{

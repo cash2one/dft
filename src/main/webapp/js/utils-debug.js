@@ -25,6 +25,11 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
+        name: 'getEnCollection'/*(String) => java.util.List */,
+        len: 1,
+        formHandler: false
+      },
+      {
         name: 'toggleQybj'/*(String, String, int) => String */,
         len: 3,
         formHandler: false
@@ -35,8 +40,8 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getEnCollection'/*(String) => java.util.List */,
-        len: 1,
+        name: 'checkCode'/*(String, String) => String */,
+        len: 2,
         formHandler: false
       },
       {
@@ -50,18 +55,13 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'checkCode'/*(String, String) => String */,
-        len: 2,
+        name: 'deleteEnCollection'/*(String) => String */,
+        len: 1,
         formHandler: false
       },
       {
         name: 'removeEn'/*(String, String) => String */,
         len: 2,
-        formHandler: false
-      },
-      {
-        name: 'deleteEnCollection'/*(String) => String */,
-        len: 1,
         formHandler: false
       },
       {

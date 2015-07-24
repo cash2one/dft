@@ -75,13 +75,13 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'publishReports'/*(String) => String */,
-        len: 1,
+        name: 'saveUserPosts'/*(String, String) => String */,
+        len: 2,
         formHandler: false
       },
       {
-        name: 'saveUserPosts'/*(String, String) => String */,
-        len: 2,
+        name: 'publishReports'/*(String) => String */,
+        len: 1,
         formHandler: false
       },
       {
@@ -120,25 +120,25 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getUsers'/*(int, int) => java.util.Map */,
+        name: 'addPost'/*(String, String) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'addPost'/*(String, String) => String */,
+        name: 'getUsers'/*(int, int) => java.util.Map */,
         len: 2,
         formHandler: false
       }
     ],
     CodeHandler: [
       {
-        name: 'saveCodeTableMapping'/*(String, String, int) => String */,
-        len: 3,
+        name: 'delAidItems'/*(String, String) => String */,
+        len: 2,
         formHandler: false
       },
       {
-        name: 'delAidItems'/*(String, String) => String */,
-        len: 2,
+        name: 'saveCodeTableMapping'/*(String, String, int) => String */,
+        len: 3,
         formHandler: false
       },
       {
