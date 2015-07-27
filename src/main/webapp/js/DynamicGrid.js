@@ -321,6 +321,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 						this.grid.getTopToolbar().addSeparator();
 					}
 				}
+				this.id = tmpId;
 				this.grid.getTopToolbar().addButton({
 					text: '查询',
 		            iconCls: 'filter',

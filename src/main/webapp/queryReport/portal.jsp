@@ -31,10 +31,16 @@
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/adapter/ext/ext-base.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/ext-all-debug.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/src/locale/ext-lang-zh_CN.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/dfCommon.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/queryReport/charts/FusionCharts.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/portal/Portal.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/portal/PortalColumn.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/portal/Portlet.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/GridExporter.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/ExportGridPanel.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/DynamicGrid.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/dfCommon.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/query.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/sys.js"></script>
 <script type="text/javascript">
 /*
  * Ext JS Library 3.4.0
@@ -44,9 +50,167 @@
  * http://extjs.com/license
  */
 Ext.BLANK_IMAGE_URL = '../libs/ext-3.4.0/resources/images/default/s.gif';
+Ext.query.REMOTING_API.enableBuffer = 0;  
+Ext.Direct.addProvider(Ext.query.REMOTING_API);
+Ext.sys.REMOTING_API.enableBuffer = 0;  
+Ext.Direct.addProvider(Ext.sys.REMOTING_API);
+var GRIDS = new Array();
+var CHARTS = new Array();
+var conditions ={};
+var commonCbRcd = Ext.data.Record.create([
+    {name : 'bm',type : 'string'}, 
+    {name : 'name',type : 'string'}
+]);
+var cbStore = new Ext.data.Store({
+    proxy : new Ext.data.DirectProxy({
+	    directFn : DataMaintainHandler.getOptionItems,
+	    paramOrder: ['rptID','pName','affectedBy'],
+	    paramsAsHash: false
+	}),
+	reader : new Ext.data.JsonReader({
+		idProperty : 'bm'
+	}, commonCbRcd)
+});
+
+//工具条中的triggerField的触发函数
+var qpTreeSingleWin;
+var qpTreeMultiWin;
+var qpTreeCascWin;
+var qpTreeWin;
+function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
+	if(cMulti==1){
+		if(!qpTreeMultiWin){
+			qpTreeMultiWin = new App.widget.ParamTreeWindow({
+				directFn: DataMaintainHandler.getOptionItemsOfTree,
+				checkModel : 'multiple',
+				treeId: 'm_'+ cQueryParam,
+				rptID: rptID,
+				onlyLeafCheckable: cOnlyLeaf,
+				codeTable: cQueryParam,
+				defaultValue: '',
+				canSetNull: true
+			});
+		}
+		qpTreeWin = qpTreeMultiWin;
+	}else if(cMulti==2){
+		if(!qpTreeCascWin){
+			qpTreeCascWin = new App.widget.ParamTreeWindow({
+				directFn: QueryHandler.getOptionItemsOfTree,
+				checkModel : 'cascade',
+				treeId: 'c_'+ cQueryParam,
+				rptID: rptID,
+				codeTable: cQueryParam,
+				defaultValue: '',
+				canSetNull: true
+			});
+		}
+		qpTreeWin = qpTreeCascWin;
+	}else{
+		if(!qpTreeSingleWin){
+			qpTreeSingleWin = new App.widget.ParamTreeWindow({
+				directFn: DataMaintainHandler.getOptionItemsOfTree,
+				checkModel : 'single',
+				treeId: 's_'+ cQueryParam,
+				rptID: rptID,
+				codeTable: cQueryParam,
+				defaultValue: '',
+				canSetNull: true
+			});
+		}
+		qpTreeWin = qpTreeSingleWin;
+	}
+	var cmpPara = Ext.getCmp("q_"+cQueryParam);
+	var tmpPost={},mps = {};
+	if(cmpPara){
+		var aBy = cmpPara.affectedBy;
+		if(aBy){
+			var aparas = aBy.split(",");
+			mps = new Object();
+			for(var i = 0;i<aparas.length;i++){
+				var tp = aparas[i];
+				var tcmp = Ext.getCmp("q_h_"+tp);
+				if(tcmp){
+					var val =tcmp.getValue();
+					mps[aparas]=val;
+				}
+			}
+			tmpPost.macroParams = mps;
+		}
+	}
+	var p = {rptID: rptID,pName: cQueryParam,affectedBy: Ext.encode(tmpPost)};
+	qpTreeWin.onSelect = function(value){
+		if(!value)return;
+		Ext.getCmp("q_h_"+cQueryParam).setValue(value.id); 
+		Ext.getCmp("q_"+cQueryParam).setValue(value.text); 
+	};
+	qpTreeWin.setTreeParams(p);
+	qpTreeWin.refreshTree();
+	qpTreeWin.show();
+};
+function buildCondition(gridID){
+	var dParams = new Object();
+	var cdts = new Object();
+	var fldNames = new Array();
+	var fldValues = new Array();
+	var relations = new Array();
+	var connections = new Array();
+	var grid = Ext.getCmp(gridID);
+	//筛选。来自工具条
+	var tbItems = grid.getTopToolbar().items;
+	for(var i = 0;i<tbItems.length;i++){
+		var it = tbItems.item(i);
+		if(!it.filterFld||it.filterFld==""){
+			continue;
+		}
+		var val ="";
+		if(it.xtype=="textfield"||it.xtype=="datefield"){
+			val =it.getValue();
+		}else if(it.xtype=="trigger"||it.xtype=="combo"){
+			val =Ext.getCmp("q_h_"+it.id.substring(2)).getValue();
+		}else{
+			continue;
+		}
+		if(!val||val==""){
+			continue;
+		}
+		fldNames.push(it.filterFld);
+		fldValues.push(val);
+		relations.push(it.vop?it.vop:"equ");
+		connections.push("_and");
+	}
+	if(connections.length>0){
+		connections[connections.length-1]="empty"; 
+	}
+	cdts.fldNames=fldNames.join();
+	cdts.fldValues=fldValues.join();
+	cdts.relations=relations.join();
+	cdts.connections=connections.join();
+	dParams.filter = cdts;
+	//工具条中，用于宏替换的
+	var mps = new Object();
+	for(var i = 0;i<tbItems.length;i++){
+		var it = tbItems.item(i);
+		if(it.filterFld&&it.filterFld!=""){
+			continue;
+		}
+		var val ="";
+		if(it.xtype=="textfield"||it.xtype=="datefield"){
+			val =it.getValue();
+		}else if(it.xtype=="trigger"||it.xtype=="combo"){
+			val =Ext.getCmp("q_h_"+it.id.substring(2)).getValue();
+		}else{
+			continue;
+		}
+		mps[it.id.substring(2)]=val;
+	}
+	dParams.macroParams = mps;
+	conditions[gridID]=dParams;
+	grid.getStore().load({params:{rptID: gridID,start:0, limit:<%=cg.getString("pageSize","40")%>}});
+}
 Ext.onReady(function(){
 	var viewport = new Ext.Viewport({
     	layout:'fit',
+    	id :"THE_PORTAL",
     	xtype:'portal',
     	items:[{}]
 	});
@@ -57,9 +221,27 @@ Ext.onReady(function(){
 			if(response.responseText!=null&&response.responseText!=""){
 				var result = Ext.util.JSON.decode(response.responseText);
 				if(result){
-					var desc = result.desc;
+					var cols = result.columns;
+					if(cols!=null&&cols.length>0){
+						for(var i=0;i<cols.length;i++){
+							var col = cols[i];
+							var pts = col.items;
+							if(pts!=null){
+								for(var j=0;j<pts.length;j++){
+									var pt = pts[j];
+									//根据类型构建grid或者chart，放入portlet中
+									if(pt.ptype=="report"){
+										pt.items = createGrid(pt.items);
+									}else if(pt.ptype=="chart"){
+										pt.items = createChart(pt.items,pt.id);
+									}
+								}
+							}
+						}
+					}
+					Ext.getCmp("THE_PORTAL").items=cols;
 				}else{
-					Ext.Msg.alert("失败","加载Portal信息时发生错误："+result.info);	
+					Ext.Msg.alert("失败",""+result.info);	
 				}
 			}
 		},
@@ -68,6 +250,56 @@ Ext.onReady(function(){
         }
 	});
 });
+function createGrid(id){
+	var grid =GRIDS[id];
+	if(grid==null){
+		 var grid = new App.ux.DynamicGridPanelAuto({
+			id: id,
+			columns : [],
+			store : new Ext.data.DirectStore({
+				directFn : DataMaintainHandler.queryGeneralDataDynamic,
+				remoteSort: true,
+				paramsAsHash : false,
+				paramOrder: ['rptID','start','limit','condition'],
+				fields : []
+			}),
+			tbar: []
+		});
+		grid.getStore().on("beforeload",function(ds,op){
+			ds.baseParams.rptID = id;
+			var tmpCdts = Ext.apply({},conditions[id]);
+			tmpCdts.metaDataLoaded = ecoGrid.metaDataLoaded;
+			Ext.copyTo(tmpCdts,op.params,'sort,dir');
+			delete op.params.sort;
+			delete op.params.dir;
+			op.params.condition = Ext.encode(tmpCdts);
+		});	
+		GRIDS[id]=grid;
+	}
+	return grid;
+}
+function createChart(id,panelID){
+	var chart = CHARTS[id];
+	if(chart==null){
+		Ext.Ajax.request({
+			url : 'rpt.query?doType=getChartInfo2Create',
+			params : {id: 'test'},
+			success : function(response, options) {
+				if(response.responseText!=null&&response.responseText!=""){
+					var result = Ext.util.JSON.decode(response.responseText);
+					if(result){
+						var ci = result.chartInfo;
+						chart = new FusionCharts(ci.swf,ci.cid,ci.width,ci.height); 
+						chart.setDataURL(ci.dataUrl);
+						chart.render(panelID);
+					}
+				}
+			}
+		});
+		CHARTS[id]=chart;
+	}
+	return chart;
+}
 </script>
 </head>
 <body>
