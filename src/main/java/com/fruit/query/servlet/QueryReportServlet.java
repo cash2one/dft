@@ -346,7 +346,6 @@ public class QueryReportServlet extends HttpServlet{
 						PrintWriter out = response.getWriter();
 						out.print("未指定要导出报表！");	
 						out.close();
-						return;
 			    	}
 				}
 				return;
@@ -362,6 +361,20 @@ public class QueryReportServlet extends HttpServlet{
 					jpls = "{result:false,info:'portalID为空！'}";
 				}
 				out.print(jpls);
+	    		out.close();
+	    		return;
+			}else if("getChartInfo2Create".equals(action)){
+				response.setContentType("text/json;charset=UTF-8");
+				PrintWriter out=response.getWriter();
+				String jc="";
+				String rptID=request.getParameter("id");
+				if(rptID!=null&&!"".equals(rptID)){
+					PortalService ps = PortalService.getPortalService();
+					jc=ps.getChartInfo2Create(rptID); 
+				}else{
+					jc = "{result:false,info:'id为空！'}";
+				}
+				out.print(jc);
 	    		out.close();
 	    		return;
 			}

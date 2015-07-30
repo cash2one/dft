@@ -54,7 +54,7 @@
 	<bean id="ecDao" class="com.ifugle.dft.check.dao.EnCollectionDao"/>
 	<bean id="qryDao" class="com.ifugle.dft.query.dao.QueryDao"/>
 	<bean id="dpDao" class="com.ifugle.dft.datapro.dao.DataProcessDao"/>
-	
+	<bean id="psvr" class="com.fruit.query.service.PortalService"/>
 	<context:annotation-config />
 	<tx:annotation-driven transaction-manager="txManager" />  
 	<!--<context:spring-configured />

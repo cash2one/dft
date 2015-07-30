@@ -149,7 +149,8 @@
     <init-param>  
         <param-name>query.classes</param-name>  
         <param-value>
-        	com.ifugle.dft.query.handler.QueryHandler
+        	com.ifugle.dft.query.handler.QueryHandler,
+        	com.fruit.query.handler.PortalHandler
         </param-value>
     </init-param> 
     <init-param>  

@@ -31,16 +31,20 @@
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/adapter/ext/ext-base.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/ext-all-debug.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/src/locale/ext-lang-zh_CN.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/LockingGridView.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/Ext.ux.tree.TreeCheckNodeUI.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/queryReport/charts/FusionCharts.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/portal/Portal.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/portal/PortalColumn.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/portal/Portlet.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/GridExporter.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/ExportGridPanel.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/DynamicGrid.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/DynamicMultiGrid.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/TreeWindow.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/ParamTreeWindow.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/dfCommon.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/render.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/query.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/sys.js"></script>
 <script type="text/javascript">
 /*
  * Ext JS Library 3.4.0
@@ -52,8 +56,7 @@
 Ext.BLANK_IMAGE_URL = '../libs/ext-3.4.0/resources/images/default/s.gif';
 Ext.query.REMOTING_API.enableBuffer = 0;  
 Ext.Direct.addProvider(Ext.query.REMOTING_API);
-Ext.sys.REMOTING_API.enableBuffer = 0;  
-Ext.Direct.addProvider(Ext.sys.REMOTING_API);
+App.ux.defaultPageSize=<%=cg.getString("pageSize","40")%>;
 var GRIDS = new Array();
 var CHARTS = new Array();
 var conditions ={};
@@ -63,7 +66,7 @@ var commonCbRcd = Ext.data.Record.create([
 ]);
 var cbStore = new Ext.data.Store({
     proxy : new Ext.data.DirectProxy({
-	    directFn : DataMaintainHandler.getOptionItems,
+	    directFn : PortalHandler.getOptionItems,
 	    paramOrder: ['rptID','pName','affectedBy'],
 	    paramsAsHash: false
 	}),
@@ -81,7 +84,7 @@ function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
 	if(cMulti==1){
 		if(!qpTreeMultiWin){
 			qpTreeMultiWin = new App.widget.ParamTreeWindow({
-				directFn: DataMaintainHandler.getOptionItemsOfTree,
+				directFn: PortalHandler.getOptionItemsOfTree,
 				checkModel : 'multiple',
 				treeId: 'm_'+ cQueryParam,
 				rptID: rptID,
@@ -95,7 +98,7 @@ function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
 	}else if(cMulti==2){
 		if(!qpTreeCascWin){
 			qpTreeCascWin = new App.widget.ParamTreeWindow({
-				directFn: QueryHandler.getOptionItemsOfTree,
+				directFn: PortalHandler.getOptionItemsOfTree,
 				checkModel : 'cascade',
 				treeId: 'c_'+ cQueryParam,
 				rptID: rptID,
@@ -108,7 +111,7 @@ function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
 	}else{
 		if(!qpTreeSingleWin){
 			qpTreeSingleWin = new App.widget.ParamTreeWindow({
-				directFn: DataMaintainHandler.getOptionItemsOfTree,
+				directFn: PortalHandler.getOptionItemsOfTree,
 				checkModel : 'single',
 				treeId: 's_'+ cQueryParam,
 				rptID: rptID,
@@ -209,19 +212,34 @@ function buildCondition(gridID){
 }
 Ext.onReady(function(){
 	var viewport = new Ext.Viewport({
-    	layout:'fit',
-    	id :"THE_PORTAL",
-    	xtype:'portal',
-    	items:[{}]
+		layout:'fit',
+	    items:[{
+	    	id :"THE_PORTAL",
+	    	xtype:'portal',
+	        margins:'35 5 5 0',
+	    	items:[{}/*{
+	        	items:[{"id":"text_00","title":"面板1","height":300,"layout":"fit","html":"just a minute!","ptype":"text"},
+	        	        {"id":"report_01","title":"面板2","height":200,"layout":"fit","html":"qydjcx","ptype":"report"}],
+	        	columnWidth:0.33
+	        },{
+	            "items":[{"id":"chart_10","title":"面板3","height":200,"layout":"fit","html":"dj","ptype":"chart"},
+	                     {"id":"report_11","title":"面板4","height":400,"layout":"fit","html":"dj","ptype":"report"}],
+	            columnWidth:0.33
+	        },{
+	            "items":[{"id":"text_20","title":"面板5","height":100,"layout":"fit","html":"last one","ptype":"text"}],
+	            columnWidth:0.33
+	        }*/
+	        ]
+		}]
 	});
 	Ext.Ajax.request({
 		url : 'rpt.query?doType=loadPortlets',
 		params : {portalID: 'test'},
 		success : function(response, options) {
 			if(response.responseText!=null&&response.responseText!=""){
-				var result = Ext.util.JSON.decode(response.responseText);
-				if(result){
-					var cols = result.columns;
+				var obj = Ext.util.JSON.decode(response.responseText);
+				if(obj.result){
+					var cols = obj.columns;
 					if(cols!=null&&cols.length>0){
 						for(var i=0;i<cols.length;i++){
 							var col = cols[i];
@@ -237,11 +255,12 @@ Ext.onReady(function(){
 									}
 								}
 							}
+							Ext.getCmp("THE_PORTAL").add(col);
 						}
 					}
-					Ext.getCmp("THE_PORTAL").items=cols;
+					Ext.getCmp("THE_PORTAL").doLayout();
 				}else{
-					Ext.Msg.alert("失败",""+result.info);	
+					Ext.Msg.alert("失败",""+obj.info);	
 				}
 			}
 		},
@@ -250,14 +269,20 @@ Ext.onReady(function(){
         }
 	});
 });
+Ext.getCmp("THE_PORTAL").on("afterlayout",function(ct,layout){
+	if(GRIDS!=null&&GRIDS.length>0){
+	}
+	if(CHARTS!=null&&CHARTS.length>0){
+	}
+});
 function createGrid(id){
 	var grid =GRIDS[id];
 	if(grid==null){
-		 var grid = new App.ux.DynamicGridPanelAuto({
+		 var grid = new App.ux.DynamicGridPanelMulti({
 			id: id,
 			columns : [],
 			store : new Ext.data.DirectStore({
-				directFn : DataMaintainHandler.queryGeneralDataDynamic,
+				directFn : PortalHandler.queryGeneralDataDynamic,
 				remoteSort: true,
 				paramsAsHash : false,
 				paramOrder: ['rptID','start','limit','condition'],
@@ -268,13 +293,14 @@ function createGrid(id){
 		grid.getStore().on("beforeload",function(ds,op){
 			ds.baseParams.rptID = id;
 			var tmpCdts = Ext.apply({},conditions[id]);
-			tmpCdts.metaDataLoaded = ecoGrid.metaDataLoaded;
+			tmpCdts.metaDataLoaded = grid.metaDataLoaded;
 			Ext.copyTo(tmpCdts,op.params,'sort,dir');
 			delete op.params.sort;
 			delete op.params.dir;
 			op.params.condition = Ext.encode(tmpCdts);
 		});	
 		GRIDS[id]=grid;
+		grid.getStore().load({params:{rptID:id,start:0, limit:App.ux.defaultPageSize,condition:''}});
 	}
 	return grid;
 }
@@ -283,15 +309,18 @@ function createChart(id,panelID){
 	if(chart==null){
 		Ext.Ajax.request({
 			url : 'rpt.query?doType=getChartInfo2Create',
-			params : {id: 'test'},
+			params : {id: id},
 			success : function(response, options) {
 				if(response.responseText!=null&&response.responseText!=""){
-					var result = Ext.util.JSON.decode(response.responseText);
-					if(result){
-						var ci = result.chartInfo;
-						chart = new FusionCharts(ci.swf,ci.cid,ci.width,ci.height); 
+					var obj = Ext.util.JSON.decode(response.responseText);
+					if(obj.result){
+						var ci = obj.chartInfo;
+						alert(ci.swf);
+						chart = new FusionCharts("charts/"+ci.swf,ci.cid,ci.width,ci.height); 
 						chart.setDataURL(ci.dataUrl);
 						chart.render(panelID);
+					}else{
+						chart=null;
 					}
 				}
 			}
@@ -303,5 +332,6 @@ function createChart(id,panelID){
 </script>
 </head>
 <body>
+<iframe name='ifmExport' src='' frameborder=0  marginwidth=0></iframe>
 </body>
 </html>

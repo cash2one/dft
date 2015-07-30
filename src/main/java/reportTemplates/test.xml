@@ -30,17 +30,17 @@
 <rptData sourceType="1" canPaging="1" defaultPageSize="30" >
 	<sql><![CDATA[select cf.swdjzh,cf.ename,cf.ee as cFhalfYear,cs.ee as cShalfYear,lf.ee as lFhalfYear,ls.ee as lShalfYear from
 		(select a.swdjzh,b.mc as ename,sum(se) as ee from RTK a,dj_cz b
-		where a.czfpbm='0801' and  rkrq>=20130101 and rkrq<=20130131 and a.swdjzh=b.swdjzh
+		where a.czfpbm={czfpbm} and  rkrq>=20120101 and rkrq<=20120131 and a.swdjzh=b.swdjzh
 		group by a.swdjzh,b.mc)cf,(select c.swdjzh,d.mc as ename,sum(se) as ee from RTK c,dj_cz d
-		where c.czfpbm='0801' and  rkrq>=20130201 and rkrq<=20130231 and c.swdjzh=d.swdjzh
+		where c.czfpbm={czfpbm} and  rkrq>=20120201 and rkrq<=20120231 and c.swdjzh=d.swdjzh
 		group by c.swdjzh,d.mc)cs,
 		(select e.swdjzh,f.mc as ename,sum(se) as ee from RTK e,dj_cz f
-		where e.czfpbm='0801' and  rkrq>=20120101 and rkrq<=20120131 and e.swdjzh=f.swdjzh
+		where e.czfpbm={czfpbm} and  rkrq>=20110101 and rkrq<=20110131 and e.swdjzh=f.swdjzh
 		group by e.swdjzh,f.mc)lf,
 		(select r.swdjzh,t.mc as ename,sum(se) as ee from RTK r,dj_cz t
-		where r.czfpbm='0801' and  rkrq>=20120201 and rkrq<=20120231 and r.swdjzh=t.swdjzh
+		where r.czfpbm={czfpbm} and  rkrq>=20110201 and rkrq<=20110231 and r.swdjzh=t.swdjzh
 		group by r.swdjzh,t.mc)ls
-		where cf.swdjzh=cs.swdjzh and cf.swdjzh=lf.swdjzh and cf.swdjzh=ls.swdjzh
+		where cf.swdjzh=cs.swdjzh(+) and cf.swdjzh=lf.swdjzh(+) and cf.swdjzh=ls.swdjzh(+)
 		]]>
 	</sql>
 </rptData>
