@@ -2,7 +2,7 @@
 <report id="test" name="测试" description="税收收入列表，按月统计各种税种收入及财政贡献。" multiUnit="1" defaultUnit="wan2Decimals" supportUnits='wan2Decimals,yi2Decimals'>
 <parameters>
 	
-	<para name="czfpbm" desc="乡镇" hidden="0" renderType="2" dataType="string">
+	<para name="czfpbm" desc="乡镇" hidden="0" renderType="2" dataType="string" defaultRule="_first">
 		<paraDetail multi="1" leafOnly="0" sourceType="1">
 			<sql><![CDATA[
 				SELECT A.BM,MC NAME,PID,ISLEAF FROM BM_CONT A   WHERE A.TABLE_BM='BM_CZFP'

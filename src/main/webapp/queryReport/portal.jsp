@@ -249,9 +249,9 @@ Ext.onReady(function(){
 									var pt = pts[j];
 									//根据类型构建grid或者chart，放入portlet中
 									if(pt.ptype=="report"){
-										pt.items = createGrid(pt.items);
+										pt.items = createGrid(pt.items,pt.loadInPortal);
 									}else if(pt.ptype=="chart"){
-										pt.items = createChart(pt.items,pt.id);
+										pt.items = createChart(pt.items,pt.id,pt.loadInPortal);
 									}
 								}
 							}
@@ -269,13 +269,8 @@ Ext.onReady(function(){
         }
 	});
 });
-Ext.getCmp("THE_PORTAL").on("afterlayout",function(ct,layout){
-	if(GRIDS!=null&&GRIDS.length>0){
-	}
-	if(CHARTS!=null&&CHARTS.length>0){
-	}
-});
-function createGrid(id){
+
+function createGrid(id,loadInPortal){
 	var grid =GRIDS[id];
 	if(grid==null){
 		 var grid = new App.ux.DynamicGridPanelMulti({
@@ -299,12 +294,12 @@ function createGrid(id){
 			delete op.params.dir;
 			op.params.condition = Ext.encode(tmpCdts);
 		});	
-		GRIDS[id]=grid;
 		grid.getStore().load({params:{rptID:id,start:0, limit:App.ux.defaultPageSize,condition:''}});
+		GRIDS[id]=grid;
 	}
 	return grid;
 }
-function createChart(id,panelID){
+function createChart(id,panelID,loadInPortal){
 	var chart = CHARTS[id];
 	if(chart==null){
 		Ext.Ajax.request({
@@ -316,7 +311,7 @@ function createChart(id,panelID){
 					if(obj.result){
 						var ci = obj.chartInfo;
 						alert(ci.swf);
-						chart = new FusionCharts("charts/"+ci.swf,ci.cid,ci.width,ci.height); 
+						chart = new FusionCharts("charts/"+ci.swf,ci.cid,ci.width,ci.height);
 						chart.setDataURL(ci.dataUrl);
 						chart.render(panelID);
 					}else{

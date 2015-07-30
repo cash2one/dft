@@ -90,7 +90,7 @@ public class PortalService {
 						String ptlType = jptl.has("type")?jptl.getString("type"):"text";
 						ptl.put("ptype", ptlType);
 						String id = "";
-						if(ptl.has("id")){
+						if(jptl.has("id")){
 							id = jptl.getString("id");
 						}else if("report".equals(ptlType)){
 							id = "report_"+i+j;
@@ -100,6 +100,11 @@ public class PortalService {
 							id = "text_"+i+j;
 						}
 						ptl.put("id", id);
+						/*if(jptl.has("loadInPortal")){
+							ptl.put("loadInPortal", jptl.getString("loadInPortal"));
+						}else{
+							ptl.put("loadInPortal", "");
+						}*/
 						String content = jptl.getString("content");
 						parsePortletContent(ptl,content,ptlType);
 						System.out.println("portlet("+id+"):"+ptl.toString());
@@ -129,7 +134,7 @@ public class PortalService {
 		StringBuffer jstr = new StringBuffer("{id:'test',name:'测试',total:'5',colCount:'3',defaultHeight:'200',columns:[");
 		jstr.append("{'columnwidth':'.33',items:[");
 		jstr.append("{id:'text',title:'面板1',height:'300',type:'text',content:'just a minute!'},");
-		jstr.append("{id:'tax',title:'面板2',height:'',type:'report',content:'test'}] },");
+		jstr.append("{id:'tax',title:'面板2',height:'',type:'report',content:'test',loadInPortal:'lazy'}] },");
 		jstr.append("{'columnwidth':'.33',items:[");
 		jstr.append("{title:'面板3',height:'',type:'chart',content:'dj'},");
 		jstr.append("{title:'面板4',height:'400',type:'report',content:'dj'}]");

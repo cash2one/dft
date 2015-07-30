@@ -2,14 +2,14 @@
 <report id="dj" name="测试" hasChart="1" directExport="0">
 <description><![CDATA[ 登记清单表。</br>第二行的简介<font color="red">这里是~~</font>]]></description>
 <parameters>
-	<para name="pczfpbm" desc="乡镇" hidden="0" renderType="2" dataType="string" >
+	<para name="pczfpbm" desc="乡镇" hidden="0" renderType="2" dataType="string" defaultRule="_first">
 		<paraDetail multi="1" leafOnly="1" sourceType="1">
 			<sql><![CDATA[
 				SELECT BM,MC NAME, ISLEAF, PID from bm_cont where table_bm='BM_CZFP'
 				]]></sql>
 		</paraDetail>
 	</para>
-	<para name="qyzt" desc="企业状态" hidden="0" renderType="2" dataType="1" >
+	<para name="qyzt" desc="企业状态" hidden="0" renderType="2" dataType="1" defaultRule="_first">
 		<paraDetail multi="1" sourceType="0">
 			<paraItems>
 				<item bm="0" name="非正常" pid="" isDefault="1"/>
