@@ -1,7 +1,7 @@
 /**********************************************************************
  * 
  * Code generated automatically by DirectJNgine
- * Copyright (c) 2009, Pedro AgullÃ³ Soliveres
+ * Copyright (c) 2009, Pedro Agull¨® Soliveres
  * 
  * DO NOT MODIFY MANUALLY!!
  * 
@@ -120,25 +120,25 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getUsers'/*(int, int) => java.util.Map */,
+        name: 'addPost'/*(String, String) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'addPost'/*(String, String) => String */,
+        name: 'getUsers'/*(int, int) => java.util.Map */,
         len: 2,
         formHandler: false
       }
     ],
     CodeHandler: [
       {
-        name: 'saveCodeTableMapping'/*(String, String, int) => String */,
-        len: 3,
+        name: 'delAidItems'/*(String, String) => String */,
+        len: 2,
         formHandler: false
       },
       {
-        name: 'delAidItems'/*(String, String) => String */,
-        len: 2,
+        name: 'saveCodeTableMapping'/*(String, String, int) => String */,
+        len: 3,
         formHandler: false
       },
       {
@@ -147,28 +147,13 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'deleteCodeTable'/*(String, int) => String */,
-        len: 2,
-        formHandler: false
-      },
-      {
         name: 'deleteCode'/*(String, String, String, int, String) => String */,
         len: 5,
         formHandler: false
       },
       {
-        name: 'getCodeTables'/*(int) => java.util.List */,
-        len: 1,
-        formHandler: false
-      },
-      {
         name: 'getGrades'/*() => java.util.List */,
         len: 0,
-        formHandler: false
-      },
-      {
-        name: 'getAidItemsMtTree'/*(String) => java.util.List */,
-        len: 1,
         formHandler: false
       },
       {
@@ -182,17 +167,7 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getFCodesTree'/*(String, String, String, int) => java.util.List */,
-        len: 4,
-        formHandler: false
-      },
-      {
         name: 'getCode'/*(String, int, String) => com.ifugle.dft.system.entity.Code */,
-        len: 3,
-        formHandler: false
-      },
-      {
-        name: 'getNotMappedTaxCodes'/*(int, int, int) => java.util.Map */,
         len: 3,
         formHandler: false
       },
@@ -202,13 +177,13 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getAidItems'/*(String) => java.util.List */,
-        len: 1,
+        name: 'getNotMappedTaxCodes'/*(int, int, int) => java.util.Map */,
+        len: 3,
         formHandler: false
       },
       {
-        name: 'getMappedFTable'/*(String, int) => String */,
-        len: 2,
+        name: 'getAidItems'/*(String) => java.util.List */,
+        len: 1,
         formHandler: false
       },
       {
@@ -222,17 +197,37 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getTableMappingInfo'/*(String, int, int) => String */,
-        len: 3,
-        formHandler: false
-      },
-      {
         name: 'getNotMappingCount'/*() => String */,
         len: 0,
         formHandler: false
       },
       {
-        name: 'deleteCodeTableMapping'/*(String, int) => String */,
+        name: 'getTableMappingInfo'/*(String, int, int) => String */,
+        len: 3,
+        formHandler: false
+      },
+      {
+        name: 'deleteCodeTable'/*(String, int) => String */,
+        len: 2,
+        formHandler: false
+      },
+      {
+        name: 'getCodeTables'/*(int) => java.util.List */,
+        len: 1,
+        formHandler: false
+      },
+      {
+        name: 'getAidItemsMtTree'/*(String) => java.util.List */,
+        len: 1,
+        formHandler: false
+      },
+      {
+        name: 'getFCodesTree'/*(String, String, String, int) => java.util.List */,
+        len: 4,
+        formHandler: false
+      },
+      {
+        name: 'getMappedFTable'/*(String, int) => String */,
         len: 2,
         formHandler: false
       },
@@ -240,6 +235,11 @@ Ext.sys.REMOTING_API = {
         name: 'saveAidItem'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
         len: 1,
         formHandler: true
+      },
+      {
+        name: 'deleteCodeTableMapping'/*(String, int) => String */,
+        len: 2,
+        formHandler: false
       },
       {
         name: 'saveCodeTable'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,

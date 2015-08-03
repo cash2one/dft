@@ -57,8 +57,8 @@ Ext.BLANK_IMAGE_URL = '../libs/ext-3.4.0/resources/images/default/s.gif';
 Ext.query.REMOTING_API.enableBuffer = 0;  
 Ext.Direct.addProvider(Ext.query.REMOTING_API);
 App.ux.defaultPageSize=<%=cg.getString("pageSize","40")%>;
-var GRIDS = new Array();
-var CHARTS = new Array();
+var GRIDS = {};
+var CHARTS = {};
 var conditions ={};
 var commonCbRcd = Ext.data.Record.create([
     {name : 'bm',type : 'string'}, 
@@ -93,6 +93,8 @@ function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
 				defaultValue: '',
 				canSetNull: true
 			});
+		}else{
+			qpTreeMultiWin.rptID=rptID;
 		}
 		qpTreeWin = qpTreeMultiWin;
 	}else if(cMulti==2){
@@ -106,6 +108,8 @@ function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
 				defaultValue: '',
 				canSetNull: true
 			});
+		}else{
+			qpTreeCascWin.rptID=rptID;
 		}
 		qpTreeWin = qpTreeCascWin;
 	}else{
@@ -119,10 +123,16 @@ function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
 				defaultValue: '',
 				canSetNull: true
 			});
+		}else{
+			qpTreeSingleWin.rptID=rptID;
 		}
 		qpTreeWin = qpTreeSingleWin;
 	}
-	var cmpPara = Ext.getCmp("q_"+cQueryParam);
+	
+	var grid = Ext.getCmp(rptID);
+	var tbItems = grid.getTopToolbar().items;
+	var cmpPara = tbItems.get("q_"+rptID+"_"+cQueryParam);
+	
 	var tmpPost={},mps = {};
 	if(cmpPara){
 		var aBy = cmpPara.affectedBy;
@@ -131,7 +141,9 @@ function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
 			mps = new Object();
 			for(var i = 0;i<aparas.length;i++){
 				var tp = aparas[i];
-				var tcmp = Ext.getCmp("q_h_"+tp);
+				var tcmp=tbItems.get("q_h_"+rptID+"_"+tp)
+
+				
 				if(tcmp){
 					var val =tcmp.getValue();
 					mps[aparas]=val;
@@ -143,8 +155,10 @@ function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
 	var p = {rptID: rptID,pName: cQueryParam,affectedBy: Ext.encode(tmpPost)};
 	qpTreeWin.onSelect = function(value){
 		if(!value)return;
-		Ext.getCmp("q_h_"+cQueryParam).setValue(value.id); 
-		Ext.getCmp("q_"+cQueryParam).setValue(value.text); 
+		var g = Ext.getCmp(rptID);
+		var tbs = g.getTopToolbar().items;
+		tbs.item("q_h_"+rptID+"_"+cQueryParam).setValue(value.id);
+		tbs.item("q_"+rptID+"_"+cQueryParam).setValue(value.text);
 	};
 	qpTreeWin.setTreeParams(p);
 	qpTreeWin.refreshTree();
@@ -169,7 +183,7 @@ function buildCondition(gridID){
 		if(it.xtype=="textfield"||it.xtype=="datefield"){
 			val =it.getValue();
 		}else if(it.xtype=="trigger"||it.xtype=="combo"){
-			val =Ext.getCmp("q_h_"+it.id.substring(2)).getValue();
+			var val = tbItems.get("q_h_"+gridID+"_"+it.id.substring(3+gridID.length)).getValue();
 		}else{
 			continue;
 		}
@@ -200,11 +214,12 @@ function buildCondition(gridID){
 		if(it.xtype=="textfield"||it.xtype=="datefield"){
 			val =it.getValue();
 		}else if(it.xtype=="trigger"||it.xtype=="combo"){
-			val =Ext.getCmp("q_h_"+it.id.substring(2)).getValue();
+			alert(it.id.substring(3+gridID.length));
+			var val = tbItems.get("q_h_"+gridID+"_"+it.id.substring(3+gridID.length)).getValue();
 		}else{
 			continue;
 		}
-		mps[it.id.substring(2)]=val;
+		mps[it.id.substring(3+gridID.length)]=val;
 	}
 	dParams.macroParams = mps;
 	conditions[gridID]=dParams;
@@ -310,7 +325,6 @@ function createChart(id,panelID,loadInPortal){
 					var obj = Ext.util.JSON.decode(response.responseText);
 					if(obj.result){
 						var ci = obj.chartInfo;
-						alert(ci.swf);
 						chart = new FusionCharts("charts/"+ci.swf,ci.cid,ci.width,ci.height);
 						chart.setDataURL(ci.dataUrl);
 						chart.render(panelID);

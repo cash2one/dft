@@ -356,7 +356,7 @@ public class QueryReportServlet extends HttpServlet{
 				String portalID=request.getParameter("portalID");
 				if(portalID!=null&&!"".equals(portalID)){
 					PortalService ps = PortalService.getPortalService();
-					jpls=ps.loadPortlets(portalID); 
+					jpls=ps.getPortlets(portalID); 
 				}else{
 					jpls = "{result:false,info:'portalID为空！'}";
 				}

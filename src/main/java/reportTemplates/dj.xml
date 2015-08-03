@@ -2,7 +2,7 @@
 <report id="dj" name="测试" hasChart="1" directExport="0">
 <description><![CDATA[ 登记清单表。</br>第二行的简介<font color="red">这里是~~</font>]]></description>
 <parameters>
-	<para name="pczfpbm" desc="乡镇" hidden="0" renderType="2" dataType="string" defaultRule="_first">
+	<para name="czfpbm" desc="乡镇" hidden="0" renderType="2" dataType="string" defaultRule="_first">
 		<paraDetail multi="1" leafOnly="1" sourceType="1">
 			<sql><![CDATA[
 				SELECT BM,MC NAME, ISLEAF, PID from bm_cont where table_bm='BM_CZFP'
@@ -18,7 +18,7 @@
 		</paraDetail>
 	</para>
 </parameters>
-<title>$pczfpbm$登记清册</title>
+<title>$czfpbm$登记清册</title>
 <head titleInHead="1" style="headTitle" height='60'>
 	<subTitle center="年月：2013年10月" cStyle="subTitleC" lStyle="subTitleL" rStyle="subTitleR"/>
 </head>
@@ -50,7 +50,7 @@
 		</sql>
 	</rptData>
 </DataSets>
-<foot left="制表单位:$pczfpbm$" cStyle="footC" lStyle="footL" rStyle="footR"/>
+<foot left="制表单位:$czfpbm$" cStyle="footC" lStyle="footL" rStyle="footR"/>
 <chart id="colTest" chartType="Multi-MSColumn3D" width="300" height="300" dataTemplateName="col_single_test">
 	<data sourceType="1" dataFormat="0" isMultiSeries="1" categoryIndex="CZFPBM" dataIndex="CC" seriesIndex="ISMAP">
 		<sql><![CDATA[
@@ -76,6 +76,6 @@
 	</data>
 </chart>
 <!--expName:导出文件的文件名。如果没有设置expName，则使用title，如果title也未设置，则使用模板名tmp-->
-<export template="test.xls" expName="$pczfpbm$登记清册"/>
+<export template="test.xls" expName="$czfpbm$登记清册"/>
 </report>
 

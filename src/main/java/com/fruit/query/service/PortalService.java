@@ -14,6 +14,7 @@ import com.fruit.query.data.ParaValue;
 import com.fruit.query.data.Row;
 import com.fruit.query.data.RptMultiHeader;
 import com.fruit.query.data.Unit;
+import com.fruit.query.parser.PortalInfoParser;
 import com.fruit.query.parser.TemplatesLoader;
 import com.fruit.query.report.Chart;
 import com.fruit.query.report.ColumnDefine;
@@ -33,114 +34,31 @@ public class PortalService {
 			portalService=new PortalService();
 		return portalService;
 	}
-	public String loadPortlets(String portalID) {
-		String strPdesign = "";
-		try{
-			strPdesign = getPortalByID(portalID);
-		}catch(Exception e){
-			System.out.println(e.toString());
-			return "{result:false,info:'加载portal设计信息时发生错误!'}";
-		}
+	public String getPortlets(String portalID) {
 		JSONArray jpls = null;
-		try{
-			jpls = parse2Portlets(strPdesign);
-		}catch(Exception e){
-			System.out.println(e.toString());
-			return "{result:false,info:'解析portal设计信息时发生错误!'}";
+		PortalInfoParser parser = PortalInfoParser.getParser();
+		jpls = parser.getExtPortletsById(portalID);
+		//如果还未找到缓存的、已构造的portlets，尝试重新按设计文件构造
+		if(jpls==null){
+			//缓存里找到设计信息
+			JSONObject portalDesignInfo = null;
+			try{
+				portalDesignInfo =parser.getPortalDesignByID(portalID);
+			}catch(Exception e){
+				System.out.println(e.toString());
+				return "{result:false,info:'加载portal设计信息时发生错误!'}";
+			}
+			//设计信息构造成Ext的portlet构件
+			try{
+				jpls = parser.parse2Portlets(portalDesignInfo);
+			}catch(Exception e){
+				System.out.println(e.toString());
+				return "{result:false,info:'解析portal设计信息时发生错误!'}";
+			}
 		}
 		StringBuffer strPls = new StringBuffer("{result:true,columns:");
 		strPls.append(jpls==null?"[]":jpls.toString()).append("}");
 		return strPls.toString();
-	}
-	//按portal配置信息生成ext的panel成员
-	public JSONArray parse2Portlets(String strPls)throws Exception {
-		JSONObject jp = new JSONObject(strPls);
-		//默认列宽和面板高度
-		float dfColumnWidth =(float)(Math.round(100/jp.getInt("colCount")))/100;
-		int dfHeight = 200;
-		try{
-			dfHeight = jp.has("defaultHeight")?jp.getInt("defaultHeight"):200;
-		}catch(Exception e){
-		}
-		JSONArray jcols = jp.getJSONArray("columns");
-		JSONArray colpanels = null;
-		if(jcols!=null&&jcols.length()>0){
-			//按列循环
-			colpanels = new JSONArray();
-			for(int i=0;i<jcols.length();i++){
-				JSONObject jcol = jcols.getJSONObject(i);
-				JSONObject colpanel = new JSONObject();
-				colpanel.put("columnWidth", jcol.has("columnwidth")?jcol.getDouble("columnwidth"):dfColumnWidth);
-				JSONArray jptls = jcol.getJSONArray("items");
-				JSONArray ptls = null;
-				if(jptls!=null){
-					//一个列中的portlet面板循环
-					ptls = new JSONArray();
-					for(int j = 0;j<jptls.length();j++){
-						JSONObject jptl = jptls.getJSONObject(j);
-						JSONObject ptl = new JSONObject();
-						ptl.put("layout", "fit");
-						int h = 200;
-						try{
-							h=jptl.has("height")?jptl.getInt("height"):dfHeight;
-						}catch(Exception e){
-						}
-						ptl.put("height", h);
-						ptl.put("title", jptl.has("title")?jptl.getString("title"):"");
-						String ptlType = jptl.has("type")?jptl.getString("type"):"text";
-						ptl.put("ptype", ptlType);
-						String id = "";
-						if(jptl.has("id")){
-							id = jptl.getString("id");
-						}else if("report".equals(ptlType)){
-							id = "report_"+i+j;
-						}else if("chart".equals(ptlType)){
-							id = "chart_"+i+j;
-						}else{
-							id = "text_"+i+j;
-						}
-						ptl.put("id", id);
-						/*if(jptl.has("loadInPortal")){
-							ptl.put("loadInPortal", jptl.getString("loadInPortal"));
-						}else{
-							ptl.put("loadInPortal", "");
-						}*/
-						String content = jptl.getString("content");
-						parsePortletContent(ptl,content,ptlType);
-						System.out.println("portlet("+id+"):"+ptl.toString());
-						ptls.put(ptl);
-					}
-				}
-				colpanel.put("items", ptls);
-				System.out.println("colpanel("+i+"):"+colpanel.toString());
-				colpanels.put(colpanel);
-			}
-		}
-		System.out.println("最终输出总的面板:"+colpanels.toString());
-		return colpanels;
-	}
-	//根据类型解析portlet的具体内容
-	public void parsePortletContent(JSONObject ptl,String content,String ptlType)throws Exception{
-		if("report".equals(ptlType)||"chart".equals(ptlType)){
-			ptl.put("items", content);
-			//ptl.put("html", content);
-		}else {
-			ptl.put("html", content);
-		}
-	}
-	
-	//根据id获取portal配置信息
-	public String getPortalByID(String pid)throws Exception{
-		StringBuffer jstr = new StringBuffer("{id:'test',name:'测试',total:'5',colCount:'3',defaultHeight:'200',columns:[");
-		jstr.append("{'columnwidth':'.33',items:[");
-		jstr.append("{id:'text',title:'面板1',height:'300',type:'text',content:'just a minute!'},");
-		jstr.append("{id:'tax',title:'面板2',height:'',type:'report',content:'test',loadInPortal:'lazy'}] },");
-		jstr.append("{'columnwidth':'.33',items:[");
-		jstr.append("{title:'面板3',height:'',type:'chart',content:'dj'},");
-		jstr.append("{title:'面板4',height:'400',type:'report',content:'dj'}]");
-		jstr.append("},{'columnwidth':'.33',items:[");
-		jstr.append("{title:'面板5',height:'100',type:'text',content:'last one'}]}]}");
-		return jstr.toString();
 	}
 	public String getChartInfo2Create(String rptID) {
 		StringBuffer cinfo = new StringBuffer("");
@@ -325,7 +243,7 @@ public class PortalService {
 		Map cont = new HashMap<String, Object>();
 		if (pa.getRenderType() == 1) {
 			cont.put("xtype", "hidden");
-			cont.put("id", "q_h_" + pa.getName());
+			cont.put("id", "q_h_"+rptID+"_" + pa.getName());
 			cont.put("filterFld", filterFld);
 			cont.put("vop", valueOperator);
 			ParaValue op = null;
@@ -337,7 +255,7 @@ public class PortalService {
 			cont = new HashMap<String, Object>();
 			cont.put("rptID", rptID);
 			cont.put("xtype", "combo");
-			cont.put("id", "q_" + pa.getName());
+			cont.put("id", "q_"+rptID+"_" + pa.getName());
 			cont.put("width", 60);
 			cont.put("hiddenName", pa.getName());
 			cont.put("valueField", "bm");
@@ -351,7 +269,7 @@ public class PortalService {
 			cont.put("value", op == null ? "" : op.getDesc());
 		} else if (pa.getRenderType() == 2) {
 			cont.put("xtype", "hidden");
-			cont.put("id", "q_h_" + pa.getName());
+			cont.put("id", "q_h_" +rptID+"_"+ pa.getName());
 			cont.put("filterFld", filterFld);
 			cont.put("vop", valueOperator);
 			ParaValue op = null;
@@ -363,7 +281,7 @@ public class PortalService {
 			cont = new HashMap<String, Object>();
 			cont.put("rptID", rptID);
 			cont.put("xtype", "trigger");
-			cont.put("id", "q_" + pa.getName());
+			cont.put("id", "q_" +rptID+"_"+ pa.getName());
 			cont.put("width", 60);
 			cont.put("isMulti", pa.getIsMulti());
 			cont.put("filterFld", filterFld);
@@ -374,7 +292,7 @@ public class PortalService {
 		} else if (pa.getRenderType() == 3) {
 			cont.put("rptID", rptID);
 			cont.put("xtype", "datefield");
-			cont.put("id", "q_" + pa.getName());
+			cont.put("id", "q_"+rptID+"_" + pa.getName());
 			cont.put("width", 70);
 			String d = pa.getDateFormat();
 			cont.put("format", (d == null || "".equals(d)) ? "Y-m-d" : d);
@@ -384,7 +302,7 @@ public class PortalService {
 		} else {
 			cont.put("rptID", rptID);
 			cont.put("xtype", "textfield");
-			cont.put("id", "q_" + pa.getName());
+			cont.put("id", "q_" +rptID+"_"+ pa.getName());
 			cont.put("width", 80);
 			cont.put("filterFld", filterFld);
 			cont.put("vop", valueOperator);

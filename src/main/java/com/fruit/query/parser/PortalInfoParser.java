@@ -1,0 +1,218 @@
+package com.fruit.query.parser;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.*;
+
+import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.fruit.query.util.QueryConfig;
+
+public class PortalInfoParser {
+	private static Logger log = Logger.getLogger(PortalInfoParser.class);
+	private static PortalInfoParser pps;
+
+	private PortalInfoParser() {
+	}
+	public static PortalInfoParser getParser() {
+		if (pps == null)
+			pps = new PortalInfoParser();
+		return pps;
+	}
+	private List infos = null;
+	private Map infosMap = null;
+	private Map extPortletsMap = null;
+	//载入指定目录下的设计文件，缓存，并解析成ext组件，也缓存
+	public void loadPortalInfosFromFs(String id){
+		String path=QueryConfig.getConfig().getString("portalInfoPath", "portalInfos");
+		String pathType = QueryConfig.getConfig().getString("rptPathType", "relative");
+		String pre=path.substring(0,1);
+		if("relative".equals(pathType)){//相对路径模式
+			if(!"/".equals(pre)){
+				path="/"+path;
+			}
+			URL rootP=TemplatesLoader.class.getClassLoader().getResource(path); 
+			if(rootP==null){
+				log.info("root of portalInfo is null!");
+				return;
+			}
+			try{
+				System.out.println("root of portalInfo:"+rootP.getPath());
+				path=rootP.toURI().getPath();
+			}catch(Throwable e){
+				System.out.println("toURI转换错误："+e.toString());
+				path=rootP.getPath();
+				path = path.replaceAll("%20", " ");
+			}
+		}
+		List portalPaths=new ArrayList();
+		infos=new ArrayList();
+		infosMap=new HashMap();
+		extPortletsMap =new HashMap();
+		InputStream is=null;
+		try{
+			java.io.File dir=new java.io.File(path);
+			getAllFilesPath(dir,portalPaths);
+			System.out.println("共找到"+portalPaths.size()+"个文件！");
+			//各个报表设计文件循环解析、加载。
+			if(portalPaths!=null&&portalPaths.size()>0){
+				for(int i=0;i<portalPaths.size();i++){
+					//文件流转化成string作为参数传递给解析器
+					String xmlPath=(String)portalPaths.get(i);
+					File ptFile=new File(xmlPath); 
+					is=new FileInputStream(ptFile) ;
+					long contentLength = ptFile.length();
+					byte[] ba = new byte[(int)contentLength];
+					is.read(ba);
+					String ptDesignInfo = new String(ba,"utf-8");
+					is.close();
+					JSONObject jp=null;
+					try{
+						jp = new JSONObject(ptDesignInfo);
+					}catch(Exception e){
+						System.out.println(e.toString());
+					}
+					if(jp==null){
+						continue;
+					}else{
+						JSONArray portlets =null;
+						try{
+							portlets =parse2Portlets(jp);
+						}catch(Exception e){
+						}
+						if(portlets!=null){
+							extPortletsMap.put(jp.getString("id"),portlets);
+						}
+						infos.add(jp);
+						infosMap.put(jp.getString("id"), jp);
+					}
+					
+				}
+				System.out.println("共解析"+infos.size()+"个portal设计文件！");
+			}
+		}catch(Exception e){
+			if(is!=null){
+				try{
+					is.close();
+				}catch(Exception ex){};
+			}
+			System.out.print("加载报表设计文件信息时发生错误："+e.toString());
+		}finally{
+			try{
+				is.close();
+			}catch(Exception e){
+				
+			}
+		}
+		return ;
+	}
+	//按portal配置信息生成ext的panel成员
+	public JSONArray parse2Portlets(JSONObject jp)throws Exception {
+		//默认列宽和面板高度
+		float dfColumnWidth =(float)(Math.round(100/jp.getInt("colCount")))/100;
+		int dfHeight = 200;
+		try{
+			dfHeight = jp.has("defaultHeight")?jp.getInt("defaultHeight"):200;
+		}catch(Exception e){
+		}
+		JSONArray jcols = jp.getJSONArray("columns");
+		JSONArray colpanels = null;
+		if(jcols!=null&&jcols.length()>0){
+			//按列循环
+			colpanels = new JSONArray();
+			for(int i=0;i<jcols.length();i++){
+				JSONObject jcol = jcols.getJSONObject(i);
+				JSONObject colpanel = new JSONObject();
+				colpanel.put("columnWidth", jcol.has("columnwidth")?jcol.getDouble("columnwidth"):dfColumnWidth);
+				JSONArray jptls = jcol.getJSONArray("items");
+				JSONArray ptls = null;
+				if(jptls!=null){
+					//一个列中的portlet面板循环
+					ptls = new JSONArray();
+					for(int j = 0;j<jptls.length();j++){
+						JSONObject jptl = jptls.getJSONObject(j);
+						JSONObject ptl = new JSONObject();
+						ptl.put("layout", "fit");
+						int h = 200;
+						try{
+							h=jptl.has("height")?jptl.getInt("height"):dfHeight;
+						}catch(Exception e){
+						}
+						ptl.put("height", h);
+						ptl.put("title", jptl.has("title")?jptl.getString("title"):"");
+						String ptlType = jptl.has("type")?jptl.getString("type"):"text";
+						ptl.put("ptype", ptlType);
+						String id = "";
+						if(jptl.has("id")){
+							id = jptl.getString("id");
+						}else if("report".equals(ptlType)){
+							id = "report_"+i+j;
+						}else if("chart".equals(ptlType)){
+							id = "chart_"+i+j;
+						}else{
+							id = "text_"+i+j;
+						}
+						ptl.put("id", id);
+						/*if(jptl.has("loadInPortal")){
+							ptl.put("loadInPortal", jptl.getString("loadInPortal"));
+						}else{
+							ptl.put("loadInPortal", "");
+						}*/
+						String content = jptl.getString("content");
+						parsePortletContent(ptl,content,ptlType);
+						System.out.println("portlet("+id+"):"+ptl.toString());
+						ptls.put(ptl);
+					}
+				}
+				colpanel.put("items", ptls);
+				System.out.println("colpanel("+i+"):"+colpanel.toString());
+				colpanels.put(colpanel);
+			}
+		}
+		System.out.println("最终输出总的面板:"+colpanels.toString());
+		return colpanels;
+	}
+	//根据类型解析portlet的具体内容
+	private void parsePortletContent(JSONObject ptl,String content,String ptlType)throws Exception{
+		if("report".equals(ptlType)||"chart".equals(ptlType)){
+			ptl.put("items", content);
+		}else {
+			ptl.put("html", content);
+		}
+	}
+	//返回设计信息
+	public JSONObject getPortalDesignByID(String id){
+		JSONObject pi = null;
+		if(infosMap!=null){
+			pi = (JSONObject)infosMap.get(id);
+		}
+		return pi;
+	}
+	//返回构造好的portlets
+	public JSONArray getExtPortletsById(String id){
+		JSONArray pts = null;
+		if(infosMap!=null){
+			pts = (JSONArray)extPortletsMap.get(id);
+		}
+		return pts;
+	}
+	public void loadPortalInfosFromDb(){
+		//stub
+	}
+	private void getAllFilesPath(File dir,List pathList)throws Exception{
+		File[] fs = dir.listFiles(); 
+		if(fs==null||fs.length==0)return;
+		for(int i=0; i<fs.length; i++){ 
+			if(fs[i].isDirectory()){
+				getAllFilesPath(fs[i],pathList); 
+			}else{
+				pathList.add(fs[i].getAbsolutePath());
+				System.out.println(fs[i].getAbsolutePath());
+			}
+		} 
+	}
+}

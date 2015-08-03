@@ -40,7 +40,7 @@ public class PortalHandler {
 		psvr = (PortalService)ContextUtil.getBean("psvr");
 		cg = (Configuration)ContextUtil.getBean("config");
 		if(cg!=null){
-			cg.getHandlersMap().put("DataHandler","com.fruit.query.handler.PortalHandler");
+			cg.getHandlersMap().put("PortalHandler","com.fruit.query.handler.PortalHandler");
 		}
 	}
 	public void setWebContext(WebContext ctx){

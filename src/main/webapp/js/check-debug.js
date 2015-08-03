@@ -1,7 +1,7 @@
 /**********************************************************************
  * 
  * Code generated automatically by DirectJNgine
- * Copyright (c) 2009, Pedro AgullÃ³ Soliveres
+ * Copyright (c) 2009, Pedro Agull¨® Soliveres
  * 
  * DO NOT MODIFY MANUALLY!!
  * 
@@ -169,14 +169,14 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'savePzDetail'/*(String, String, String, String, String) => String */,
-        len: 5,
-        formHandler: false
-      },
-      {
         name: 'saveVirtualEn'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
         len: 1,
         formHandler: true
+      },
+      {
+        name: 'savePzDetail'/*(String, String, String, String, String) => String */,
+        len: 5,
+        formHandler: false
       },
       {
         name: 'getNewPzDetail'/*() => java.util.List */,

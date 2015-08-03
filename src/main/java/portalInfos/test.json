@@ -1,0 +1,11 @@
+{id:'test',name:'测试',total:'5',colCount:'3',defaultHeight:'200',columns:[
+	{'columnwidth':'.33',items:[
+		{id:'text',title:'面板1',height:'300',type:'text',content:'just a minute!'},
+		{id:'tax',title:'面板2',height:'',type:'report',content:'test',loadInPortal:'lazy'}]
+	},{'columnwidth':'.33',items:[
+		{title:'面板3',height:'',type:'chart',content:'dj'},
+		{title:'面板4',height:'400',type:'report',content:'dj'}]
+	},{'columnwidth':'.33',items:[
+		{title:'面板5',height:'100',type:'text',content:'last one'}]
+	}]
+}

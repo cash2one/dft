@@ -58,6 +58,8 @@ App.ux.DynamicGridPanel = function(config) {
 		scope : this,
 		handler : function(btn, e) {
 			this.exportExcel();
+			//var expUrl='getRptData.query?doType=toExcel&rptID='+this.id;
+	        //window.open(expUrl,"","scrollbars=auto,toolbar=yes,location=no,directories=no,status=no,menubar=yes,resizable=yes,width=780,height=500,left=10,top=50");
 		}
 	});
 	var btns = [this.actExportXLS];
@@ -234,7 +236,7 @@ App.ux.DynamicGridPanelMulti = Ext.extend(App.ux.DynamicGridPanel, {
 						it.listeners = {
 						    beforequery: function(qe){
 								cbStore.baseParams.pName = qe.combo.getName();
-								cbStore.baseParams.rptID = tmpId;
+								cbStore.baseParams.rptID = this.rptID;
 								var tmpPost={},mps = {};
 								var aBy = qe.combo.affectedBy;
 								if(aBy){
@@ -242,7 +244,7 @@ App.ux.DynamicGridPanelMulti = Ext.extend(App.ux.DynamicGridPanel, {
 									mps = new Object();
 									for(var i = 0;i<aparas.length;i++){
 										var tp = aparas[i];
-										var tcmp = Ext.getCmp("q_h_"+tp);
+										var tcmp = Ext.getCmp("q_h_"+this.rptID+"_"+tp);
 										if(tcmp){
 											var val =tcmp.getValue();
 											mps[aparas]=val;
@@ -254,15 +256,15 @@ App.ux.DynamicGridPanelMulti = Ext.extend(App.ux.DynamicGridPanel, {
 								cbStore.load();
 							},
 							select: function(combo, record, index) {
-								Ext.getCmp('q_h_'+this.id.substring(2)).setValue(record.get('bm'));
+								Ext.getCmp('q_h_'+this.rptID+"_"+this.id.substring(3+this.rptID.length)).setValue(record.get('bm'));
 								var affs = combo.affect;
 								var arrCmps = affs?affs.split(","):[];
 								for(var i=0;i<arrCmps.length;i++){
-									var cp = Ext.getCmp("q_"+arrCmps[i]);
+									var cp = Ext.getCmp("q_"+this.rptID+"_"+arrCmps[i]);
 									if(cp){
 										cp.setValue("");
 									}
-									var hcp = Ext.getCmp("q_h_"+arrCmps[i]);
+									var hcp = Ext.getCmp("q_h_"+this.rptID+"_"+arrCmps[i]);
 									if(hcp){
 										hcp.setValue("");
 									}
@@ -273,7 +275,7 @@ App.ux.DynamicGridPanelMulti = Ext.extend(App.ux.DynamicGridPanel, {
 						it.editable = false;
 						it.destroy = Ext.emptyFn;
 						it.onTriggerClick=function(){
-							showQparamTree(it.rptID,this.id.substring(2),this.isMulti);
+							showQparamTree(it.rptID,this.id.substring(3+this.rptID.length),this.isMulti);
 						};
 					}
 					this.grid.getTopToolbar().add(it);
