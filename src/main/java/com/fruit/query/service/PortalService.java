@@ -332,4 +332,166 @@ public class PortalService {
 		}
 		return units;
 	}
+	public List getPortals() {
+		List pts = null;
+		PortalInfoParser parser = PortalInfoParser.getParser();
+		pts = parser.getPortalDesigns();
+		return pts;
+	}
+	public boolean deletePortaDesign(String pid) {
+		PortalInfoParser parser = PortalInfoParser.getParser();
+		parser.deletePortalDesign(pid);
+		return true;
+	}
+	//保存配置信息，要更新缓存，并将内容重写到文件系统
+	public boolean savePortal(Map params, String pid) {
+		String cMode= (String)params.get("cMode");
+		String rows = (String)params.get("rows");
+		String name = (String)params.get("name");
+		String remark = (String)params.get("remark");
+		String sdfHeight = (String)params.get("defaultHeight");
+		String scolCount = (String)params.get("colCount");
+		int colCount = 0,defaultHeight=200;
+		try{
+			colCount = Integer.parseInt(scolCount);
+		}catch(Exception e){
+		}
+		try{
+			defaultHeight = Integer.parseInt(sdfHeight);
+		}catch(Exception e){
+		}
+		JSONObject jpt = new JSONObject();
+		JSONArray jrows = null;
+		int pc = 0;
+		//解析来自grid行的portlet的设计，统计portlet数量并更新total属性，并结合列数计算columnWidth，重组内容
+		try{
+			jrows = new JSONArray(rows);
+			pc = jrows==null?0:jrows.length();
+			double columnWidth = Math.round(100/colCount)/100.0;
+			JSONArray parsedCols = parsePortalColumns(jrows,colCount,columnWidth);
+			jpt.put("id", pid);
+			jpt.put("name", name);
+			jpt.put("remark", remark);
+			jpt.put("colCount", colCount);
+			jpt.put("defaultHeight", defaultHeight);
+			jpt.put("total", pc);
+			jpt.put("columns", parsedCols);
+		}catch(Exception e){
+		}
+		//更新缓存
+		PortalInfoParser ps = PortalInfoParser.getParser();
+		ps.refreshPortalByID(pid,jpt);
+		//保存到文件
+		return true;
+	}
+	private JSONArray parsePortalColumns(JSONArray jrows, int colCount,double columnWidth) {
+		if(jrows==null||jrows.length()==0||colCount<=0){ 
+			return null;
+		}
+		JSONArray cols = new JSONArray();
+		int jl = jrows.length();
+		int extraPc = jl%colCount;
+		int pcOfEachCol = jl/colCount;
+		try{
+			for(int i=0;i<extraPc;i++){
+				JSONObject col = new JSONObject();
+				col.put("columnWidth", columnWidth);
+				JSONArray items = new JSONArray();
+				int s = i*(pcOfEachCol+1),e = (i+1)*(pcOfEachCol+1);
+				for(int j=s;j<e;j++){
+					JSONObject jr = jrows.getJSONObject(j);
+					parseCol(jr);
+					items.put(jr);
+				}
+				col.put("items", items);
+				cols.put(col);
+			}
+			int rStart = (pcOfEachCol+1)*extraPc;
+			for(int i =extraPc;i<colCount;i++){
+				JSONObject col = new JSONObject();
+				col.put("columnWidth", columnWidth);
+				JSONArray items = new JSONArray();
+				int s = rStart+(i-extraPc)*pcOfEachCol,e =rStart+(i+1-extraPc)*pcOfEachCol;
+				for(int j=s;j<e;j++){
+					JSONObject jr = jrows.getJSONObject(j);
+					parseCol(jr);
+					items.put(jr);
+				}
+				col.put("items", items);
+				cols.put(col);
+			}
+		}catch(Exception e){
+		}
+		
+		return cols;
+	}
+	private void parseCol(JSONObject jr) throws Exception{
+		if(!jr.has("height")||"".equals(jr.getString("height"))){
+			jr.put("height", 200);
+		}
+		String sType = jr.has("type")?jr.getString("type"):"";
+		if("1".equals(sType)){
+			jr.put("type", "chart");
+		}else if("2".equals(sType)){
+			jr.put("type", "text");
+		}else{
+			jr.put("type", "report");
+		}
+	}
+	public boolean checkPortalid(String id) {
+		boolean dup = false;
+		PortalInfoParser parser = PortalInfoParser.getParser();
+		Map pmaps = parser.getPortalDesignsMap();
+		if(pmaps!=null&&pmaps.containsKey(id)){
+			dup = true;
+		}
+		return dup;
+	}
+	public JSONObject getPortalDesign(String id) {
+		JSONObject info = new JSONObject();
+		PortalInfoParser parser = PortalInfoParser.getParser();
+		JSONObject jds = parser.getPortalDesignByID(id);
+		if(jds!=null){
+			try{
+				JSONObject jsum = new JSONObject();
+				jsum.put("id", jds.getString("id"));
+				jsum.put("name", jds.getString("name"));
+				jsum.put("remark", jds.has("remark")?jds.getString("remark"):"");
+				jsum.put("defaultHeight", jds.has("defaultHeight")?jds.getString("defaultHeight"):200);
+				jsum.put("colCount", jds.has("colCount")?jds.getString("colCount"):1);
+				info.put("portalInfo", jsum);
+				
+				JSONArray jcols =  jds.getJSONArray("columns");
+				JSONArray pts = new JSONArray();
+				if(jcols!=null&&jcols.length()>0){
+					for(int i=0;i<jcols.length();i++){
+						JSONObject jcol = jcols.getJSONObject(i);
+						JSONArray jptls = jcol.getJSONArray("items");
+						for(int j = 0;j<jptls.length();j++){
+							JSONObject jptl = jptls.getJSONObject(j);
+							JSONObject ptl = new JSONObject();
+							ptl.put("id", jptl.has("id")?jptl.getString("id"):"");
+							ptl.put("title", jptl.has("title")?jptl.getString("title"):"");
+							ptl.put("height", jptl.has("height")?jptl.getString("height"):"");
+							String type = "0";
+							String jtype = jptl.has("type")?jptl.getString("type"):"";
+							if("chart".equals(jtype)){
+								type="1";
+							}else if("text".equals(jtype)){
+								type="2";
+							}else {
+								type="0";
+							}
+							ptl.put("type", type);
+							ptl.put("content", jptl.has("content")?jptl.getString("content"):"");
+							pts.put(ptl);
+						}
+					}
+				}
+				info.put("portlets", pts);
+			}catch(Exception e){
+			}
+		}
+		return info;
+	}
 }

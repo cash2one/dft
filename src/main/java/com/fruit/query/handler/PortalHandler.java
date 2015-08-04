@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import com.fruit.query.data.OptionItem;
 import com.fruit.query.data.ParaValue;
+import com.fruit.query.data.PortalInfo;
 import com.fruit.query.parser.TemplatesLoader;
 import com.fruit.query.report.Parameter;
 import com.fruit.query.report.ParameterForFilter;
@@ -27,6 +28,8 @@ import com.ifugle.dft.utils.ContextUtil;
 import com.ifugle.dft.utils.entity.TreeNode;
 import com.ifugle.dft.query.entity.StoreResult;
 import com.ifugle.dft.system.entity.User;
+import com.ifugle.dft.utils.entity.SubmitResult;
+import com.softwarementors.extjs.djn.config.annotations.DirectFormPostMethod;
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod;
 import com.softwarementors.extjs.djn.servlet.ssm.WebContext;
 import com.softwarementors.extjs.djn.servlet.ssm.WebContextManager;
@@ -515,5 +518,74 @@ public class PortalHandler {
 			log.error(e.toString());
 		}
 		return units;
+	}
+	@DirectMethod
+	public List getPortals(){
+		List portals = null;
+		try{
+			List jpts = psvr.getPortals();
+			if(jpts!=null){
+				portals = new ArrayList();
+				for(int i=0;i<jpts.size();i++){
+					JSONObject jp = (JSONObject)jpts.get(i);
+					PortalInfo tp = new PortalInfo();
+					tp.setId(jp.getString("id"));
+					tp.setName(jp.getString("name"));
+					tp.setRemark(jp.has("remark")?jp.getString("remark"):"");
+					int tt = 0,cc = 0;
+					try{
+						String stt = jp.has("total")?jp.getString("total"):"0";
+						tt = Integer.parseInt(stt);
+					}catch(Exception e){
+					}
+					try{
+						String scc = jp.has("colCount")?jp.getString("colCount"):"1";
+					}catch(Exception e){
+					}
+					tp.setTotal(tt);
+					tp.setColCount(cc);
+					portals.add(tp);
+				}
+			}
+		}catch(Exception e){
+			log.error(e.toString());
+		}
+		return portals;
+	}
+	@DirectMethod
+	public String deletePortalDesign(String pid){
+		StringBuffer json = new StringBuffer("{result:");
+		boolean done = psvr.deletePortaDesign(pid);
+		json.append(done).append("}");
+		return json.toString();
+	}
+	@DirectFormPostMethod
+	public SubmitResult savePortal(Map params,Map fileFields){
+		SubmitResult result = new SubmitResult();
+		Map errors = new HashMap();	
+		String pid = (String)params.get("portalid");
+		try{
+			boolean done =psvr.savePortal(params, pid);
+			result.setSuccess(done);
+			Map infos = new HashMap();
+			infos.put("msg", "保存portal配置信息成功！");
+			result.setInfos(infos);
+		}catch(Throwable e){
+			result.setSuccess(false);
+			errors.put("msg", "保存portal配置信息时发生错误："+e.toString());
+		}
+		return result;
+	}
+	@DirectMethod
+	public String checkPortalid(String id){
+		StringBuffer result = new StringBuffer("{duplicate:");
+		boolean duplicate =  psvr.checkPortalid(id);
+		result.append(duplicate).append("}");
+		return result.toString();
+	}
+	@DirectMethod
+	public String getPortalDesign(String id){
+		JSONObject info = psvr.getPortalDesign(id);
+		return info==null?"{}":info.toString();
 	}
 }

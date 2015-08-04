@@ -315,7 +315,7 @@ var userForm = new Ext.FormPanel({
         }),
         valueField : "Id", 
         displayField : "text", 
-        readOnly: false
+        editable: false
 	},{
         name: "qybj",
         xtype:'combo',

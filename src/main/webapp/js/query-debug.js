@@ -1,7 +1,7 @@
 /**********************************************************************
  * 
  * Code generated automatically by DirectJNgine
- * Copyright (c) 2009, Pedro Agull¨® Soliveres
+ * Copyright (c) 2009, Pedro AgullÃ³ Soliveres
  * 
  * DO NOT MODIFY MANUALLY!!
  * 
@@ -72,13 +72,38 @@ Ext.query.REMOTING_API = {
         formHandler: false
       },
       {
+        name: 'checkPortalid'/*(String) => String */,
+        len: 1,
+        formHandler: false
+      },
+      {
         name: 'getOptionItems'/*(String, String, String) => java.util.List */,
         len: 3,
         formHandler: false
       },
       {
+        name: 'savePortal'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
+        len: 1,
+        formHandler: true
+      },
+      {
+        name: 'getPortalDesign'/*(String) => String */,
+        len: 1,
+        formHandler: false
+      },
+      {
+        name: 'deletePortalDesign'/*(String) => String */,
+        len: 1,
+        formHandler: false
+      },
+      {
         name: 'queryGeneralDataDynamic'/*(String, int, int, String) => com.ifugle.dft.query.entity.StoreResult */,
         len: 4,
+        formHandler: false
+      },
+      {
+        name: 'getPortals'/*() => java.util.List */,
+        len: 0,
         formHandler: false
       }
     ]

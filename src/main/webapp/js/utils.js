@@ -1,7 +1,7 @@
 /**********************************************************************
  * 
  * Code generated automatically by DirectJNgine
- * Copyright (c) 2009, Pedro Agull®Æ Soliveres
+ * Copyright (c) 2009, Pedro Agull√≥ Soliveres
  * 
  * DO NOT MODIFY MANUALLY!!
  * 
