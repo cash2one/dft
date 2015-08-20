@@ -43,7 +43,7 @@ public class ChartDataParser {
 		    if(chart.getIsMultiSeries()==0){
 		    	buildSingleSeriesData(doc,dt);
 		    }else{
-		    	buildMultiSeriesData(doc,dt);
+		    	buildMultiSeriesData(doc,dt,chart);
 		    }
 		    xml = doc.asXML();
 		}catch(Exception e){
@@ -52,7 +52,7 @@ public class ChartDataParser {
 		return xml;
 	}
 	
-	private void buildMultiSeriesData(Document doc,ChartDataInfo dt) {
+	private void buildMultiSeriesData(Document doc,ChartDataInfo dt,Chart chart) {
 		if(doc==null||dt ==null){
 			return ;
 		}
@@ -80,6 +80,7 @@ public class ChartDataParser {
 		//如果原模板中已有dataset节点，清空之
 		List dsNodes = root.elements("dataset");
 		clearNodes(root,dsNodes);
+		Map rmap = chart.getRenderMap();
 		//循环创建dataset节点
 		List dts = dt.getDataSets();
 		if(dts!=null){
@@ -88,6 +89,11 @@ public class ChartDataParser {
 				Element dsnode = root.addElement("dataset");
 				String sname = cd.getSeriesName();
 				dsnode.addAttribute("seriesName", sname);
+				//2015-08-20 for Combination Charts
+				if(rmap!=null&&rmap.containsKey(sname)){
+					String r = (String)rmap.get(sname);
+					dsnode.addAttribute("renderAs", r);
+				}
 				if(cts!=null){
 					Map data = cd.getData();
 					for(int j=0;j<cts.size();j++){

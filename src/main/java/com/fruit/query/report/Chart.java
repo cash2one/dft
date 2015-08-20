@@ -1,5 +1,7 @@
 package com.fruit.query.report;
 
+import java.util.Map;
+
 import com.fruit.query.data.ProcedureBean;
 
 public class Chart {
@@ -27,6 +29,14 @@ public class Chart {
 	private String dataIndex;
 	//多指标图表报表的series数据取自哪个字段
 	private String seriesIndex;
+	//2015-08-20用于多渲染形式的combine报表，哪种series渲染成哪种图形的名值对
+	private Map renderMap;
+	public Map getRenderMap() {
+		return renderMap;
+	}
+	public void setRenderMap(Map renderMap) {
+		this.renderMap = renderMap;
+	}
 	public int getDataFormat() {
 		return dataFormat;
 	}

@@ -51,7 +51,8 @@
 	</rptData>
 </DataSets>
 <foot left="制表单位:$czfpbm$" cStyle="footC" lStyle="footL" rStyle="footR"/>
-<chart id="colTest" chartType="Multi-MSColumn3D" width="300" height="300" dataTemplateName="col_single_test">
+<!-- Multi-MSColumn3D MSCombi3D MSCombi2D-->
+<chart id="colTest" chartType="MSCombi2D" width="300" height="200" dataTemplateName="col_single_test">
 	<data sourceType="1" dataFormat="0" isMultiSeries="1" categoryIndex="CZFPBM" dataIndex="CC" seriesIndex="ISMAP">
 		<sql><![CDATA[
 			select count(xh)cc,ismap,czfpbm from dj_cz where czfpbm is not null
@@ -74,6 +75,10 @@
 			<out dataType="3"/>
 		</procedure>-->
 	</data>
+	<seriesRender>
+		<series sname="0" renderAs="Area"/>
+		<series sname="1" renderAs="Line"/>
+	</seriesRender>
 </chart>
 <!--expName:导出文件的文件名。如果没有设置expName，则使用title，如果title也未设置，则使用模板名tmp-->
 <export template="test.xls" expName="$czfpbm$登记清册"/>

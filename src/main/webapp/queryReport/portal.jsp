@@ -214,7 +214,6 @@ function buildCondition(gridID){
 		if(it.xtype=="textfield"||it.xtype=="datefield"){
 			val =it.getValue();
 		}else if(it.xtype=="trigger"||it.xtype=="combo"){
-			alert(it.id.substring(3+gridID.length));
 			var val = tbItems.get("q_h_"+gridID+"_"+it.id.substring(3+gridID.length)).getValue();
 		}else{
 			continue;
@@ -225,28 +224,71 @@ function buildCondition(gridID){
 	conditions[gridID]=dParams;
 	grid.getStore().load({params:{rptID: gridID,start:0, limit:<%=cg.getString("pageSize","40")%>}});
 }
+
 Ext.onReady(function(){
-	var viewport = new Ext.Viewport({
+	/*var viewport = new Ext.Viewport({
 		layout:'fit',
 	    items:[{
 	    	id :"THE_PORTAL",
 	    	xtype:'portal',
 	        margins:'35 5 5 0',
-	    	items:[{}/*{
-	        	items:[{"id":"text_00","title":"面板1","height":300,"layout":"fit","html":"just a minute!","ptype":"text"},
-	        	        {"id":"report_01","title":"面板2","height":200,"layout":"fit","html":"qydjcx","ptype":"report"}],
-	        	columnWidth:0.33
-	        },{
-	            "items":[{"id":"chart_10","title":"面板3","height":200,"layout":"fit","html":"dj","ptype":"chart"},
-	                     {"id":"report_11","title":"面板4","height":400,"layout":"fit","html":"dj","ptype":"report"}],
-	            columnWidth:0.33
-	        },{
-	            "items":[{"id":"text_20","title":"面板5","height":100,"layout":"fit","html":"last one","ptype":"text"}],
-	            columnWidth:0.33
-	        }*/
-	        ]
+	    	items:[{}]
 		}]
+	});*/
+	var portletMaxsize = function(e, target, panel) {
+
+		panel.originalOwnerCt = panel.ownerCt;
+		panel.originalPosition = panel.ownerCt.items.indexOf(panel);
+		panel.originalSize = panel.getSize();
+		
+		maxsizePanel.add(panel);
+		panel.tools['maximize'].setVisible(false);
+		if (panel.tools['restore'])
+			panel.tools['restore'].setVisible(true);
+
+		topView.layout.setActiveItem(1);
+		maxsizePanel.doLayout();
+	};
+
+	var portletRestore = function(e, target, panel) {
+		panel.originalOwnerCt.insert(panel.originalPosition, panel);
+		panel.setSize(panel.originalSize);
+		panel.tools['maximize'].setVisible(true);
+		if (panel.tools['restore'])
+			panel.tools['restore'].setVisible(false);
+		topView.layout.setActiveItem(0);
+		panel.originalOwnerCt.doLayout();
+	};
+	var maxsizePanel = new Ext.Panel({
+		ref : 'maxsizePanel',
+		style : 'padding:10px 10px 10px 10px',
+		border : false,
+		layout : 'fit' 
 	});
+	var tools = [{
+		id : 'restore',
+		qtip : '还原',
+		hidden : true,
+		handler : portletRestore,
+		scope : this
+	}, {
+		id : 'maximize',
+		qtip : '最大化',
+		handler : portletMaxsize,
+		scope : this
+	}];
+	var topView = new Ext.Viewport({
+    	layout : 'card',
+    	margins : '2 5 5 0',
+    	activeItem : 0,
+    	border : false,
+    	items: [{
+	    	id :"THE_PORTAL",
+	    	xtype:'portal',
+	        margins:'35 5 5 0',
+	    	items:[{}]
+		},maxsizePanel]
+    });
 	Ext.Ajax.request({
 		url : 'rpt.query?doType=loadPortlets',
 		params : {portalID: 'test'},
@@ -262,11 +304,18 @@ Ext.onReady(function(){
 							if(pts!=null){
 								for(var j=0;j<pts.length;j++){
 									var pt = pts[j];
+									pt.tools = tools;
 									//根据类型构建grid或者chart，放入portlet中
 									if(pt.ptype=="report"){
 										pt.items = createGrid(pt.items,pt.loadInPortal);
 									}else if(pt.ptype=="chart"){
-										pt.items = createChart(pt.items,pt.id,pt.loadInPortal);
+										var chartid = pt.items;
+										var fpanel = new Ext.Panel({
+											id: 'cd_'+pt.id,
+											items:[{}]
+										});
+										fpanel.items = createChart(chartid,'cd_'+pt.id,pt.loadInPortal);
+										pt.items = fpanel;
 									}
 								}
 							}
@@ -314,6 +363,7 @@ function createGrid(id,loadInPortal){
 	}
 	return grid;
 }
+
 function createChart(id,panelID,loadInPortal){
 	var chart = CHARTS[id];
 	if(chart==null){
@@ -325,9 +375,9 @@ function createChart(id,panelID,loadInPortal){
 					var obj = Ext.util.JSON.decode(response.responseText);
 					if(obj.result){
 						var ci = obj.chartInfo;
-						chart = new FusionCharts("charts/"+ci.swf,ci.cid,ci.width,ci.height);
+						chart = new FusionCharts("charts/"+ci.swf,ci.cid,"100%","100%");
 						chart.setDataURL(ci.dataUrl);
-						chart.render(panelID);
+		                chart.render(panelID); 
 					}else{
 						chart=null;
 					}

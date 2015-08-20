@@ -285,6 +285,18 @@ public class ReportTemplateParser {
 			chart.setDataIndex(dnode.attributeValue("dataIndex"));
 			chart.setSeriesIndex(dnode.attributeValue("seriesIndex"));
 		}
+		//2015-08-20 combine图表时，按series名对应其要渲染成的图表类型
+		Element snode=cnode.element("seriesRender");
+		if(snode!=null&&snode.elementIterator("series")!=null){
+			Map renderMap = new HashMap();
+			for(Iterator iit=snode.elementIterator("series");iit.hasNext();){
+				Element tn=(Element)iit.next();
+				String sname=tn.attributeValue("sname");
+				String rd=tn.attributeValue("renderAs");
+				renderMap.put(sname, rd);
+			}
+			chart.setRenderMap(renderMap);
+		}
 		return chart;
 	}
 	private Foot parseFoot(Element fnode) {
