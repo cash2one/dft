@@ -1,0 +1,7 @@
+2015-08-21 15:07:43,593 - ResourceManager : unable to find resource 'test.vm' in any resource loader.
+2015-08-21 15:11:40,281 - ResourceManager : unable to find resource 'test.vm' in any resource loader.
+2015-08-21 15:12:26,671 - ResourceManager : unable to find resource 'test.vm' in any resource loader.
+2015-08-21 15:13:01,859 - ResourceManager : unable to find resource 'test.vm' in any resource loader.
+2015-08-21 15:13:19,656 - ResourceManager : unable to find resource 'test.vm' in any resource loader.
+2015-08-21 15:13:51,015 - ResourceManager : unable to find resource '/test.vm' in any resource loader.
+2015-08-21 15:13:59,562 - ResourceManager : unable to find resource '/test.vm' in any resource loader.

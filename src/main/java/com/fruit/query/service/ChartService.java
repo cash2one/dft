@@ -1,5 +1,6 @@
 package com.fruit.query.service;
 
+import java.io.*;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,9 +13,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.json.JSONObject;
 
 import com.fruit.query.data.ChartDataInfo;
@@ -509,5 +517,62 @@ public class ChartService {
 		dt.setCategories(categories);
 		dt.setDataSets(dataSets);
 		return dt;
+	}
+	
+	public static void main(String[] args){
+		String templateFile = "/test.vm";
+		try{  
+			Properties p=new Properties(); 
+			p.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader"); 
+			Velocity.init(p);  
+  
+            VelocityContext context = new VelocityContext(); 
+            List cts = new ArrayList();
+            cts.add("01");
+            cts.add("02");
+            cts.add("03");
+            context.put("categories", cts);  
+            Map srs = new HashMap();
+            List datas = new ArrayList();
+            datas.add("1974");
+            datas.add("1735");
+            datas.add("1775");
+            srs.put("0", datas);
+            datas = new ArrayList();
+            datas.add("28");
+            datas.add("95");
+            datas.add("151");
+            srs.put("1", datas);
+            datas = new ArrayList();
+            datas.add("138");
+            datas.add("249");
+            datas.add("115");
+            srs.put("2", datas);
+            datas = new ArrayList();
+            datas.add("");
+            datas.add("");
+            datas.add("");
+            srs.put("3", datas);
+            context.put("series", srs); 
+            Template template = null;  
+            try {  
+                template = Velocity.getTemplate(templateFile,"UTF-8");  
+            } catch (ResourceNotFoundException rnfe) {  
+                System.out.println("Example : error : cannot find template "  
+                        + templateFile);  
+            } catch (ParseErrorException pee) {  
+                System.out.println("Example : Syntax error in template "  
+                        + templateFile + ":" + pee);  
+            }  
+            BufferedWriter writer = new BufferedWriter(  
+                    new OutputStreamWriter(System.out));  
+  
+            if (template != null)  
+                template.merge(context, writer);  
+            writer.flush();  
+            writer.close();  
+        } catch (Exception e) {  
+            System.out.println(e);  
+        }  
 	}
 }

@@ -48,6 +48,7 @@
 		<jdbc.groupId>com.oracle</jdbc.groupId>
 		<jdbc.artifactId>ojdbc5</jdbc.artifactId>
 		<jdbc.version>11.2.0.1.0</jdbc.version>
+		<velocity>1.7</velocity>
 		<!--<jdbc.driverClassName>oracle.jdbc.driver.OracleDriver</jdbc.driverClassName>
 		<jdbc.url><![CDATA[jdbc:oracle:thin:@127.0.0.1:1521:ora9i]]></jdbc.url>
 		<jdbc.username>dnft</jdbc.username>
@@ -227,7 +228,12 @@
 			<groupId>com.jspsmart</groupId>
   			<artifactId>jspsmart</artifactId>
 			<version>${jspsmart}</version>
-		</dependency>       
+		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>${velocity}</version>
+		</dependency>     
 	</dependencies>
 	
 	<pluginRepositories>
