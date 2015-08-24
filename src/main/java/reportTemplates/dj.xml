@@ -52,7 +52,7 @@
 </DataSets>
 <foot left="制表单位:$czfpbm$" cStyle="footC" lStyle="footL" rStyle="footR"/>
 <!-- Multi-MSColumn3D MSCombi3D MSCombi2D-->
-<chart id="colTest" chartType="MSCombi2D" width="300" height="200" dataTemplateName="col_single_test">
+<chart id="colTest" chartType="MSCombi2D" width="300" height="200" dataTemplateName="test" templateFormat="vm">
 	<data sourceType="1" dataFormat="0" isMultiSeries="1" categoryIndex="CZFPBM" dataIndex="CC" seriesIndex="ISMAP">
 		<sql><![CDATA[
 			select count(xh)cc,ismap,czfpbm from dj_cz where czfpbm is not null

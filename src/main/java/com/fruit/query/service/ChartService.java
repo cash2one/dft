@@ -475,13 +475,16 @@ public class ChartService {
 		List<ChartDataSet> dataSets = new ArrayList<ChartDataSet>();
 		ChartDataSet cdSet = new ChartDataSet();
 		Map<String,String> dtMap = new HashMap<String,String>();
+		List<String> odata = new ArrayList<String>();
 		while(rs.next()){
 			String val=rs.getString(dFld);
 			String ctVal = rs.getString(ctFld);
 			categories.add(ctVal);
 			dtMap.put(ctVal, val);
+			odata.add(val);
 		}
 		cdSet.setData(dtMap);
+		cdSet.setOrderedData(odata);
 		dataSets.add(cdSet);
 		dt.setCategories(categories);
 		dt.setDataSets(dataSets);
@@ -507,12 +510,15 @@ public class ChartService {
 				ChartDataSet cdSet = new ChartDataSet();
 				cdSet.setSeriesName(sVal);
 				cdSet.setData(new HashMap<String,String>());
+				cdSet.setOrderedData(new ArrayList<String>());
 				dataSets.add(cdSet);
 				dsMap.put(sVal, cdSet);
 			}
 			ChartDataSet tset = dsMap.get(sVal);
 			Map<String,String> dtmap =tset.getData();
 			dtmap.put(ctVal, val);
+			List<String> odt = tset.getOrderedData();
+			odt.add(val);
 		}
 		dt.setCategories(categories);
 		dt.setDataSets(dataSets);
@@ -520,12 +526,11 @@ public class ChartService {
 	}
 	
 	public static void main(String[] args){
-		String templateFile = "/test.vm";
+		String templateFile = "/test.xml";
 		try{  
 			Properties p=new Properties(); 
 			p.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader"); 
 			Velocity.init(p);  
-  
             VelocityContext context = new VelocityContext(); 
             List cts = new ArrayList();
             cts.add("01");

@@ -31,6 +31,14 @@ public class Chart {
 	private String seriesIndex;
 	//2015-08-20用于多渲染形式的combine报表，哪种series渲染成哪种图形的名值对
 	private Map renderMap;
+	//2015-08-24 图表模板的格式，默认vm，可设置为xml以向后兼容
+	private String templateFormat="vm";
+	public String getTemplateFormat() {
+		return templateFormat;
+	}
+	public void setTemplateFormat(String templateFormat) {
+		this.templateFormat = templateFormat;
+	}
 	public Map getRenderMap() {
 		return renderMap;
 	}

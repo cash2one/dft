@@ -241,6 +241,13 @@ public class ReportTemplateParser {
 		}
 		chart.setHeight(height);
 		chart.setDataTemplateName(cnode.attributeValue("dataTemplateName"));
+		String tf = cnode.attributeValue("templateFormat");
+		if(StringUtils.isEmpty(tf)){
+			tf = "xml";
+		}else{
+			tf = "vm";
+		}
+		chart.setTemplateFormat(tf);
 		//数据描述
 		Element dnode=cnode.element("data");
 		if(dnode!=null){

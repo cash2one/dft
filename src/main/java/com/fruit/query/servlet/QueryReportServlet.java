@@ -310,20 +310,26 @@ public class QueryReportServlet extends HttpServlet{
 				if(rptID!=null&&!"".equals(rptID)){
 					rpt=TemplatesLoader.getTemplatesLoader().getReportTemplate(rptID);
 					if(rpt!=null){
-						Map paraVals=(Map)request.getSession().getAttribute("paraVals");
-						ChartDataInfo dt = ChartService.getChartService().getChartData(rpt, paraVals);
-						//解析并重组xml
-						oStream = ChartDataParser.getParser().buildXmlData(rpt.getChart(), dt);
+						Chart chart = rpt.getChart();
+						if(chart!=null){
+							Map paraVals=(Map)request.getSession().getAttribute("paraVals");
+							ChartDataInfo dt = ChartService.getChartService().getChartData(rpt, paraVals);
+							if("vm".equals(chart.getTemplateFormat())){
+								ChartDataParser.getParser().buildXmlDataForVelocity(chart, dt,response);
+							}else{
+								oStream = ChartDataParser.getParser().buildXmlData(chart, dt);
+								try {
+						 			response.setContentType("text/xml;charset=UTF-8");
+									PrintWriter out=response.getWriter();
+									out.print(oStream);
+						    		out.close();
+								}catch(IOException e1) {
+									System.out.println("输出错误！！！" + e1.getMessage());
+								}	
+							}
+						}
 					}
 				}
-		 		try {
-		 			response.setContentType("text/xml;charset=UTF-8");
-					PrintWriter out=response.getWriter();
-					out.print(oStream);
-		    		out.close();
-				}catch(IOException e1) {
-					System.out.println("输出错误！！！" + e1.getMessage());
-				}		
 				return;				
 			}else if("directExport".equals(action)){
 				String rptID=request.getParameter("rptID");

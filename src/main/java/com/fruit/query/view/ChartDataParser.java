@@ -1,10 +1,24 @@
 package com.fruit.query.view;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -13,6 +27,7 @@ import com.fruit.query.data.ChartDataInfo;
 import com.fruit.query.data.ChartDataSet;
 import com.fruit.query.parser.TemplatesLoader;
 import com.fruit.query.report.Chart;
+import com.fruit.query.util.QueryConfig;
 import com.softwarementors.extjs.djn.StringUtils;
 
 public class ChartDataParser {
@@ -142,5 +157,74 @@ public class ChartDataParser {
 			}
 		}
 		return true;
+	}
+	
+	public String buildXmlDataForVelocity(Chart chart,ChartDataInfo dt,HttpServletResponse response){
+		if(chart==null||dt ==null){
+			return "";
+		}
+		String xml = "";
+		String tmpName = chart.getDataTemplateName();
+		if(StringUtils.isEmpty(tmpName)){
+			return "";
+		}
+		String chartPathType = QueryConfig.getConfig().getString("chartPathType", "relative");
+		if("relative".equals(chartPathType)){
+			Properties p=new Properties(); 
+			p.setProperty("file.resource.loader.cache","true");
+			p.setProperty("resource.loader", "class");
+	        p.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+	        Velocity.init(p);
+		}else{
+			Properties p=new Properties(); 
+			p.setProperty("file.resource.loader.cache","true");
+			p.setProperty("resource.loader", "file");
+	        p.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
+	        Velocity.init(p);  
+		}
+		try{
+			String chartsPath = QueryConfig.getConfig().getString("chartRepositoryPath", "chartTemplates");
+			boolean endSlash=chartsPath.endsWith("/");
+			StringBuffer absTmpName = new StringBuffer(chartsPath);
+			if(!endSlash){
+				absTmpName.append("/").append(tmpName);
+			}else{
+				absTmpName.append(tmpName);
+			}
+			absTmpName.append(".vm");
+			//模板
+			Template template = null;  
+            try {  
+                template = Velocity.getTemplate(absTmpName.toString(),"UTF-8");  
+            } catch (ResourceNotFoundException rnfe) {  
+               log.error("未找到指定的图表模板："  + absTmpName.toString());  
+            } catch (ParseErrorException pee) {  
+            	log.error("解析图表模板发生错误，模板：" + absTmpName.toString() + "。错误信息:" + pee);  
+            }
+            VelocityContext context = new VelocityContext(); 
+            addContext(context,chart,dt);
+            
+            response.setContentType("text/xml;charset=UTF-8");
+            PrintWriter writer = response.getWriter();
+            BufferedWriter logger = new BufferedWriter(  new OutputStreamWriter(System.out));  
+            if (template != null){
+            	template.merge(context, writer); 
+            	template.merge(context, logger); 
+            }
+            writer.flush();  
+            writer.close(); 
+            logger.flush();
+            logger.close();
+		}catch(Exception e){
+			log.error(e.toString());
+		}
+		System.out.println(xml);
+		return xml;
+	}
+	private void addContext(VelocityContext context,Chart chart,ChartDataInfo chartDt){
+		List cts = chartDt.getCategories();
+		context.put("categories", cts); 
+		List dts = chartDt.getDataSets();
+		context.put("series", dts);
 	}
 }

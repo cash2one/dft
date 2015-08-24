@@ -1,4 +1,4 @@
-<chart caption='各分片核定情况' xAxisName='分片' yAxisName='户数' showValues='0' numberPrefix=''>
+<chart caption='各分片核定情况test' xAxisName='分片x' yAxisName='户数y' showValues='0' numberPrefix=''>
     <styles>
     	<definition>
     		<style name='CanvasAnim' type='animation' param='_xScale' start='0' duration='1'/>
@@ -13,16 +13,16 @@
      #end
     </categories>
 	#set($renderAs="")
-    #foreach( $s in ${series.keySet()})
-		#if($s =="0") 
-			#set($renderAs="rederAs=""Area""")
-		#elseif($s =="1") 
-			#set($renderAs="rederAs=""Line""")
+    #foreach( $s in $series)
+		#if($s.seriesName=="0") 
+			#set($renderAs="renderAs=""Area""")
+		#elseif($s.seriesName=="1") 
+			#set($renderAs="renderAs=""Line""")
 		#else
 			#set($renderAs="")
 		#end 
-    	<dataset seriesName="$s" $!renderAs>
-    		#foreach( $v in ${series.get($s)} )  
+    	<dataset seriesName="$s.seriesName" $!renderAs>
+    		#foreach( $v in ${s.orderedData} )  
     		<set value="$!v" />
 			#end 
 		</dataset>
