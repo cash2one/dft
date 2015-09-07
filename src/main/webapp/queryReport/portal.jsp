@@ -15,6 +15,7 @@
 	response.addHeader("Cache-Control", "no-cache");
 	response.addHeader("Expires", "Thu, 01 Jan 1970 00:00:01 GMT");
 	Configuration cg = (Configuration) ContextUtil.getBean("config");
+	String portalID = request.getParameter("portalID");
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -291,7 +292,7 @@ Ext.onReady(function(){
     });
 	Ext.Ajax.request({
 		url : 'rpt.query?doType=loadPortlets',
-		params : {portalID: 'test'},
+		params : {portalID: '<%=portalID%>'},
 		success : function(response, options) {
 			if(response.responseText!=null&&response.responseText!=""){
 				var obj = Ext.util.JSON.decode(response.responseText);

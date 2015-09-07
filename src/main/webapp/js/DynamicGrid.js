@@ -311,7 +311,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 						}
 					}else if(it.xtype=="trigger"){
 						it.editable = false;
-						//it.destroy = Ext.emptyFn;
+						it.destroy = Ext.emptyFn;
 						it.onTriggerClick=function(){
 							showQparamTree(this.id.substring(2),this.isMulti,this.onlyLeaf);
 						};
@@ -321,7 +321,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 						this.grid.getTopToolbar().addSeparator();
 					}
 				}
-				this.id = tmpId;
+				//this.id = tmpId;
 				this.grid.getTopToolbar().addButton({
 					text: '查询',
 		            iconCls: 'filter',
