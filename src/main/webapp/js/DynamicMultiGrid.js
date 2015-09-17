@@ -218,6 +218,12 @@ App.ux.DynamicGridPanelMulti = Ext.extend(App.ux.DynamicGridPanel, {
 				if (columns[_coli].width < _avg) {
 					columns[_coli].width = _avg;
 				}
+				if(columns[_coli].renderer&&typeof(columns[_coli].renderer)=="string"){
+					columns[_coli].renderStr = columns[_coli].renderer;
+					columns[_coli].renderer=App.rpt.Renders[columns[_coli].renderer];
+				}else if(columns[_coli].isLink>0){//no renderer,as a link column,it need renderer
+					columns[_coli].renderer=App.rpt.Renders["renderFoo"];
+				}
 			}
 
 			// 判断初始化多选框列

@@ -787,7 +787,6 @@ var paramWin = new Ext.Window({
 	height : 320,
 	title : "参数",
 	layout : 'fit',
-	autoScroll: true,
 	closeAction :"hide",
 	items : [
 	],
