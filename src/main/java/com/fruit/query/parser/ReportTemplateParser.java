@@ -762,9 +762,46 @@ public class ReportTemplateParser {
 					}catch(Exception e){
 					}
 					col.setIsLink(isLink);
-					col.setLinkParams(cn.attributeValue("linkParams"));
-					col.setTarget(cn.attributeValue("target"));
-					col.setLinkTo(cn.attributeValue("linkTo"));
+					//2015-10-29 修改链接报表功能，允许以弹出框方式打开，弹出窗体可以分tab显示多张链接报表
+					String linkAction = cn.attributeValue("linkAction");
+					if("popup".equalsIgnoreCase(linkAction)){
+						col.setLinkAction(1);
+					}else{
+						col.setLinkAction(0);
+					}
+					if(col.getIsLink()==1){
+						if(col.getLinkAction()==0){
+							col.setLinkParams(cn.attributeValue("linkParams"));
+							col.setTarget(cn.attributeValue("target"));
+							col.setLinkTo(cn.attributeValue("linkTo"));
+						}else{
+							String sPopHeight = cn.attributeValue("popHeight");
+							String sPopWidth = cn.attributeValue("popWidth");
+							int popHeight = 480;
+							int popWidth = 640;
+							try{
+								popHeight = Integer.parseInt(sPopHeight);
+							}catch(Exception e){
+							}
+							try{
+								popWidth = Integer.parseInt(sPopWidth);
+							}catch(Exception e){
+							}
+							col.setPopHeight(popHeight);
+							col.setPopWidth(popWidth);
+							//读取分tab的信息
+							ArrayList<LinkTab> linkTabs = null;
+							if(cn!=null&&cn.elementIterator("linkTab")!=null){
+								linkTabs=new ArrayList<LinkTab>();
+								for(Iterator lit=cn.elementIterator("linkTab");lit.hasNext();){
+									Element ltnode=(Element)lit.next();
+									LinkTab ltb=parseLinkTab(ltnode);
+									linkTabs.add(ltb);
+								}
+							}
+							col.setLinkTabs(linkTabs);
+						}
+					}
 					//2013-09-10 增加属性，是否分组字段。
 					int isGroup = 0;
 					try{
@@ -818,6 +855,20 @@ public class ReportTemplateParser {
 			}
 		}
 		return cd;
+	}
+	/**
+	 * 2015-10-29 解析链接弹出窗体的各个tab信息
+	 * @return
+	 */
+	private LinkTab parseLinkTab(Element ltnode){
+		if(ltnode==null){
+			return null;
+		}
+		LinkTab ltb=new LinkTab();
+		ltb.setTitle(ltnode.attributeValue("title"));
+		ltb.setLinkParams(ltnode.attributeValue("linkParams"));
+		ltb.setLinkTo(ltnode.attributeValue("linkTo"));
+		return null;
 	}
 	/**
 	 * 解析取数描述信息

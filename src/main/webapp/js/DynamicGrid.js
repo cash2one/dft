@@ -185,71 +185,8 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 				}
 			}
 			var _len = columns.length;
-			var _hzcount = 0;// 大宽度字母的总个数
-			var _zmcount = 0;// 小宽度字母字母的总个数
-			var _sum_length = 0; // 总字符串长
-			var _rownums;// 总字符个数
-			var _avg; // 每列平均长度
-			var _tmp; // 临时初始值
-			var _replace;// 替换后的值
-			var _indx; // 列头位索引
-			var _head; // 列头宽度
-
+			
 			for (var _coli = 0; _coli < _len; _coli++) {
-				_indx = columns[_coli].dataIndex;
-				_head = columns[_coli].header.length;
-				_hzcount = 0;
-				_zmcount = 0;
-				_tmp = "";
-				for (var k = 0;; k++) {
-					if (typeof this.ds.getAt(k) != "undefined") {
-						// 获取临时串
-						_tmp = _tmp + String(this.ds.getAt(k).get(_indx));
-					} else {
-						_rownums = k;
-						break;
-					}
-				}
-				_replace = _tmp.replace(/[0-9a-z:\.<>=]/gi, "");
-				_hzcount = _replace.length;
-				_zmcount = _tmp.length - _hzcount;
-				// 一个小宽度是长10,一个大宽度是长15
-				var _sum_length = _hzcount * 15 + _zmcount * 10;
-				_rownums = _rownums == 0 ? 1 : _rownums;
-				_avg = Math.round(_sum_length / _rownums);
-				// 计算表头的长度
-				_head = _head * 13 + 5;
-				if (_head > _avg) {
-					_avg = _head;
-				}
-				// 对于日期特殊处理
-				if (typeof columns[_coli].format == "string") {
-					if (columns[_coli].format == 'Ymd H:i:s') {
-						_avg = 130;
-
-					} else if (columns[_coli].format == 'Ymd') {
-						_avg = 80;
-					} else if (columns[_coli].format == 'H:i:s') {
-						_avg = 80;
-					}
-				}
-				// 对于靠右特殊处理
-				if (typeof columns[_coli].align == "string") {
-					if (columns[_coli].align == 'right') {
-						// 小于100,都归于100
-						if (_avg < 100) {
-							_avg = 100;
-						}
-					}
-				}
-				// 长度大于500的,都归于500处理
-				if (_avg > 500) {
-					_avg = 500;
-				}
-				if (columns[_coli].width < _avg) {
-					columns[_coli].width = _avg;
-				}
-				
 				if(ISMU&&defaultUnit&&columns[_coli].isMultiUnit>0){
 					var rfun = unStore.getById(defaultUnit);
 					columns[_coli].renderer=rfun?App.rpt.Renders[rfun.get("renderFun")]:null;

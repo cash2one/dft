@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 报表节点，整个文档只有一个，顶级节点。id是报表的唯一标识，name是报表的显示名称 -->
+<report id="fsz_ljzbb2" name="分税种报表_链接子报表" totalRow="0" totalPosition="0" remoteSort="0">
+	<parameters>
+		<para name="ZWRQ" desc="账务日期" renderType="3" dateFormat="Ymd"  dataType="int" defaultValue="20130831" hidden="1"/>
+		<para name="XM" desc="税种" renderType="0"  dataType="string" defaultValue="" hidden="1"/>
+		<para name="SRKJ" desc="收入口径" renderType="1" dataType="int" defaultRule="_first"  hidden="1">
+			<paraDetail multi="0" sourceType="0">
+				<paraItems>
+					<item bm="0" name="地方财政收入" />
+					<item bm="1" name="财政总收入" isDefault='1'/>
+				</paraItems>
+			</paraDetail>
+		</para>
+                <para name="SZ" desc="税种" renderType="1" dataType="string" defaultRule="_first"  hidden="1">
+			<paraDetail multi="0" sourceType="0">
+				<paraItems>
+					<item bm="1.7" name="地方小税种" isDefault='1' />
+					<item bm="1.8" name="农业两税" />
+                                        <item bm="1.9" name="非税收入" />
+
+				</paraItems>
+			</paraDetail>
+		</para>
+		</parameters>
+	<paraProcesses>
+		<paraPro name="zb_nian" desc="制表年" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'yyyy') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_yue" desc="制表月" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'mm') from dual]]></sql>
+		</paraPro>
+		<paraPro name="zb_ri" desc="制表日" proMode="1">
+			<sql><![CDATA[SELECT to_char(sysdate,'dd') from dual]]></sql>
+		</paraPro>
+		<paraPro name="nian" desc="年份" proMode="1">
+			<sql><![CDATA[SELECT substr({ZWRQ},1,4) from dual]]></sql>
+		</paraPro>
+                <paraPro name="yue" desc="月份" proMode="1">
+			<sql><![CDATA[SELECT substr({ZWRQ},5,2) from dual]]></sql>
+		</paraPro>
+                <paraPro name="kjmc" desc="口径名称" proMode="1">
+			<sql><![CDATA[SELECT mc from (select '1' bm,'财政总收入' mc from dual
+union all
+select '0' bm,'地方财政收入' mc from dual) where bm={SRKJ}]]></sql>
+		</paraPro>
+	</paraProcesses>
+	<title>@nian@年@yue@月分税种@kjmc@_链接子报表</title>
+        <head titleInHead="1" style="headTitle">
+	<subTitle/>
+        </head>
+	<columns complex="1" sourceType="0">
+		<column  pid="" colId="tmpmc" dataIndex="TMPMC" colName="测试" dataType="0" width="150" isleaf="1"  isOrder="0"/>
+		<column  pid="" colId="xm" dataIndex="XM" colName="税种" dataType="0" width="150" isleaf="1"  isOrder="0"/>
+        <column  pid="" colId="dns" colName="当年数" dataType="0" width="150" isleaf="0"/>
+        <column  pid="" colId="sns" colName="上年数" dataType="0" width="150" isleaf="0"/>
+		<column pid="dns" colId="dndy" dataIndex="DNDY" colName="当月" dataType="2"  width="130" isleaf="1" isOrder="0" renderer="regMoney"/>
+		<column pid="dns" colId="dnlj" dataIndex="DNLJ" colName="累计" dataType="2"  width="130" isleaf="1" isOrder="0" renderer="regMoney"/>
+		<column pid="sns" colId="sndy" dataIndex="SNDY" colName="当月" dataType="2"  width="130" isleaf="1" isOrder="0" renderer="regMoney"/>
+		<column pid="sns" colId="snlj" dataIndex="SNLJ" colName="累计" dataType="2"  width="130" isleaf="1" isOrder="0" renderer="regMoney"/>
+        <column  pid="" colId="ljzj" dataIndex="LJZJ" colName="累计增减" dataType="0" width="150" isleaf="1"  isOrder="0" renderer="regMoney"/>
+		<column  pid="" colId="zf" dataIndex="ZF" colName="累计增幅" dataType="0" width="150" isleaf="1"  isOrder="0"/>
+		<column  pid="" colId="bz" dataIndex="BZ" colName="累计比重" dataType="0" width="150" isleaf="1"  isOrder="0"/>
+</columns>
+	<rptData sourceType="1" canPaging="1" defaultPageSize="40" maxSize="100" >
+		<sql><![CDATA[
+
+select {XM} tmpmc,xm,dndy,dnlj,sndy,snlj,ljzj,zf,bz
+from
+(
+select '1.7' xh,v03 xm,n01 dndy,n02 dnlj,n03 sndy,n04 snlj,n05 ljzj,n06 zf,n07 bz
+from bb_data
+where bb_id='BB_SZ' and ny={ZWRQ} and V08={SRKJ}  and v01 in ('1.7.1.1','1.7.1.2','1.7.1.3','1.7.1.4','1.7.1.5','1.7.1.6','1.7.1.7','1.7.1.8','1.7.1.9','1.7.2.0','1.7.2.1','1.7.2.2')
+union all
+select '1.7' xh,'合计' xm,n01 dndy,n02 dnlj,n03 sndy,n04 snlj,n05 ljzj,n06 zf,n07 bz
+from bb_data
+where bb_id='BB_SZ' and ny={ZWRQ} and V08={SRKJ}  and v01='1.7'
+union  all
+select '1.8' xh,v03 xm,n01 dndy,n02 dnlj,n03 sndy,n04 snlj,n05 ljzj,n06 zf,n07 bz
+from bb_data
+where bb_id='BB_SZ' and ny={ZWRQ} and V08={SRKJ}  and v01 in ('1.8.1','1.8.2')
+union all
+select '1.8' xh,'合计' xm,n01 dndy,n02 dnlj,n03 sndy,n04 snlj,n05 ljzj,n06 zf,n07 bz
+from bb_data
+where bb_id='BB_SZ' and ny={ZWRQ} and V08={SRKJ}  and v01='1.8'
+union all
+select '1.9' xh,v03 xm,n01 dndy,n02 dnlj,n03 sndy,n04 snlj,n05 ljzj,n06 zf,n07 bz
+from bb_data
+where bb_id='BB_SZ' and ny={ZWRQ} and V08={SRKJ}  and v01 in ('1.9.1','1.9.2','1.9.3','1.9.4','1.9.5','1.9.6','1.9.7')
+union all
+select '1.9' xh,'合计' xm,n01 dndy,n02 dnlj,n03 sndy,n04 snlj,n05 ljzj,n06 zf,n07 bz
+from bb_data
+where bb_id='BB_SZ' and ny={ZWRQ} and V08={SRKJ}  and v01='1.9'  
+union all
+select v01 xh,v03 xm,n01 dndy,n02 dnlj,n03 sndy,n04 snlj,n05 ljzj,n06 zf,n07 bz
+from bb_data
+where bb_id='BB_SZ' and ny={ZWRQ} and V08={SRKJ}  and v01 in ('1.1','1.2','1.3','1.4','1.5','1.6','2.0')
+)
+where xh={SZ}
+
+
+		]]>
+		</sql>
+	</rptData>
+<foot left="制表单位:$czfpbm$" right="制表日期：@zb_nian@年@zb_yue@月@zb_ri@日" lStyle="footL" rStyle="footR"/>
+</report>

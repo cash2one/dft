@@ -1,4 +1,7 @@
 package com.fruit.query.data;
+
+import java.util.ArrayList;
+
 /**
  * 
  * @author wxh
@@ -24,6 +27,12 @@ public class Column {
 	private int isMultiUnit ;     //是否可以切换单位来显示
 	//2013-08-30 链接报表用属性
 	private int isLink;           //是否在当前字段上链接
+	//2015-10-29
+	private int linkAction;       //链接报表以什么方式展现。0：默认，打开新窗体。1：在原页面中弹出模态window
+	private int popHeight = 480;  //如果链接报表以弹出方式打开，弹出窗体的高宽
+	private int popWidth = 640;
+	private ArrayList<LinkTab> LinkTabs;       //如果链接报表以弹出窗体打开，弹出窗体中的各个tab定义（每个tab都可以链接一报表）
+	
 	private String linkParams;    //链接时传递的字段，逗号分隔；
 	private String target;        //链接报表打开的地方。参考js，_blank,_self
 	private String linkTo;        //链接到哪张报表
@@ -303,4 +312,31 @@ public class Column {
 	public void setDataType(int dataType) {
 		this.dataType = dataType;
 	}
+	
+	public int getLinkAction() {
+		return linkAction;
+	}
+	public void setLinkAction(int linkAction) {
+		this.linkAction = linkAction;
+	}
+	
+	public int getPopHeight() {
+		return popHeight;
+	}
+	public void setPopHeight(int popHeight) {
+		this.popHeight = popHeight;
+	}
+	public int getPopWidth() {
+		return popWidth;
+	}
+	public void setPopWidth(int popWidth) {
+		this.popWidth = popWidth;
+	}
+	public ArrayList<LinkTab> getLinkTabs() {
+		return LinkTabs;
+	}
+	public void setLinkTabs(ArrayList<LinkTab> linkTabs) {
+		LinkTabs = linkTabs;
+	}
+	
 }

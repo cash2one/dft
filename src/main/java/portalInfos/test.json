@@ -1,11 +1,6 @@
-{id:'test',name:'测试',remark:'',total:'5',colCount:'3',defaultHeight:'200',columns:[
-	{'columnWidth':'.33',items:[
-		{id:'text',title:'面板1',height:'300',type:'text',content:'just a minute!'},
-		{id:'tax',title:'面板2',height:'',type:'report',content:'test'}]
-	},{'columnWidth':'.33',items:[
-		{title:'面板3',height:'',type:'chart',content:'dj',height:'300'},
-		{title:'面板4',height:'400',type:'report',content:'dj'}]
-	},{'columnWidth':'.33',items:[
-		{title:'面板5',height:'100',type:'text',content:'last one'}]
+{id:'test',name:'财政总收入',remark:'',total:'2',colCount:'1',defaultHeight:'300',columns:[
+	{'columnWidth':'1.00',items:[
+		{id:'text',title:'财政总收入报表',height:'200',type:'report',content:'czzsr'},
+		{id:'tax',title:'财政总收入图表',height:'500',type:'chart',content:'czzsr'}]
 	}]
 }

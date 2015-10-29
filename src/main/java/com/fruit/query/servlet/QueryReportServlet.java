@@ -249,6 +249,11 @@ public class QueryReportServlet extends HttpServlet{
 		    		}else{
 		    			ltmp.loadTemplatesFromDb(path);
 		    		}
+		    		try{
+		    			PortalInfoParser.getParser().loadPortalInfosFromFs();
+		    		}catch(Exception e){
+		    			e.printStackTrace();
+		    		}
 		    	}catch(Exception e){
 		    		e.printStackTrace();
 		    	}
@@ -262,6 +267,11 @@ public class QueryReportServlet extends HttpServlet{
 		    			ltmp.loadTemplatesFromFile(path);
 		    		}else{
 		    			ltmp.loadTemplatesFromDb(path);
+		    		}
+		    		try{
+		    			PortalInfoParser.getParser().loadPortalInfosFromFs();
+		    		}catch(Exception e){
+		    			e.printStackTrace();
 		    		}
 		    	}catch(Exception e){
 		    		e.printStackTrace();
