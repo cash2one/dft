@@ -90,12 +90,6 @@ App.ux.DynamicGridPanel = function(config) {
 				store : this.store,
 				displayMsg : '当前 {0} - {1} &nbsp;&nbsp; 共 {2}条',
 				emptyMsg : '没有数据'//,
-				/*listeners : {
-					beforechange : function(self, params) {
-						Ext.applyIf(params, this.store.lastOptions.params);
-						return true;
-					}
-				}*/
 			}
 		});
 	}

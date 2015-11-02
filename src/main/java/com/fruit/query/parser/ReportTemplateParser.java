@@ -764,7 +764,7 @@ public class ReportTemplateParser {
 					col.setIsLink(isLink);
 					//2015-10-29 修改链接报表功能，允许以弹出框方式打开，弹出窗体可以分tab显示多张链接报表
 					String linkAction = cn.attributeValue("linkAction");
-					if("popup".equalsIgnoreCase(linkAction)){
+					if("popup".equalsIgnoreCase(linkAction)||"1".equals(linkAction)){
 						col.setLinkAction(1);
 					}else{
 						col.setLinkAction(0);
@@ -868,7 +868,7 @@ public class ReportTemplateParser {
 		ltb.setTitle(ltnode.attributeValue("title"));
 		ltb.setLinkParams(ltnode.attributeValue("linkParams"));
 		ltb.setLinkTo(ltnode.attributeValue("linkTo"));
-		return null;
+		return ltb;
 	}
 	/**
 	 * 解析取数描述信息

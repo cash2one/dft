@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="link_en" name="登记明细" >
+<parameters>
+	<para name="SWDJZH" desc="税号" hidden="1" bindMode="1"  bindTo="SWDJZH"/>
+</parameters>
+<title>登记明细</title>
+<columns complex="0" sourceType="0">
+	<column colId="mc" dataIndex="MC" colName="单位名称" width="150" />
+	<column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="110" />
+	<column colId="dz" dataIndex="DZ" colName="地址" width="110" />
+	<column colId="fddbr" dataIndex="FDDBR" colName="法人" width="110" />
+</columns>
+<rptData sourceType="1" canPaging="0">
+	<sql><![CDATA[select swdjzh,mc,dz,fddbr, czfpbm from DJ_CZ 
+	where swdjzh={SWDJZH}
+		]]>
+	</sql>
+</rptData>
+</report>
+

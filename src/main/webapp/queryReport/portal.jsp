@@ -81,21 +81,21 @@ var qpTreeSingleWin;
 var qpTreeMultiWin;
 var qpTreeCascWin;
 var qpTreeWin;
-function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
+function showQparamTreeByRptID(cRid,cQueryParam,cMulti,cOnlyLeaf){
 	if(cMulti==1){
 		if(!qpTreeMultiWin){
 			qpTreeMultiWin = new App.widget.ParamTreeWindow({
 				directFn: PortalHandler.getOptionItemsOfTree,
 				checkModel : 'multiple',
 				treeId: 'm_'+ cQueryParam,
-				rptID: rptID,
+				rptID: cRid,
 				onlyLeafCheckable: cOnlyLeaf,
 				codeTable: cQueryParam,
 				defaultValue: '',
 				canSetNull: true
 			});
 		}else{
-			qpTreeMultiWin.rptID=rptID;
+			qpTreeMultiWin.rptID=cRid;
 		}
 		qpTreeWin = qpTreeMultiWin;
 	}else if(cMulti==2){
@@ -104,13 +104,13 @@ function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
 				directFn: PortalHandler.getOptionItemsOfTree,
 				checkModel : 'cascade',
 				treeId: 'c_'+ cQueryParam,
-				rptID: rptID,
+				rptID: cRid,
 				codeTable: cQueryParam,
 				defaultValue: '',
 				canSetNull: true
 			});
 		}else{
-			qpTreeCascWin.rptID=rptID;
+			qpTreeCascWin.rptID=cRid;
 		}
 		qpTreeWin = qpTreeCascWin;
 	}else{
@@ -119,20 +119,21 @@ function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
 				directFn: PortalHandler.getOptionItemsOfTree,
 				checkModel : 'single',
 				treeId: 's_'+ cQueryParam,
-				rptID: rptID,
+				rptID: cRid,
+				onlyLeafCheckable: cOnlyLeaf,
 				codeTable: cQueryParam,
 				defaultValue: '',
 				canSetNull: true
 			});
 		}else{
-			qpTreeSingleWin.rptID=rptID;
+			qpTreeSingleWin.rptID=cRid;
 		}
 		qpTreeWin = qpTreeSingleWin;
 	}
 	
-	var grid = Ext.getCmp(rptID);
+	var grid = Ext.getCmp(cRid);
 	var tbItems = grid.getTopToolbar().items;
-	var cmpPara = tbItems.get("q_"+rptID+"_"+cQueryParam);
+	var cmpPara = tbItems.get("q_"+cRid+"_"+cQueryParam);
 	
 	var tmpPost={},mps = {};
 	if(cmpPara){
@@ -142,9 +143,7 @@ function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
 			mps = new Object();
 			for(var i = 0;i<aparas.length;i++){
 				var tp = aparas[i];
-				var tcmp=tbItems.get("q_h_"+rptID+"_"+tp)
-
-				
+				var tcmp=tbItems.get("q_h_"+cRid+"_"+tp)
 				if(tcmp){
 					var val =tcmp.getValue();
 					mps[aparas]=val;
@@ -153,19 +152,19 @@ function showQparamTree(rptID,cQueryParam,cMulti,cOnlyLeaf){
 			tmpPost.macroParams = mps;
 		}
 	}
-	var p = {rptID: rptID,pName: cQueryParam,affectedBy: Ext.encode(tmpPost)};
+	var p = {rptID: cRid,pName: cQueryParam,affectedBy: Ext.encode(tmpPost)};
 	qpTreeWin.onSelect = function(value){
 		if(!value)return;
-		var g = Ext.getCmp(rptID);
+		var g = Ext.getCmp(cRid);
 		var tbs = g.getTopToolbar().items;
-		tbs.item("q_h_"+rptID+"_"+cQueryParam).setValue(value.id);
-		tbs.item("q_"+rptID+"_"+cQueryParam).setValue(value.text);
+		tbs.item("q_h_"+cRid+"_"+cQueryParam).setValue(value.id);
+		tbs.item("q_"+cRid+"_"+cQueryParam).setValue(value.text);
 	};
 	qpTreeWin.setTreeParams(p);
 	qpTreeWin.refreshTree();
 	qpTreeWin.show();
 };
-function buildCondition(gridID){
+function buildConditionByRptID(gridID){
 	var dParams = new Object();
 	var cdts = new Object();
 	var fldNames = new Array();

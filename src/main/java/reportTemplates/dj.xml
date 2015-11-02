@@ -26,8 +26,8 @@
 	<column colId="czfpbm" dataIndex="CZFPBM" colName="财政分片编码" width="90" isGroup="1" dataType="int"/>
 	<column colId="mc" dataIndex="MC" colName="单位名称" width="150" isLink="1" linkTo="fsz_ljzbb" linkParams="SZ,ZWRQ,SRKJ" />
 	<column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="110" dataType="string" isLink="1" linkAction="popUp" popHeight="400" popWidth="480">
-		<linkTab title="分税种报表_1" linkTo="fsz_ljzbb" linkParams="SZ,ZWRQ,SRKJ" />
-		<linkTab title="分税种报表_2" linkTo="fsz_ljzbb2" linkParams="SZ,ZWRQ,SRKJ" />
+		<linkTab title="企业收税明细" linkTo="link_en" linkParams="SWDJZH" />
+		<linkTab title="企业登记明细" linkTo="link_en_2" linkParams="MC" />
 	</column>
 	<column colId="dz" dataIndex="DZ" colName="地址" width="120" dataType="double" />		
 	<column colId="fddbr" dataIndex="FDDBR" colName="法人代表" width="100" />

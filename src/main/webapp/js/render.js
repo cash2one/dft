@@ -1,19 +1,27 @@
 Ext.ns('App.rpt');
 App.rpt.HIDEZERO=false;
 function renderLink(v,col,r){
-	var sParams =col.linkParams;
-	var pms = sParams?sParams.split(","):new Array();
-	var tg = col.target?col.target:"_blank";
-	var aStr = "<a target='"+tg+"' href='";
-	var url = RPTROOT+"&rptID="+col.linkTo
-	for(var i=0;i<pms.length;i++){
-		var p = pms[i];
-		if(r.get(p)){
-			url+="&"+p+"="+r.get(p);
+	var aStr = "";
+	if(col.linkAction==1){
+		var st = r.store
+		var rindex = st.indexOf(r);
+		aStr = "<a href='javascript:void(0);' onclick='showLinkPopWin(\""+col.id+"\","+rindex+")'>";
+		aStr += v+"</a>";
+	}else{
+		var sParams =col.linkParams;
+		var pms = sParams?sParams.split(","):new Array();
+		var tg = col.target?col.target:"_blank";
+		aStr = "<a target='"+tg+"' href='";
+		var url = RPTROOT+"&rptID="+col.linkTo
+		for(var i=0;i<pms.length;i++){
+			var p = pms[i];
+			if(r.get(p)){
+				url+="&"+p+"="+r.get(p);
+			}
 		}
+		url = encodeURI(url);
+		aStr =aStr+url+"'>"+v+"</a>";
 	}
-	url = encodeURI(url);
-	aStr =aStr+url+"'>"+v+"</a>";
 	return aStr;
 }
 App.rpt.Renders = {

@@ -79,6 +79,7 @@ var rptID="<%=rptID%>";
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/ParamTreeWindow.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/dfCommon.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/DynamicGrid.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/DynamicPopupGrid.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/render.js"></script>
 <style type="text/css">
 .rptGrid .x-grid3-row {
@@ -111,6 +112,9 @@ var cQPRecord;
 var defaultUnit = "<%=rpt.getDefaultUnit()%>";
 var showUnit = <%=rpt.getMultiUnit()%>;
 var condition ={};
+var GRIDS = {};
+var conditions ={};
+var linkedHeight = 480,linkedWidth =640;
 var titleInHead = <%=titleInHead%>;
 /********高级筛选中公共的combobox，作为交互renderType=1时的公共编辑器。*****/
 var commonCbRcd = Ext.data.Record.create([
@@ -747,6 +751,7 @@ function showQparamTree(cQueryParam,cMulti,cOnlyLeaf){
 		}
 		qpTreeWin = qpTreeSingleWin;
 	}
+	qpTreeMultiWin.rptID=rptID;
 	var cmpPara = Ext.getCmp("q_"+cQueryParam);
 	var tmpPost={},mps = {};
 	if(cmpPara){
@@ -816,7 +821,8 @@ function saveQueryPlan(qpid,onlyClob){
 	var cols = [];
 	for(var i = 0; i<cfgs.length;i++){
 		var c = cfgs[i];
-		cols.push(Ext.copyTo({},c,'id,align,dataIndex,dataType,header,hidden,hideable,sortable,tooltip,width,isMultiUnit,renderer,isLink,linkParams,target,linkTo,isGroup'));
+		cols.push(Ext.copyTo({},c,
+				'id,align,dataIndex,dataType,header,hidden,hideable,sortable,tooltip,width,isMultiUnit,renderer,isLink,linkParams,target,linkTo,linkAction,popHeight,popWidth,linkTabs,isGroup'));
 	}
 	buildCondition();
 	var tmpCdts = Ext.apply({},condition);
@@ -1434,6 +1440,266 @@ var foot = new Ext.Panel({
 	frame : true,
 	html: "<%=strFoot%>"
 });
+/****************2015-11-02 增加弹出窗体链接功能*********************/
+function showQparamTreeByRptID(cRid,cQueryParam,cMulti,cOnlyLeaf){
+	if(cMulti==1){
+		if(!qpTreeMultiWin){
+			qpTreeMultiWin = new App.widget.ParamTreeWindow({
+				directFn: PortalHandler.getOptionItemsOfTree,
+				checkModel : 'multiple',
+				treeId: 'm_'+ cQueryParam,
+				rptID: cRid,
+				onlyLeafCheckable: cOnlyLeaf,
+				codeTable: cQueryParam,
+				defaultValue: '',
+				canSetNull: true
+			});
+		}else{
+			qpTreeMultiWin.rptID=cRid;
+		}
+		qpTreeWin = qpTreeMultiWin;
+	}else if(cMulti==2){
+		if(!qpTreeCascWin){
+			qpTreeCascWin = new App.widget.ParamTreeWindow({
+				directFn: PortalHandler.getOptionItemsOfTree,
+				checkModel : 'cascade',
+				treeId: 'c_'+ cQueryParam,
+				rptID: cRid,
+				codeTable: cQueryParam,
+				defaultValue: '',
+				canSetNull: true
+			});
+		}else{
+			qpTreeCascWin.rptID=cRid;
+		}
+		qpTreeWin = qpTreeCascWin;
+	}else{
+		if(!qpTreeSingleWin){
+			qpTreeSingleWin = new App.widget.ParamTreeWindow({
+				directFn: PortalHandler.getOptionItemsOfTree,
+				checkModel : 'single',
+				treeId: 's_'+ cQueryParam,
+				rptID: cRid,
+				onlyLeafCheckable: cOnlyLeaf,
+				codeTable: cQueryParam,
+				defaultValue: '',
+				canSetNull: true
+			});
+		}else{
+			qpTreeSingleWin.rptID=cRid;
+		}
+		qpTreeWin = qpTreeSingleWin;
+	}
+	
+	var tgrid = Ext.getCmp(cRid);
+	var tbItems = tgrid.getTopToolbar().items;
+	var cmpPara = tbItems.get("q_"+cRid+"_"+cQueryParam);
+	
+	var tmpPost={},mps = {};
+	if(cmpPara){
+		var aBy = cmpPara.affectedBy;
+		if(aBy){
+			var aparas = aBy.split(",");
+			mps = new Object();
+			for(var i = 0;i<aparas.length;i++){
+				var tp = aparas[i];
+				var tcmp=tbItems.get("q_h_"+cRid+"_"+tp)
+				if(tcmp){
+					var val =tcmp.getValue();
+					mps[aparas]=val;
+				}
+			}
+			tmpPost.macroParams = mps;
+		}
+	}
+	var p = {rptID: cRid,pName: cQueryParam,affectedBy: Ext.encode(tmpPost)};
+	qpTreeWin.onSelect = function(value){
+		if(!value)return;
+		var g = Ext.getCmp(cRid);
+		var tbs = g.getTopToolbar().items;
+		tbs.item("q_h_"+cRid+"_"+cQueryParam).setValue(value.id);
+		tbs.item("q_"+cRid+"_"+cQueryParam).setValue(value.text);
+	};
+	qpTreeWin.setTreeParams(p);
+	qpTreeWin.refreshTree();
+	qpTreeWin.show();
+};
+function buildConditionByRptID(gridID){
+	var dParams = new Object();
+	var cdts = new Object();
+	var fldNames = new Array();
+	var fldValues = new Array();
+	var relations = new Array();
+	var connections = new Array();
+	var tgrid = Ext.getCmp(gridID);
+	//筛选。来自工具条
+	var tbItems = tgrid.getTopToolbar().items;
+	for(var i = 0;i<tbItems.length;i++){
+		var it = tbItems.item(i);
+		if(!it.filterFld||it.filterFld==""){
+			continue;
+		}
+		var val ="";
+		if(it.xtype=="textfield"||it.xtype=="datefield"){
+			val =it.getValue();
+		}else if(it.xtype=="trigger"||it.xtype=="combo"){
+			var val = tbItems.get("q_h_"+gridID+"_"+it.id.substring(3+gridID.length)).getValue();
+		}else{
+			continue;
+		}
+		if(!val||val==""){
+			continue;
+		}
+		fldNames.push(it.filterFld);
+		fldValues.push(val);
+		relations.push(it.vop?it.vop:"equ");
+		connections.push("_and");
+	}
+	if(connections.length>0){
+		connections[connections.length-1]="empty"; 
+	}
+	cdts.fldNames=fldNames.join();
+	cdts.fldValues=fldValues.join();
+	cdts.relations=relations.join();
+	cdts.connections=connections.join();
+	dParams.filter = cdts;
+	//工具条中，用于宏替换的
+	var mps = new Object();
+	for(var i = 0;i<tbItems.length;i++){
+		var it = tbItems.item(i);
+		if(it.filterFld&&it.filterFld!=""){
+			continue;
+		}
+		var val ="";
+		if(it.xtype=="textfield"||it.xtype=="datefield"){
+			val =it.getValue();
+		}else if(it.xtype=="trigger"||it.xtype=="combo"){
+			var val = tbItems.get("q_h_"+gridID+"_"+it.id.substring(3+gridID.length)).getValue();
+		}else{
+			continue;
+		}
+		mps[it.id.substring(3+gridID.length)]=val;
+	}
+	dParams.macroParams = mps;
+	//conditions[gridID]=dParams;
+	Ext.apply(conditions[gridID].macroParams,dParams.macroParams);
+	tgrid.getStore().load({params:{rptID: gridID,start:0, limit:<%=cg.getString("pageSize","40")%>}});
+}
+
+var linkTabs = new Ext.TabPanel({
+    activeTab: 0,
+    frame: true,
+	enableTabScroll:true,
+	layoutOnTabChange:true,
+	listeners: {
+		beforetabchange: function(tp,np,cp){
+	        var store =  np.items.get(0).store;
+	        store.load({
+				params:{
+					rptID: np.id.substring(4),
+					start:0, 
+					limit:App.ux.defaultPageSize
+				}
+			});
+	    }
+	},
+    items: []
+});
+ 
+var linkPopWin = new Ext.Window({
+	width : linkedWidth,
+	height : linkedHeight,
+	title : "",
+	layout : 'fit',
+	closeAction :"hide",
+	items : [linkTabs],
+	buttons : [
+	{
+		text : "关闭",
+		handler : function() {
+			linkPopWin.hide();
+		}
+	}],
+	buttonAlign : "center"
+});
+linkPopWin.on("show",function(){
+	var nps = linkTabs.items;
+	for(var i = 0;i<nps.getCount();i++){
+		var np = nps.get(i);
+		var store =  np.items.get(0).store;
+	    store.load({
+			params:{
+				rptID: np.id.substring(4),
+				start:0, 
+				limit:App.ux.defaultPageSize
+			}
+		});
+	}
+})
+function showLinkPopWin(colid,rindex){
+	var col= grid.getColumnModel().getColumnById(colid);
+	var linkedRpts = col.linkTabs?Ext.decode(col.linkTabs): null;
+	if(linkedRpts){
+		for(var i = 0;i<linkedRpts.length;i++){
+			var t = linkedRpts[i];
+			if(!Ext.getCmp(t.linkTo)){
+				addTabs(t.linkTo,t.title);
+			}
+			//处理传递的链接参数，当成工具栏交互参数结果处理
+			var lparams = t.linkParams?t.linkParams.split(","):null;
+			if(lparams){
+				var r = grid.getStore().getAt(rindex)
+				var mps = new Object();
+				for(var j= 0;j<lparams.length;j++){
+					var p = lparams[j];
+		           	mps[p] = r.get(p);
+		       	}
+				//设置查询参数，先保存链接传入的
+				if(!conditions[t.linkTo]){
+					conditions[t.linkTo] = {};
+				}
+				conditions[t.linkTo].macroParams = mps;
+			}
+		}
+	}
+	linkPopWin.show();
+}
+function addTabs(id,tabTitle){
+	var tgrid =GRIDS[id];
+	if(tgrid==null){
+		tgrid = new App.ux.DynamicGridPanelPopup({
+			id: id,
+			columns : [],
+			store : new Ext.data.DirectStore({
+				directFn : PortalHandler.queryGeneralDataDynamic,
+				remoteSort: true,
+				paramsAsHash : false,
+				paramOrder: ['rptID','start','limit','condition'],
+				fields : []
+			}),
+			tbar: []
+		});
+		tgrid.getStore().on("beforeload",function(ds,op){
+			ds.baseParams.rptID = id;
+			var tmpCdts = Ext.apply({},conditions[id]);
+			tmpCdts.metaDataLoaded = GRIDS[id].metaDataLoaded;
+			Ext.copyTo(tmpCdts,op.params,'sort,dir');
+			delete op.params.sort;
+			delete op.params.dir;
+			op.params.condition = Ext.encode(tmpCdts);
+		});	
+		GRIDS[id]=tgrid;
+		var gpanel={
+			id: 'tab_'+ id, 
+	        layout:'fit',
+	        title: tabTitle,
+	        closable: false, 
+	        items: GRIDS[id]
+		}
+		linkTabs.add(gpanel);
+	}
+}
+/********************************************************************/
 Ext.onReady(function(){
 	Ext.QuickTips.init();
 	new Ext.Viewport({

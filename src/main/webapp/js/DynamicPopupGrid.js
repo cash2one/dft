@@ -1,12 +1,11 @@
-Ext.ns('App.ux');
-App.ux.defaultPageSize=40;
-App.ux.DynamicGridPanel = function(config) {
+
+App.ux.DynamicGridPanelNoExport = function(config) {
 	config = config || {};
 	Ext.apply(this, config);
 
 	var plugins = [new Ext.ux.grid.GridExporter({
 		mode : this.mode ? this.mode : 'remote',
-		maxExportRows :30000
+		maxExportRows :60000
 	})];
 	if (config.plugins) {
 		plugins = plugins.concat(config.plugins);
@@ -41,35 +40,17 @@ App.ux.DynamicGridPanel = function(config) {
 		this.colModel = this.cm;
 	}
 	if (Ext.isArray(this.colModel)) {
-		this.colModel = new Ext.grid.ColumnModel({
+		this.cm = new Ext.ux.grid.LockingColumnModel({
 			columns : this.colModel,
 			defaults : {
-				sortable : false,
-				menuDisabled : true
+				sortable : false
 			}
 		});
 	}
 	this.enableColumnMove = config.enableColumnMove
 			? config.enableColumnMove
 			: false;
-	this.actExportXLS = new Ext.Action({
-		text : '导出',
-		iconCls : 'expExcel',
-		scope : this,
-		handler : function(btn, e) {
-			this.exportExcel();
-			//var expUrl='getRptData.query?doType=toExcel&rptID='+this.id;
-	        //window.open(expUrl,"","scrollbars=auto,toolbar=yes,location=no,directories=no,status=no,menubar=yes,resizable=yes,width=780,height=500,left=10,top=50");
-		}
-	});
-	var btns = [this.actExportXLS];
-	if (config.tbar) {
-		btns = config.tbar.concat(btns);
-	}
-	Ext.apply(config, {
-		tbar : btns
-	});
-	if (this.bbar || (this.disablePaging && this.disablePaging == true)) {
+	if ((this.disablePaging && this.disablePaging == true)) {
 	} else {
 		var count = App.ux.defaultPageSize;
 		if (this.pageCount) {
@@ -86,10 +67,10 @@ App.ux.DynamicGridPanel = function(config) {
 			}
 		});
 	}
-	App.ux.DynamicGridPanel.superclass.constructor.call(this, config);
+	App.ux.DynamicGridPanelNoExport.superclass.constructor.call(this, config);
 };
 
-Ext.extend(App.ux.DynamicGridPanel, Ext.grid.GridPanel, {
+Ext.extend(App.ux.DynamicGridPanelNoExport, Ext.grid.GridPanel, {
 	columns : [],
 	metaDataLoaded : false,
 	viewConfig : {
@@ -113,7 +94,7 @@ Ext.extend(App.ux.DynamicGridPanel, Ext.grid.GridPanel, {
 	loadMask : true
 });
 
-Ext.reg('DynamicGridPanel', App.ux.DynamicGridPanel);
+Ext.reg('DynamicGridPanelNoExport', App.ux.DynamicGridPanelNoExport);
 
 App.ux.columnTipRender = function(value, p, record) {
 	if (value) {
@@ -121,15 +102,11 @@ App.ux.columnTipRender = function(value, p, record) {
 	}
 	return value;
 };
-
 /**
- * @class App.ux.DynamicGridPanelMulti
+ * @class App.ux.DynamicGridPanelPopup
  * @overrides onDataChange
- * @author jlong
- * @date 2013-04-15 Adds support the grid to assign the column width by the
- *       column content
  */
-App.ux.DynamicGridPanelMulti = Ext.extend(App.ux.DynamicGridPanel, {
+App.ux.DynamicGridPanelPopup = Ext.extend(App.ux.DynamicGridPanelNoExport, {
 	columns : [],
 	viewConfig : {
 		emptyText : "没有数据",
@@ -229,7 +206,6 @@ App.ux.DynamicGridPanelMulti = Ext.extend(App.ux.DynamicGridPanel, {
 					}
 				});
 			}
-			
 			this.metaDataLoaded = true;
 			this.grid.getTopToolbar().doLayout();
 			this.refresh();
@@ -240,4 +216,4 @@ App.ux.DynamicGridPanelMulti = Ext.extend(App.ux.DynamicGridPanel, {
 	loadMask : true
 });
 
-Ext.reg('DynamicGridPanelMulti', App.ux.DynamicGridPanelMulti);
+Ext.reg('DynamicGridPanelPopup', App.ux.DynamicGridPanelPopup);

@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fruit.query.data.Column;
 import com.fruit.query.data.DataSet;
+import com.fruit.query.data.LinkTab;
 import com.fruit.query.data.OptionItem;
 import com.fruit.query.data.ParaProcess;
 import com.fruit.query.data.ParaValue;
@@ -192,6 +193,26 @@ public class QueryDao extends BaseDao{
 				column.put("linkParams",col.getLinkParams());
 				column.put("target",col.getTarget());
 				column.put("linkTo",col.getLinkTo());
+				column.put("linkAction", col.getLinkAction());
+				column.put("popHeight", col.getPopHeight());
+				column.put("popWidth", col.getPopWidth());
+				ArrayList ltabs = col.getLinkTabs();
+				if(ltabs!=null&&ltabs.size()>0){
+					JSONArray jtbs = new JSONArray();
+					for(int j = 0; j<ltabs.size(); j++){
+						LinkTab ltb = (LinkTab)ltabs.get(j);
+						JSONObject jtb = new JSONObject();
+						try{
+							jtb.put("title", ltb.getTitle());
+							jtb.put("linkTo", ltb.getLinkTo());
+							jtb.put("linkParams", ltb.getLinkParams());
+						}catch(Exception e){
+						}
+						jtbs.put(jtb);
+					}
+					String strTbs = jtbs.toString();
+					column.put("linkTabs", strTbs);
+				}
 				column.put("isGroup", col.getIsGroup());
 				column.put("hideZero", col.getHideZero());
 				columns.add(column);
@@ -234,6 +255,10 @@ public class QueryDao extends BaseDao{
 						column.put("linkParams",col.has("linkParams")?col.getString("linkParams"):"");
 						column.put("target",col.has("target")?col.getString("target"):"");
 						column.put("linkTo",col.has("linkTo")?col.getString("linkTo"):"");
+						column.put("linkAction", col.has("linkAction")?col.getInt("linkAction"):"0");
+						column.put("popHeight",col.has("popHeight")?col.getInt("popHeight"):"480");
+						column.put("popWidth", col.has("popWidth")?col.getInt("popWidth"):"640");
+						column.put("linkTabs", col.has("linkTabs")?col.getString("linkTabs"):"");
 						column.put("isGroup", col.has("isGroup")?col.getInt("isGroup"):"0");
 						column.put("hideZero", col.has("hideZero")?col.getInt("hideZero"):"0");
 						columns.add(column);
