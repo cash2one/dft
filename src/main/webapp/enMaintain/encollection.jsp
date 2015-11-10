@@ -55,14 +55,14 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 		items:[
 		{
 			id:'addNode',
-			text:'添加下级节点',
+			text:'新建',
 			menu:[
 				{
 					id:'insertNode',
-					text:'添加目录节点'
+					text:'目录'
 				},{
 					id:'appendNode',
-					text:'添加集合节点'
+					text:'集合'
 				}
 			]
 		},'-',
@@ -78,7 +78,7 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 	});
 	//企业集合树
 	var en_root_value=new Ext.tree.AsyncTreeNode({    
-		text : '企业集合',
+		text : '库',
 		draggable : false,
 		expanded:true, 
 		uiProvider:Ext.tree.TreeNodeUI,
@@ -95,7 +95,7 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 		animate: false,   
 		rootVisible: true, 
 		autoScroll:true, //自动滚动条
-		title:'企业集合选项',
+		title:'企业集合',
 		header:true,
 		loader : enloader
 	}); 
@@ -611,7 +611,7 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 		clicksToEdit:1,
 	    selModel: checkmodel1,
 	    tbar: [{
-			text: '添加企业',
+			text: '增加',
 			iconCls: 'add',
 			id:'addEn',
 			handler : function(){
@@ -625,7 +625,7 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 				excelWin.show();
 			}
 		},{
-		    text: '删除企业',
+		    text: '删除',
 		    iconCls: 'remove',
 		    id:'removeEn',
 			handler :function(){

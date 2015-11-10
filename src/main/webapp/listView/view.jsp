@@ -427,7 +427,7 @@ var cdtCm = new Ext.grid.ColumnModel({
 		id : 'fld',
 		header : "字段",
 		dataIndex : 'fld',
-		width : 80,
+		width : 160,
 		editor : cb_flds2filter,
 		renderer : function(v, p, r) {
 			var index = fltCdtDs.find('name', v);
@@ -467,7 +467,7 @@ var cdtCm = new Ext.grid.ColumnModel({
 		id : 'connection',
 		header : "条件关系",
 		dataIndex : 'connection',
-		width : 120,
+		width : 100,
 		renderer : function(v, p, r) {
 			var index = cbConnectionStore.find('bm', v);
 			var cbRec = cbConnectionStore.getAt(index);
