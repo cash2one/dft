@@ -995,6 +995,7 @@ var mappedPanel=new Ext.Panel({
         height:400,
         bodyStyle:'padding:0px;background:none;border:0px;',
         layout: 'fit',
+        split: true,
         items:[enGrid]
 	},{	
 		region:"center",

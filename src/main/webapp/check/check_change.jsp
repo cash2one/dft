@@ -1945,6 +1945,7 @@ Ext.onReady(function(){
             region:"north",
             height:400,
             layout: 'fit',
+            split: true,
             items:[enGrid]
         },{
         	region:"center",

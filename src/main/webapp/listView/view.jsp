@@ -751,7 +751,7 @@ function showQparamTree(cQueryParam,cMulti,cOnlyLeaf){
 		}
 		qpTreeWin = qpTreeSingleWin;
 	}
-	qpTreeMultiWin.rptID=rptID;
+	qpTreeWin.rptID=rptID;
 	var cmpPara = Ext.getCmp("q_"+cQueryParam);
 	var tmpPost={},mps = {};
 	if(cmpPara){
