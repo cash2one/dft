@@ -26,6 +26,8 @@ public class Configuration {
 	private Map financeFieldsMap= null;
 	private String[] defaultDJfldsArray = null;
 	private Map treasuryImpMaps = null;
+	//2015-11-17 显示在列表的字段
+	private Map fieldsMapShowInList = null;
 	private static ResourceBundle resources = null;
 	//所有有列表数据查询的handler都应该向这个map注册自己。便于系统“自动感知”各个handler，便于导出excel的反射
 	private Map handlersMap = new HashMap();
@@ -93,16 +95,23 @@ public class Configuration {
 		if(tbnames!=null&&tbnames.size()>0){
 			fieldsMapByTable = new HashMap();
 			fieldsMapByTableShow = new HashMap();
+			fieldsMapShowInList = new HashMap();
 	    	for(int i=0;i<tbnames.size();i++){
 	    		String tb = (String)tbnames.get(i);
-	    		StringBuffer allsql = new StringBuffer("select tname,field,mc,f_type,val_src,mapbm,showmod,isrtk,sort from en_dictionary where tname='");
-	    		allsql.append(tb).append("' order by sort");
-	    		List allflds = jdbcTemplate.query(allsql.toString(),params, ParameterizedBeanPropertyRowMapper.newInstance(En_field.class));;
+	    		StringBuffer allsql = new StringBuffer("select tname,field,mc,f_type,val_src,mapbm,showmod,isrtk,sort ");
+	    		allsql.append(" from en_dictionary where tname='").append(tb).append("' order by sort");
+	    		List allflds = jdbcTemplate.query(allsql.toString(),params, ParameterizedBeanPropertyRowMapper.newInstance(En_field.class));
 	    		fieldsMapByTable.put(tb, allflds);
-	    		StringBuffer showsql = new StringBuffer("select tname,field,mc,f_type,val_src,mapbm,showmod,isrtk,sort from en_dictionary where tname='");
-	    		showsql.append(tb).append("' and showmod>0 order by sort");
+	    		
+	    		StringBuffer showsql = new StringBuffer("select tname,field,mc,f_type,val_src,mapbm,showmod,isrtk,sort ");
+	    		showsql.append(" from en_dictionary where tname='").append(tb).append("' and showmod>0 order by sort");
 	    		List showflds = jdbcTemplate.query(showsql.toString(),params, ParameterizedBeanPropertyRowMapper.newInstance(En_field.class));
 	    		fieldsMapByTableShow.put(tb, showflds);
+	    		
+	    		StringBuffer showInListsql = new StringBuffer("select tname,field,mc,f_type,val_src,mapbm,showmod,isrtk,sort,colwidth ");
+	    		showInListsql.append(" from en_dictionary where tname='").append(tb).append("' and showinlist>0 order by sort");
+	    		List silstflds = jdbcTemplate.query(showInListsql.toString(),params, ParameterizedBeanPropertyRowMapper.newInstance(En_field.class));
+	    		fieldsMapShowInList.put(tb, silstflds);
 	    	}
 		}
 	}
@@ -122,8 +131,15 @@ public class Configuration {
 		}
 		return fieldsMapByTableShow;
 	}
+	//2015-11-18
+	public Map getDJFieldsShowInList(){
+		if(fieldsMapShowInList==null){
+			loadEn_Dictionary();
+		}
+		return fieldsMapShowInList;
+	}
 	/**
-	 * 跟据字典配置获取默认的表头
+	 * 跟据字典配置获取默认显示的字段
 	* @return
 	 */
 	public String[] getDefaultDJfldsArray() {
@@ -147,9 +163,25 @@ public class Configuration {
 		}
 		return defaultDJfldsArray;
 	}
-	
+	//获取核定列表默认显示的列
 	public String[] getDefaultFldsArray() {
-		String[] heads=new String[]{"XH","SWDJZH","MC","CZFPBM","FDDBR","DZ"};
+		String[] heads = null;
+		if(fieldsMapShowInList==null){
+			loadEn_Dictionary();
+		}
+		if(fieldsMapShowInList!=null){
+			List lstHead = (List)fieldsMapShowInList.get("DJ_CZ");
+			if(lstHead!=null){
+				heads = new String[lstHead.size()];
+				for(int i = 0;i<lstHead.size();i++){
+					En_field fld = (En_field)lstHead.get(i);
+					heads[i]=fld.getField();
+				}
+			}
+		}
+		if(heads==null||heads.length==0){
+			heads = new String[]{"XH","SWDJZH","MC","CZFPBM","FDDBR","DZ"};
+		}
 		return heads;
 	}
 	

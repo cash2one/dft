@@ -16,6 +16,22 @@ public class En_field {
 	private int sort;    //排序
 	private int valuetype;
 	private int loadAll=0;
+	//2015-11-17 增加属性，字段是否默认显示在列表中，宽度
+	private int showinlist=0;
+	private int colwidth = 100;
+	
+	public int getShowinlist() {
+		return showinlist;
+	}
+	public void setShowinlist(int showinlist) {
+		this.showinlist = showinlist;
+	}
+	public int getColwidth() {
+		return colwidth;
+	}
+	public void setColwidth(int colwidth) {
+		this.colwidth = colwidth;
+	}
 	public En_field(){
 		
 	}

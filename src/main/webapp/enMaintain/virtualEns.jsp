@@ -11,6 +11,8 @@
 	response.addHeader("Cache-Control", "no-cache");
 	response.addHeader("Expires", "Thu, 01 Jan 1970 00:00:01 GMT");
 	Configuration cg = (Configuration)ContextUtil.getBean("config");
+	Map fldsMapShowInList = cg.getDJFieldsShowInList();
+    List fldsInList = fldsMapShowInList==null?new ArrayList(): (List)fldsMapShowInList.get("DJ_CZ");
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>

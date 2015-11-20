@@ -1,7 +1,7 @@
 /**********************************************************************
  * 
  * Code generated automatically by DirectJNgine
- * Copyright (c) 2009, Pedro AgullÃ³ Soliveres
+ * Copyright (c) 2009, Pedro Agull¨® Soliveres
  * 
  * DO NOT MODIFY MANUALLY!!
  * 
@@ -80,8 +80,8 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getCollectionEns'/*(int, int, String) => java.util.Map */,
-        len: 3,
+        name: 'getCollectionEns'/*(int, int, String, String, String) => java.util.Map */,
+        len: 5,
         formHandler: false
       },
       {

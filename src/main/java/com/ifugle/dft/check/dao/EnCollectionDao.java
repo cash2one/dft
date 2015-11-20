@@ -120,7 +120,7 @@ public class EnCollectionDao extends BaseDao{
 		return result;
 	}
 	@SuppressWarnings("unchecked")
-	public Map getCollectionEns(int start, int limit, String enId,User user) {
+	public Map getCollectionEns(int start, int limit,String pField,String pValue, String enId,User user) {
 		Map infos = new HashMap();
 		StringBuffer sql = new StringBuffer("select distinct swdjzh,mc,fddbr,dz,a.qybj,nvl(a.showorder,0)showorder from ");
 		sql.append("qyjh_detail a,(select j.* from dj_cz j,(select max(xh)xh from dj_cz group by swdjzh)dj ");
@@ -146,7 +146,11 @@ public class EnCollectionDao extends BaseDao{
 		}else{
 			sql.append(" where ");
 		}
-		sql.append(" dj.xh=j.xh) b where a.eid=b.swdjzh and a.jhid='").append(enId).append("' order by showorder");
+		sql.append(" dj.xh=j.xh) b where a.eid=b.swdjzh and a.jhid='").append(enId).append("' ");
+		if(pField != null && !"".equals(pField)){
+			sql.append(" and b. ").append(pField).append(" like '%").append(pValue).append("%'");
+		}	
+		sql.append(" order by showorder");
 		int count = queryCount(sql.toString());
 		infos.put("totalCount", new Integer(count));
 		List ens = queryForPage(sql.toString(),start,limit,EnterpriseOfJh.class);

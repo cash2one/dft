@@ -21,6 +21,8 @@
     String sYear = sdf.format(new Date());
     String czfpbm_BJ= cg.getString("czfpbm_BJ","");
     String wScreen = cg.getString("wScreen","yes");
+    Map fldsMapShowInList = cg.getDJFieldsShowInList();
+    List fldsInList = fldsMapShowInList==null?new ArrayList(): (List)fldsMapShowInList.get("DJ_CZ");
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -66,48 +68,33 @@ var ssm = new Ext.grid.CheckboxSelectionModel({singleSelect: false});
 //ssm.handleMouseDown = Ext.emptyFn;
 var cm = new Ext.grid.ColumnModel({
 	columns: [
-		ssm,
-	    {
-	        header: "税号",
-	        dataIndex: 'swdjzh',
-	        width: 150,
-	        align: 'left',
-	        renderer: renderFoo
-	    },{
-	        header: "企业名称",
-	        dataIndex: 'mc',
-	        width: 200,
-	        align: 'left',
-	        renderer: renderFoo    
-	    },{
-	        header: "财政分片",
-	        dataIndex: 'czfpbm',
-	        width: 100,
-	        align: 'left',
-	        renderer: renderFoo
-	    },{
-	    	header: "法人",
-	        dataIndex: 'fddbr',
-	        width: 80,
-	        align: 'left',
-	        renderer: renderFoo
-		},{
-		header: "地址",
-	        dataIndex: 'dz',
-	        width: 200,
+		ssm
+		<%for(int i=0;i<fldsInList.size();i++){
+			En_field f = (En_field)fldsInList.get(i);
+			String fname = f.getField().toLowerCase();
+		%>
+		,{
+			header: "<%=f.getMc()%>",
+	        dataIndex: '<%=fname%>',
+	        width: <%=f.getColwidth()%>,
 	        align: 'left',
 	        renderer: renderFoo
 		}
+		<%}%>
 	],
 	defaultSortable: false
 });
 var cRecord = Ext.data.Record.create([
-	{name: 'xh', type: 'int'},
-	{name: 'swdjzh', type: 'string'},
-	{name: 'mc', type: 'string'},
-	{name: 'czfpbm', type: 'string'},
-	{name: 'fddbr', type: 'string'},
-	{name: 'dz', type: 'string'}
+	{name: 'xh', type: 'int'}
+	<%for(int i=0;i<fldsInList.size();i++){
+		En_field f = (En_field)fldsInList.get(i);
+		String fname = f.getField().toLowerCase();
+	%>
+	,{name: '<%=fname%>', type: 'string'}
+		<%if(f.getVal_src()==2){%>
+		,{name: '<%=fname%>_bm', type: 'string'}
+		<%}%>
+	<%}%>
 ]);
 var enDs = new Ext.data.Store({
 	proxy: new Ext.data.DirectProxy({

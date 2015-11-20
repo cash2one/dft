@@ -288,24 +288,37 @@ public class CheckHandler {
 			tHeads=cg.getDefaultFldsArray();
 		}
 		if(tHeads==null||tHeads.length==0){
-			tHeads=new String[]{"XH","SWDJZH","MC","CZFPBM"};
+			tHeads=new String[]{"xh","swdjzh","mc","czfpbm"};
 		}
 		List heads=new ArrayList();
-		heads.add("XH");
-		heads.add("SWDJZH");
-		heads.add("MC");
-		heads.add("CZFPBM");
+		boolean hasXh = false,hasSh = false,hasMc = false,hasCzfp = false;
+		
 		if(ismap>=0){
-			heads.add("QYNM");
-			heads.add("DZDAH");
+			heads.add("qynm");
+			heads.add("dzdah");
 		}
 		//检查是否设置了swdjzh字段，这个字段是必要的。
 		for(int i=0;i<tHeads.length;i++){
-			if("XH".equals(tHeads[i].toUpperCase())||"SWDJZH".equals(tHeads[i].toUpperCase())||"MC".equals(tHeads[i].toUpperCase())||"CZFPBM".equals(tHeads[i].toUpperCase())){
-				continue;
+			if("xh".equals(tHeads[i].toLowerCase())){
+				hasXh = true;
+			}
+			if("swdjzh".equals(tHeads[i].toLowerCase())){
+				hasSh = true;
+			}
+			if("mc".equals(tHeads[i].toLowerCase())){
+				hasMc = true;
+			}
+			if("czfpbm".equals(tHeads[i].toLowerCase())){
+				hasCzfp = true;
 			}
 			heads.add(tHeads[i]);	
 		}
+		//这四个字段如果没有配置，必须补上
+		if(!hasXh)heads.add("xh");
+		if(!hasSh)heads.add("swdjzh");
+		if(!hasMc)heads.add("mc");
+		if(!hasCzfp)heads.add("czfpbm");
+		
 		aHeads=new String[heads.size()];
 		for(int i=0;i<heads.size();i++){
 			aHeads[i]=(String)heads.get(i);

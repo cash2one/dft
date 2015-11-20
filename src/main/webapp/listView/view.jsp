@@ -100,7 +100,7 @@ Ext.query.REMOTING_API.enableBuffer = 0;
 Ext.Direct.addProvider(Ext.query.REMOTING_API);
 Ext.Ajax.timeout = 120000;
 App.ux.defaultPageSize=<%=cg.getString("pageSize","40")%>;
-var RPTROOT="<%=request.getContextPath()%>/listView/view.jsp?isLink=1";
+var RPTROOT="<%=request.getContextPath()%>/doQuery.query?doType=getReport";
 var cFltParam = '';
 var cOperator = '';
 var cFltRecord ;
@@ -1622,7 +1622,10 @@ var linkPopWin = new Ext.Window({
 	}],
 	buttonAlign : "center"
 });
+
 linkPopWin.on("show",function(){
+	linkPopWin.setWidth(linkedWidth);
+	linkPopWin.setHeight(linkedHeight);
 	var nps = linkTabs.items;
 	for(var i = 0;i<nps.getCount();i++){
 		var np = nps.get(i);
@@ -1638,6 +1641,8 @@ linkPopWin.on("show",function(){
 })
 function showLinkPopWin(colid,rindex){
 	var col= grid.getColumnModel().getColumnById(colid);
+	linkedWidth = col.popWidth;
+	linkedHeight = col.popHeight;
 	var linkedRpts = col.linkTabs?Ext.decode(col.linkTabs): null;
 	if(linkedRpts){
 		for(var i = 0;i<linkedRpts.length;i++){

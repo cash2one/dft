@@ -116,12 +116,12 @@ public class EnCollectionHandler {
 	}
 	@SuppressWarnings("unchecked")
 	@DirectMethod
-	public Map getCollectionEns(int start,int limit,String enId){
+	public Map getCollectionEns(int start,int limit,String pField,String pValue,String enId){
 		Map enInfos = null;
 		WebContext context =WebContextManager.get();
 		HttpServletRequest request = context.getRequest();
 		User user=(User)request.getSession().getAttribute("user");
-		enInfos = ecDao.getCollectionEns(start,limit,enId,user);
+		enInfos = ecDao.getCollectionEns(start,limit, pField, pValue,enId,user);
 		return enInfos;
 	}
 	@DirectMethod

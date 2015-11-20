@@ -16,7 +16,7 @@ function renderLink(v,col,r){
 		for(var i=0;i<pms.length;i++){
 			var p = pms[i];
 			if(r.get(p)){
-				url+="&"+p+"="+r.get(p);
+				url += "&"+p+"="+r.get(p);
 			}
 		}
 		url = encodeURI(url);

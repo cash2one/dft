@@ -1,6 +1,7 @@
 ﻿<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="com.ifugle.dft.utils.*"%>
 <%@ page import="com.ifugle.dft.system.entity.User"%>
+<%@ page import="java.util.*"%>
 
 <%
 	response.setHeader("Pragma","No-cache");
@@ -10,6 +11,8 @@
 	response.addHeader("Expires", "Thu, 01 Jan 1970 00:00:01 GMT");
 	Configuration cg = (Configuration)ContextUtil.getBean("config");
 	User user = (User)session.getAttribute("user");
+	Map fldsMapShowInList = cg.getDJFieldsShowInList();
+    List fldsInList = fldsMapShowInList==null?new ArrayList(): (List)fldsMapShowInList.get("DJ_CZ");
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -113,12 +116,22 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 				Ext.getCmp('removeEn').setDisabled(false);
 				Ext.getCmp('saveEn').setDisabled(false);
 				Ext.getCmp('expExcel').setDisabled(false);
+				Ext.getCmp('en_sh').setDisabled(false);
+				Ext.getCmp('en_mc').setDisabled(false);
+				Ext.getCmp('enParas').setDisabled(false);
+				Ext.getCmp('enSearch').setDisabled(false);
+				Ext.getCmp('enParas').setValue("");
 			}else{
 				Ext.getCmp('addEn').setDisabled(true);
 				Ext.getCmp('impExcel').setDisabled(true);
 				Ext.getCmp('removeEn').setDisabled(true);
 				Ext.getCmp('saveEn').setDisabled(true);
 				Ext.getCmp('expExcel').setDisabled(true);
+				Ext.getCmp('en_sh').setDisabled(true);
+				Ext.getCmp('en_mc').setDisabled(true);
+				Ext.getCmp('enParas').setDisabled(true);
+				Ext.getCmp('enSearch').setDisabled(true);
+				Ext.getCmp('enParas').setValue("");
 			}
 			EnCollectionHandler.getEnCollectionById(""+node.id,function(data){
 				var obj = data;
@@ -141,6 +154,11 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 						Ext.getCmp('removeEn').setDisabled(true);
 						Ext.getCmp('saveEn').setDisabled(true);
 						Ext.getCmp('expExcel').setDisabled(true);
+						Ext.getCmp('en_sh').setDisabled(true);
+						Ext.getCmp('en_mc').setDisabled(true);
+						Ext.getCmp('enParas').setDisabled(true);
+						Ext.getCmp('enSearch').setDisabled(true);
+						Ext.getCmp('enParas').setValue("");
 					    Ext.getCmp('Save').disable();
 					}else{
 						enForm.getForm().findField('isprivate').setDisabled(false);
@@ -156,6 +174,11 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 							Ext.getCmp('removeEn').setDisabled(false);
 							Ext.getCmp('saveEn').setDisabled(false);
 							Ext.getCmp('expExcel').setDisabled(false);
+							Ext.getCmp('en_sh').setDisabled(false);
+							Ext.getCmp('en_mc').setDisabled(false);
+							Ext.getCmp('enParas').setDisabled(false);
+							Ext.getCmp('enSearch').setDisabled(false);
+							Ext.getCmp('enParas').setValue("");
 						}
 					    Ext.getCmp('Save').enable();
 					}
@@ -171,6 +194,8 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 				}
 			});
 			en_grid_ds.baseParams.enId=node.id;
+			en_grid_ds.baseParams.pField="";
+			en_grid_ds.baseParams.pValue="";
 			en_grid_ds.load({params:{start:0, limit:<%=cg.getString("pageSize","40")%>}});
 		}else{
 			Ext.getCmp('Save').setDisabled(true);
@@ -184,9 +209,16 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 			Ext.getCmp('removeEn').setDisabled(true);
 			Ext.getCmp('saveEn').setDisabled(true);
 			Ext.getCmp('expExcel').setDisabled(true);
+			Ext.getCmp('en_sh').setDisabled(true);
+			Ext.getCmp('en_mc').setDisabled(true);
+			Ext.getCmp('enParas').setDisabled(true);
+			Ext.getCmp('enSearch').setDisabled(true);
+			Ext.getCmp('enParas').setValue("");
 			Ext.getCmp('pid').setValue("");
 			Ext.getCmp('isleaf').setValue("");
 			en_grid_ds.baseParams.enId='0';
+			en_grid_ds.baseParams.pField="";
+			en_grid_ds.baseParams.pValue="";
 			en_grid_ds.load({params:{start:0, limit:<%=cg.getString("pageSize","40")%>}});
 		}
 	});
@@ -265,7 +297,10 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 		enForm.getForm().findField('pid').setValue(cNode.id=='en_root_value'?"":cNode.id);
 		enForm.getForm().findField('isleaf').setValue(1);
         cAddMode =0;
+        Ext.getCmp('enParas').setValue("");
         en_grid_ds.baseParams.enId='0';
+        en_grid_ds.baseParams.pField="";
+		en_grid_ds.baseParams.pValue="";
 		en_grid_ds.load({params:{start:0, limit:<%=cg.getString("pageSize","40")%>}});
 	}
 
@@ -291,7 +326,10 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 		enForm.getForm().findField('pid').setValue(cNode.id=='en_root_value'?"":cNode.id);
 		enForm.getForm().findField('isleaf').setValue(0);
     	cAddMode =1;
+    	Ext.getCmp('enParas').setValue("");
     	en_grid_ds.baseParams.enId='0';
+    	en_grid_ds.baseParams.pField="";
+		en_grid_ds.baseParams.pValue="";
 		en_grid_ds.load({params:{start:0, limit:<%=cg.getString("pageSize","40")%>}});
 	}
 	function deleteNode(){
@@ -309,6 +347,8 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 						if(obj&&obj.result){
 							Ext.Msg.alert('成功',"企业集合删除成功！");
 							en_grid_ds.baseParams.enId=selectedNode.id;
+							en_grid_ds.baseParams.pField="";
+							en_grid_ds.baseParams.pValue="";
 							en_grid_ds.load({params:{start:0, limit:<%=cg.getString("pageSize","40")%>}});						
 							var pnode = selectedNode.parentNode;
 							selectedNode.remove();
@@ -325,6 +365,11 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 							Ext.getCmp('removeEn').setDisabled(true);
 							Ext.getCmp('saveEn').setDisabled(true);
 							Ext.getCmp('expExcel').setDisabled(true);
+							Ext.getCmp('en_sh').setDisabled(true);
+							Ext.getCmp('en_mc').setDisabled(true);
+							Ext.getCmp('enParas').setDisabled(true);
+							Ext.getCmp('enSearch').setDisabled(true);
+							Ext.getCmp('enParas').setValue("");
 						}else{
 							Ext.Msg.alert('失败',"企业集合删除失败！");
 						}
@@ -472,6 +517,11 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 					    				Ext.getCmp('removeEn').setDisabled(false);
 					    				Ext.getCmp('saveEn').setDisabled(false);
 					    				Ext.getCmp('expExcel').setDisabled(false);
+					    				Ext.getCmp('en_sh').setDisabled(false);
+					    				Ext.getCmp('en_mc').setDisabled(false);
+					    				Ext.getCmp('enParas').setDisabled(false);
+					    				Ext.getCmp('enSearch').setDisabled(false);
+					    				Ext.getCmp('enParas').setValue("");
 					    			}else{		
 					    				newNode = new Ext.tree.TreeNode({
 						    				id: action.result.infos.newID,
@@ -485,6 +535,11 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 					    				Ext.getCmp('removeEn').setDisabled(true);		
 					    				Ext.getCmp('saveEn').setDisabled(true);	
 					    				Ext.getCmp('expExcel').setDisabled(true);
+					    				Ext.getCmp('en_sh').setDisabled(true);
+					    				Ext.getCmp('en_mc').setDisabled(true);
+					    				Ext.getCmp('enParas').setDisabled(true);
+					    				Ext.getCmp('enSearch').setDisabled(true);
+					    				Ext.getCmp('enParas').setValue("");
 					    			}
 					    			cNode.getUI().getIconEl().src='<%=request.getContextPath()%>/libs/ext-3.4.0/resources/images/default/tree/folder-open.gif';
 					    			cNode.appendChild(newNode);
@@ -583,7 +638,7 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 	var en_grid_ds = new Ext.data.Store({
 		proxy: new Ext.data.DirectProxy({
 			directFn: EnCollectionHandler.getCollectionEns,
-			paramOrder: ['start','limit','enId'],
+			paramOrder: ['start','limit','pField','pValue','enId'],
 			paramsAsHash: false
 		}), 
 		reader: new Ext.data.JsonReader({
@@ -650,6 +705,9 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 								var obj = Ext.decode(data);
 								if(obj&&obj.result){
 									en_grid_ds.baseParams.enId=c_Id;
+									en_grid_ds.baseParams.pField="";
+									en_grid_ds.baseParams.pValue="";
+									Ext.getCmp('enParas').setValue("");
 									en_grid_ds.load({params:{start:0, limit:<%=cg.getString("pageSize","40")%>}});
 								}else{
 									Ext.Msg.alert('系统提示','企业集合删除失败！');
@@ -684,7 +742,69 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 					}
 				});
 			}
-		}],
+		},new Ext.Toolbar.Separator(),{
+			xtype:'radio',   
+			boxLabel:'按税号',   
+			name:'stype',   
+			id:'en_sh',   
+			hideLabel:true,
+			listeners:{check:function(){
+			    Ext.getCmp('enParas').setValue("");
+			}}
+		},{ 
+			xtype:'radio',   
+			boxLabel:'按名称&nbsp;&nbsp;',   
+			name:'stype',   
+			id:'en_mc',  
+			checked:true, 
+			hideLabel:true 
+		},{
+			xtype:'textfield',
+			id:'enParas',
+			width:150,
+			enableKeyEvent:true,
+			name:'paras',
+			hideLabel:true
+			,listeners:{   
+				specialkey:function(field,e){   
+					if (e.getKey()==Ext.EventObject.ENTER){  
+						var field ='mc';
+						if(Ext.getCmp('en_sh').checked){
+							field='swdjzh';
+						}else{
+							field='mc';
+						}
+						var value = Ext.getCmp('enParas').getValue();
+						value=(value==null)?"":value.trim();
+						var c_Id = enForm.getForm().findField('id').getValue();
+						en_grid_ds.baseParams.pField=field;
+						en_grid_ds.baseParams.pValue=value;
+						en_grid_ds.baseParams.enId=c_Id;
+						en_grid_ds.load({params:{start:0, limit:<%=cg.getString("pageSize","40")%>}});
+					}   
+				}   
+			}   
+		},
+		{
+		    text: '搜索',
+		    iconCls: 'filter',
+		    id:"enSearch",
+		    handler : function(){
+				var field ='mc';
+				if(Ext.getCmp('en_sh').checked){
+					field='swdjzh';
+				}else{
+					field='mc';
+				}
+				var value = Ext.getCmp('enParas').getValue();
+				value=(value==null)?"":value.trim();
+				var c_Id = enForm.getForm().findField('id').getValue();
+				en_grid_ds.baseParams.pField=field;
+				en_grid_ds.baseParams.pValue=value;
+				en_grid_ds.baseParams.enId=c_Id;
+				en_grid_ds.load({params:{start:0, limit:<%=cg.getString("pageSize","40")%>}});
+		    }
+		},new Ext.Toolbar.Separator()],
 	    bbar: new Ext.PagingToolbar({
 	        pageSize: <%=cg.getString("pageSize","40")%>,
 		    store: en_grid_ds,
@@ -989,6 +1109,9 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 								//一页保存完成后，刷新，重载匹配信息
 								excel_grid_ds.load({params:{ start:0, limit:<%=cg.getString("pageSize","40")%>}});
 								en_grid_ds.baseParams.enId=c_Id;
+								en_grid_ds.baseParams.pField="";
+								en_grid_ds.baseParams.pValue="";
+								Ext.getCmp('enParas').setValue("");
 								en_grid_ds.load({params:{start:0, limit:<%=cg.getString("pageSize","40")%>}});
 							});
 						}	 
@@ -1359,6 +1482,9 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 							Ext.Msg.alert('系统提示','成功添加企业到企业集合！');
 							addWin.hide();
 							en_grid_ds.baseParams.enId=c_Id;
+							en_grid_ds.baseParams.pField="";
+							en_grid_ds.baseParams.pValue="";
+							Ext.getCmp('enParas').setValue("");
 							en_grid_ds.load({params:{start:0, limit:<%=cg.getString("pageSize","40")%>}});																			
 						}else{
 							Ext.Msg.alert('系统提示','添加企业到企业集合失败！');
@@ -1483,6 +1609,11 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 	    Ext.getCmp('removeEn').setDisabled(true);
 	    Ext.getCmp('saveEn').setDisabled(true);
 	    Ext.getCmp('expExcel').setDisabled(true);
+	    Ext.getCmp('en_sh').setDisabled(true);
+		Ext.getCmp('en_mc').setDisabled(true);
+		Ext.getCmp('enParas').setDisabled(true);
+		Ext.getCmp('enSearch').setDisabled(true);
+		Ext.getCmp('enParas').setValue("");
 	}); 
 </script>
 </head>
