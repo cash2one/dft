@@ -136,6 +136,7 @@ public class QueryDao extends BaseDao{
 	public Map<String, Object> buildStoreMetaData(Report rpt,User user,Map paraVals,boolean loadDefaultMeata,boolean loadUserMeata,QueryPlan sQueryplan) {
 		Map storeMetaData = new HashMap();
 		List columns = new ArrayList();
+		List headRows = null;
 		List fields = new ArrayList();
 		List ttbars = new ArrayList();
 		List paramsInForm = new ArrayList();
@@ -216,6 +217,10 @@ public class QueryDao extends BaseDao{
 				column.put("isGroup", col.getIsGroup());
 				column.put("hideZero", col.getHideZero());
 				columns.add(column);
+			}
+			//复杂表头
+			if(header.getMaxLevel()>1){
+				headRows = getGroupHeaderRows(header);
 			}
 		}else{
 			try{
@@ -327,6 +332,7 @@ public class QueryDao extends BaseDao{
 		storeMetaData.put("messageProperty", "message");
 		storeMetaData.put("fields", fields);
 		storeMetaData.put("columns", columns);
+		storeMetaData.put("headRows", headRows);
 		storeMetaData.put("ttbars",ttbars);
 		storeMetaData.put("paramsInForm",paramsInForm);
 		storeMetaData.put("hasComplexFlt",hasComplexFlt);
@@ -336,7 +342,6 @@ public class QueryDao extends BaseDao{
 		storeMetaData.put("filters", filters);
 		storeMetaData.put("cQPid", sQueryplan==null?-1:sQueryplan.getId());
 		storeMetaData.put("zeroCanHide", rpt.getZeroCanHide()>0);
-		
 		return storeMetaData;
 	}
 	public String parseParaExp(String exp,Report rpt,Map mParas)throws Exception{
@@ -625,5 +630,35 @@ public class QueryDao extends BaseDao{
 		String sql = "delete from queryplan where id=? ";
 		jdbcTemplate.update(sql,new Object[] {qpid});
 		return true;
+	}
+	
+	private List getGroupHeaderRows(RptMultiHeader header){
+		//复杂表头写为二维数组，为方便、动态、用list。除叶子列外，每个level构造列头的一行
+		List hRows=new ArrayList();
+		for(int i=1;i<header.getMaxLevel();i++){
+			List row=new ArrayList();
+			hRows.add(row);
+		}
+		for(int i=0;i<header.getSortedNodes().size();i++){
+			Column col=(Column)header.getSortedNodes().get(i);
+			int lv=col.getLevel();
+			//排序后的节点循环。底级列如果跨行，则在“被跨越”的每一行增加列的占位符{}
+			if(col.getIsleaf()>0){
+				for(int j=header.getMaxLevel()-1;j>=lv;j--){
+					List cRow=(List)hRows.get(j-1);
+					Map<String, Object> column = new HashMap<String, Object>();
+					cRow.add(column);
+				}
+			}else{
+				//非底级的节点，增加到其对应的行中。
+				List cRow=(List)hRows.get(lv-1);
+				Map<String, Object> column = new HashMap<String, Object>();
+				column.put("header", col.getColName());
+				column.put("colspan", header.getColSpan(i+1,lv));
+				column.put("align", "center");
+				cRow.add(column);
+			}
+		}
+		return hRows;
 	}
 }

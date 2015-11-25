@@ -9,7 +9,7 @@
 				]]></sql>
 		</paraDetail>
 	</para>
-	<para name="qyzt" desc="企业状态" hidden="0" renderType="2" dataType="1" defaultRule="_first">
+	<para name ="qyzt" desc="企业状态" hidden="0" renderType="2" dataType="1" defaultRule="_first">
 		<paraDetail multi="1" sourceType="0">
 			<paraItems>
 				<item bm="0" name="非正常" pid="" isDefault="1"/>
@@ -19,18 +19,23 @@
 	</para>
 </parameters>
 <title>$czfpbm$登记清册</title>
-<head titleInHead="1" style="headTitle" height='60'>
+<!--  <head titleInHead="1" style="headTitle" height='60'>
 	<subTitle center="年月：2013年10月" cStyle="subTitleC" lStyle="subTitleL" rStyle="subTitleR"/>
+</head>-->
+ <head titleInHead="1" style="headTitle" height="60">
+    <subTitle right="单位:元" left="左边" center="中间" cStyle="subTitleC" lStyle="subTitleL" rStyle="subTitleR"/>
+	<subTitle/>
 </head>
 <columns complex="0" sourceType="0">
-	<column colId="czfpbm" dataIndex="CZFPBM" colName="财政分片编码" width="90" isGroup="1" dataType="int"/>
+	<column colId="czfpbm" dataIndex="CZFPBM" colName="财政&lt;br/&gt;分片编码" width="90" isGroup="1" dataType="int"/>
 	<column colId="mc" dataIndex="MC" colName="单位名称" width="150" isLink="1" linkTo="link_en" linkParams="SWDJZH,MC" />
 	<column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="110" dataType="string" isLink="1" linkAction="popUp" popHeight="500" popWidth="880">
 		<linkTab title="企业收税明细" linkTo="link_en" linkParams="SWDJZH" />
 		<linkTab title="企业登记明细" linkTo="link_en_2" linkParams="MC" />
 	</column>
-	<column colId="dz" dataIndex="DZ" colName="地址" width="120" dataType="double" />		
-	<column colId="fddbr" dataIndex="FDDBR" colName="法人代表" width="100" />
+	<column colId="test" dataIndex="" isleaf="0" colName="父节点"  dataType="" />
+	<column colId="dz" dataIndex="DZ" colName="地址" width="120"  pid="test"/>		
+	<column colId="fddbr" dataIndex="FDDBR" colName="法人代表" width="100" pid="test"/>
 </columns>
 <rptData sourceType="1" canPaging="1" defaultPageSize="30" name="dj">
 	<sql><![CDATA[select swdjzh,mc,dz,fddbr, czfpbm from DJ_CZ 

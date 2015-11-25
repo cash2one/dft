@@ -32,18 +32,19 @@
 		</paraPro>
 	</paraProcesses>
 	<title>@nian@年@yue@月分部门$pa_srkj$</title>
-        <head titleInHead="1" style="headTitle">
+        <head titleInHead="1" style="headTitle" height="60">
+        <subTitle right="单位:元" left="左边" center="中间" cStyle="subTitleC" lStyle="subTitleL" rStyle="subTitleR"/>
 	<subTitle/>
         </head>
 	<columns complex="1" sourceType="0">
 	<column  pid="" colId="xm" dataIndex="XM" colName="部门" dataType="0" width="150" isleaf="1"  isOrder="0"/>
         <column  pid="" colId="dns" colName="当年数" dataType="0" width="150" isleaf="0"/>
         <column  pid="" colId="sns" colName="上年数" dataType="0" width="150" isleaf="0"/>
-			<column pid="dns" colId="dndy" dataIndex="DNDY" colName="当月" dataType="2"  width="130" isleaf="1" isOrder="0"/>
-		        <column pid="dns" colId="dnlj" dataIndex="DNLJ" colName="累计" dataType="2"  width="130" isleaf="1" isOrder="0"/>
-			<column pid="sns" colId="sndy" dataIndex="SNDY" colName="当月" dataType="2"  width="130" isleaf="1" isOrder="0"/>
-		        <column pid="sns" colId="snlj" dataIndex="SNLJ" colName="累计" dataType="2"  width="130" isleaf="1" isOrder="0"/>
-        <column  pid="" colId="ljzj" dataIndex="LJZJ" colName="累计增减" dataType="2" width="150" isleaf="1"  isOrder="0"/>
+	<column pid="dns" colId="dndy" dataIndex="DNDY" colName="当月" dataType="2"  width="130" isleaf="1" isOrder="0" renderer="rMoney"/>
+	<column pid="dns" colId="dnlj" dataIndex="DNLJ" colName="累计" dataType="2"  width="130" isleaf="1" isOrder="0" renderer="rMoney"/>
+	<column pid="sns" colId="sndy" dataIndex="SNDY" colName="当月" dataType="2"  width="130" isleaf="1" isOrder="0" renderer="rMoney"/>
+	<column pid="sns" colId="snlj" dataIndex="SNLJ" colName="累计" dataType="2"  width="130" isleaf="1" isOrder="0" renderer="rMoney"/>
+        <column  pid="" colId="ljzj" dataIndex="LJZJ" colName="累计增减" dataType="2" width="150" isleaf="1"  isOrder="0" renderer="rMoney"/>
 	<column  pid="" colId="zf" dataIndex="ZF" colName="累计增幅" dataType="2" width="150" isleaf="1"  isOrder="0"/>
 	column  pid="" colId="bz" dataIndex="BZ" colName="累计比重" dataType="2" width="150" isleaf="1"  isOrder="0"/>
         </columns>
@@ -56,5 +57,5 @@
                              ]]>
 		</sql>
 	</rptData>
-<foot left="制表单位:$czfpbm$" right="制表日期：@zb_nian@年@zb_yue@月@zb_ri@日" lStyle="footL" rStyle="footR" />
+<foot left="制表单位：$czfpbm$" right="制表日期：@zb_nian@年@zb_yue@月@zb_ri@日" lStyle="footL" rStyle="footR" />
 </report>

@@ -31,6 +31,7 @@ Ext.extend(Ext.ux.plugins.GroupHeaderGrid, Ext.util.Observable, {
 
 	renderHeaders: function(renderHeaders) {
 		var ts = this.templates, rows = [], tw = this.getTotalWidth();
+		if(this.cm.rows){
 		for (var i = 0; i < this.cm.rows.length; i++) {
 			var r = this.cm.rows[i], cells = [], col = 0;
 			for (var j = 0; j < r.length; j++) {
@@ -53,7 +54,9 @@ Ext.extend(Ext.ux.plugins.GroupHeaderGrid, Ext.util.Observable, {
 				cells: cells.join('')
 			});
 		}
+		}
 		rows[rows.length] = renderHeaders.call(this);
+		
 		return rows.join('');
 	},
 

@@ -198,6 +198,20 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 				columns = [].concat(this.grid.selModel).concat(columns);
 			}
 			this.cm.setConfig(columns);
+			//2015-12复杂表头
+			if (this.ds.reader.jsonData.metaData
+					&& this.ds.reader.jsonData.metaData.headRows) {
+				var hrows = this.ds.reader.jsonData.metaData.headRows;
+				if(hrows.length>0){
+					this.cm.rows = hrows;
+					/*var plugins = [new Ext.ux.plugins.GroupHeaderGrid()];
+					if (this.plugins) {
+						plugins = plugins.concat(this.plugins);
+					}
+
+					this.plugins = plugins;*/
+				}
+			}
 			if(!this.metaDataLoaded&&ttbars&&ttbars.length>0){
 				for(var i=0;i<ttbars.length;i++){
 					var it = ttbars[i];

@@ -74,6 +74,7 @@ var rptID="<%=rptID%>";
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/Ext.ux.tree.TreeCheckNodeUI.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/query.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/GridExporter.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/GroupHeaderPlugin.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/ExportGridPanel.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/TreeWindow.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/ParamTreeWindow.js"></script>
@@ -1229,6 +1230,7 @@ var grid = new App.ux.DynamicGridPanelAuto({
 	<%if(hasHead||hasFoot){%>
 	region: 'center',
 	<%}%>
+	plugins: [new Ext.ux.plugins.GroupHeaderGrid()],
 	title: "<%=titleInHead?"":rpt.getTitle().getTitleExp()%>",
 	enableColumnMove :true,
 	stripeRows: true,
@@ -1239,7 +1241,7 @@ var grid = new App.ux.DynamicGridPanelAuto({
 		paramOrder: ['rptID','start','limit','condition'],
 		fields : []
 	}),
-	view: new Ext.ux.grid.LockingGridView(App.ux.DynamicGridPanelAuto.prototype.viewConfig),
+	//view: new Ext.ux.grid.LockingGridView(App.ux.DynamicGridPanelAuto.prototype.viewConfig),
 	tbar: [
 	{
 		iconCls: 'viewMenu',
