@@ -32,28 +32,29 @@ Ext.extend(Ext.ux.plugins.GroupHeaderGrid, Ext.util.Observable, {
 	renderHeaders: function(renderHeaders) {
 		var ts = this.templates, rows = [], tw = this.getTotalWidth();
 		if(this.cm.rows){
-		for (var i = 0; i < this.cm.rows.length; i++) {
-			var r = this.cm.rows[i], cells = [], col = 0;
-			for (var j = 0; j < r.length; j++) {
-				var c = r[j];
-				c.colspan = c.colspan || 1;
-				c.col = col;
-				col += c.colspan;
-				var gs = this.getGroupStyle(c);
-				cells[j] = ts.gcell.apply({
-					id: c.id || i + '-' + col,
-					cls: c.header ? 'ux-grid-hd-group-cell' : 'ux-grid-hd-nogroup-cell',
-					style: 'width:' + gs.width + ';' + (gs.hidden ? 'display:none;' : '') + (c.align ? 'text-align:' + c.align + ';' : ''),
-					tooltip: c.tooltip ? (Ext.QuickTips.isEnabled() ? 'ext:qtip' : 'title') + '="' + c.tooltip + '"' : '',
-					value: c.header || '&#160;',
-					istyle: c.align == 'right' ? 'padding-right:16px' : ''
+			for (var i = 0; i < this.cm.rows.length; i++) {
+				var r = this.cm.rows[i], cells = [], col = 0;
+				for (var j = 0; j < r.length; j++) {
+					var c = r[j];
+					c.colspan = c.colspan || 1;
+					c.col = col;
+					col += c.colspan;
+					var gs = this.getGroupStyle(c);
+					cells[j] = ts.gcell.apply({
+						id: c.id || i + '-' + col,
+						cls: c.header ? 'ux-grid-hd-group-cell' : 'ux-grid-hd-nogroup-cell',
+						style: 'width:' + gs.width + ';' + (gs.hidden ? 'display:none;' : '') + (c.align ? 'text-align:' + c.align + ';' : ''),
+						tooltip: c.tooltip ? (Ext.QuickTips.isEnabled() ? 'ext:qtip' : 'title') + '="' + c.tooltip + '"' : '',
+						value: c.header || '&#160;',
+						istyle: c.align == 'right' ? 'padding-right:16px' : ''
+					});
+				}
+				rows[i] = ts.header.apply({
+					tstyle: 'width:' + tw + ';',
+					cells: cells.join('')
 				});
+				debugger;
 			}
-			rows[i] = ts.header.apply({
-				tstyle: 'width:' + tw + ';',
-				cells: cells.join('')
-			});
-		}
 		}
 		rows[rows.length] = renderHeaders.call(this);
 		

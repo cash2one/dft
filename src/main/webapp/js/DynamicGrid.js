@@ -132,7 +132,6 @@ App.ux.columnTipRender = function(value, p, record) {
 /**
  * @class App.ux.DynamicGridPanelAuto
  * @overrides onDataChange
- * @author jlong
  * @date 2013-04-15 Adds support the grid to assign the column width by the
  *       column content
  */
@@ -204,12 +203,13 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 				var hrows = this.ds.reader.jsonData.metaData.headRows;
 				if(hrows.length>0){
 					this.cm.rows = hrows;
-					/*var plugins = [new Ext.ux.plugins.GroupHeaderGrid()];
+					debugger;
+					var plugins = [new Ext.ux.plugins.GroupHeaderGrid()];
 					if (this.plugins) {
-						plugins = plugins.concat(this.plugins);
+						this.plugins[0].init(this);
 					}
 
-					this.plugins = plugins;*/
+					//this.plugins = plugins;
 				}
 			}
 			if(!this.metaDataLoaded&&ttbars&&ttbars.length>0){
@@ -438,6 +438,8 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 			this.refresh();
 			this.updateHeaderSortState();
 			this.syncFocusEl(0);
+			debugger;
+			//this.grid.getView().renderHeaders();
 		}
 	},
 	loadMask : true
