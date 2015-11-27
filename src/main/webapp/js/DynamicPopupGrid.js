@@ -139,6 +139,19 @@ App.ux.DynamicGridPanelPopup = Ext.extend(App.ux.DynamicGridPanelNoExport, {
 				columns = [].concat(this.grid.selModel).concat(columns);
 			}
 			this.cm.setConfig(columns);
+			//2015-12复杂表头
+			if (this.ds.reader.jsonData.metaData
+					&& this.ds.reader.jsonData.metaData.headRows) {
+				var hrows = this.ds.reader.jsonData.metaData.headRows;
+				if(hrows.length>0){
+					this.cm.rows = hrows;
+					/*var plugins = [new Ext.ux.plugins.GroupHeaderGrid()];
+					if (this.plugins) {
+						this.plugins[0].init(this);
+					}
+					this.plugins = plugins;*/
+				}
+			}
 			var tmpId="";
 			if(ttbars&&ttbars.length>0){
 				for(var i=0;i<ttbars.length;i++){
@@ -208,8 +221,8 @@ App.ux.DynamicGridPanelPopup = Ext.extend(App.ux.DynamicGridPanelNoExport, {
 			}
 			this.metaDataLoaded = true;
 			this.grid.getTopToolbar().doLayout();
-			this.refresh();
-			this.updateHeaderSortState();
+			this.refresh(true);
+			//this.updateHeaderSortState();
 			this.syncFocusEl(0);
 		}
 	},

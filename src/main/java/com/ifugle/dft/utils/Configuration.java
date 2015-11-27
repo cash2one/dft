@@ -98,18 +98,18 @@ public class Configuration {
 			fieldsMapShowInList = new HashMap();
 	    	for(int i=0;i<tbnames.size();i++){
 	    		String tb = (String)tbnames.get(i);
-	    		StringBuffer allsql = new StringBuffer("select tname,field,mc,f_type,val_src,mapbm,showmod,isrtk,sort ");
+	    		StringBuffer allsql = new StringBuffer("select tname,field,mc,f_type,val_src,mapbm,showmod,isrtk,sort,nvl(colwidth,100) colwidth ");
 	    		allsql.append(" from en_dictionary where tname='").append(tb).append("' order by sort");
 	    		List allflds = jdbcTemplate.query(allsql.toString(),params, ParameterizedBeanPropertyRowMapper.newInstance(En_field.class));
 	    		fieldsMapByTable.put(tb, allflds);
 	    		
-	    		StringBuffer showsql = new StringBuffer("select tname,field,mc,f_type,val_src,mapbm,showmod,isrtk,sort ");
+	    		StringBuffer showsql = new StringBuffer("select tname,field,mc,f_type,val_src,mapbm,showmod,isrtk,sort,nvl(colwidth,100) colwidth ");
 	    		showsql.append(" from en_dictionary where tname='").append(tb).append("' and showmod>0 order by sort");
 	    		List showflds = jdbcTemplate.query(showsql.toString(),params, ParameterizedBeanPropertyRowMapper.newInstance(En_field.class));
 	    		fieldsMapByTableShow.put(tb, showflds);
 	    		
-	    		StringBuffer showInListsql = new StringBuffer("select tname,field,mc,f_type,val_src,mapbm,showmod,isrtk,sort,colwidth ");
-	    		showInListsql.append(" from en_dictionary where tname='").append(tb).append("' and showinlist>0 order by sort");
+	    		StringBuffer showInListsql = new StringBuffer("select tname,field,mc,f_type,val_src,mapbm,showmod,isrtk,sort,nvl(colwidth,100) ");
+	    		showInListsql.append(" colwidth from en_dictionary where tname='").append(tb).append("' and showinlist>0 order by sort");
 	    		List silstflds = jdbcTemplate.query(showInListsql.toString(),params, ParameterizedBeanPropertyRowMapper.newInstance(En_field.class));
 	    		fieldsMapShowInList.put(tb, silstflds);
 	    	}

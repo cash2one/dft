@@ -779,7 +779,7 @@ public class CheckHandler {
 				ejo.put("header", df.getMc());
 				ejo.put("dataIndex",df.getField().toLowerCase());
 				ejo.put("align", "left");
-				ejo.put("width","100");
+				ejo.put("width",df.getColwidth());
 				jarr.put(ejo);
 			}
 		}catch(Exception e){

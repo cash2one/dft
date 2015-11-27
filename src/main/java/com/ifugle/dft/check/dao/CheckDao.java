@@ -112,11 +112,14 @@ public class CheckDao extends BaseDao{
 	* @return
 	 */
 	public boolean tryExcute(String sql) {
-		boolean done = false;
-		String countsql = "select count(*) count from ("+sql+")";
-		jdbcTemplate.queryForInt(countsql);
-		done = true;
-		return done;
+		try{
+			String countsql = "select count(*) count from ("+sql+")";
+			jdbcTemplate.queryForInt(countsql);
+		}catch(Exception e){
+			log.error(e.toString());
+			return false;
+		}
+		return true;
 	}
 	
 	public List readExcel(String filePath,int beginRow,int matchCol)throws Exception{

@@ -63,12 +63,13 @@
 <title>DNFT</title>
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/libs/ext-3.4.0/resources/css/ext-all.css" />
 <link href="<%=request.getContextPath()%>/css/dfCommon.css" rel="stylesheet" type="text/css" />
+<link href="<%=request.getContextPath()%>/css/GroupHeaderPlugin.css" rel="stylesheet" type="text/css" />
 <link href="<%=request.getContextPath()%>/css/LockingGridView.css" rel="stylesheet" type="text/css" />
 <script type = "text/javascript">
 var rptID="<%=rptID%>";
 </script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/adapter/ext/ext-base.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/ext-all.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/ext-all-debug.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/src/locale/ext-lang-zh_CN.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/LockingGridView.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/Ext.ux.tree.TreeCheckNodeUI.js"></script>
@@ -83,6 +84,12 @@ var rptID="<%=rptID%>";
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/DynamicPopupGrid.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/render.js"></script>
 <style type="text/css">
+.rptGrid .x-grid3-row {
+	border-bottom : 1px none;
+}
+.x-grid3-cell-inner{
+    border-right:1px none #eceff6;
+}
 .rptGrid .x-grid3-row {
 	border-bottom : 1px none;
 }
@@ -1677,6 +1684,7 @@ function addTabs(id,tabTitle){
 		tgrid = new App.ux.DynamicGridPanelPopup({
 			id: id,
 			columns : [],
+			plugins: [new Ext.ux.plugins.GroupHeaderGrid()],
 			store : new Ext.data.DirectStore({
 				directFn : PortalHandler.queryGeneralDataDynamic,
 				remoteSort: true,

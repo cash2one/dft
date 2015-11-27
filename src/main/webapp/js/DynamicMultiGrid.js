@@ -162,6 +162,14 @@ App.ux.DynamicGridPanelMulti = Ext.extend(App.ux.DynamicGridPanel, {
 				columns = [].concat(this.grid.selModel).concat(columns);
 			}
 			this.cm.setConfig(columns);
+			//2015-12复杂表头
+			if (this.ds.reader.jsonData.metaData
+					&& this.ds.reader.jsonData.metaData.headRows) {
+				var hrows = this.ds.reader.jsonData.metaData.headRows;
+				if(hrows.length>0){
+					this.cm.rows = hrows;
+				}
+			}
 			var tmpId="";
 			if(ttbars&&ttbars.length>0){
 				for(var i=0;i<ttbars.length;i++){
@@ -232,8 +240,8 @@ App.ux.DynamicGridPanelMulti = Ext.extend(App.ux.DynamicGridPanel, {
 			
 			this.metaDataLoaded = true;
 			this.grid.getTopToolbar().doLayout();
-			this.refresh();
-			this.updateHeaderSortState();
+			this.refresh(true);
+			//this.updateHeaderSortState();
 			this.syncFocusEl(0);
 		}
 	},

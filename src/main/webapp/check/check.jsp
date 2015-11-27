@@ -1767,7 +1767,7 @@ function queryForEns(opType){
 		cdts.tHeads = heads.join();
 		CheckHandler.tryGetEns(<%=sEnType%>,opType,Ext.encode(cdts),function(data){
 			var obj = Ext.decode(data);
-			if(!obj)return;
+			//if(!obj)return;
 			if(opType==0){
 				//弹出sql显示框
 				var sqlcont = obj.sql;

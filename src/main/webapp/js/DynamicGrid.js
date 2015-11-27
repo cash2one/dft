@@ -203,13 +203,11 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 				var hrows = this.ds.reader.jsonData.metaData.headRows;
 				if(hrows.length>0){
 					this.cm.rows = hrows;
-					debugger;
-					var plugins = [new Ext.ux.plugins.GroupHeaderGrid()];
+					/*var plugins = [new Ext.ux.plugins.GroupHeaderGrid()];
 					if (this.plugins) {
 						this.plugins[0].init(this);
 					}
-
-					//this.plugins = plugins;
+					this.plugins = plugins;*/
 				}
 			}
 			if(!this.metaDataLoaded&&ttbars&&ttbars.length>0){
@@ -435,10 +433,9 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 				document.getElementById('footRight').innerHTML=this.ds.reader.jsonData.footRight;
 			}
 			this.grid.getTopToolbar().doLayout();
-			this.refresh();
-			this.updateHeaderSortState();
+			this.refresh(true);
+			//this.updateHeaderSortState();
 			this.syncFocusEl(0);
-			debugger;
 			//this.grid.getView().renderHeaders();
 		}
 	},

@@ -53,7 +53,6 @@ Ext.extend(Ext.ux.plugins.GroupHeaderGrid, Ext.util.Observable, {
 					tstyle: 'width:' + tw + ';',
 					cells: cells.join('')
 				});
-				debugger;
 			}
 		}
 		rows[rows.length] = renderHeaders.call(this);

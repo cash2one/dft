@@ -29,11 +29,13 @@
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/libs/ext-3.4.0/resources/css/ext-all.css" />
 <link href="<%=request.getContextPath()%>/css/dfCommon.css" rel="stylesheet" type="text/css" />
 <link href="<%=request.getContextPath()%>/css/Portal.css" rel="stylesheet" type="text/css" />
+<link href="<%=request.getContextPath()%>/css/GroupHeaderPlugin.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/adapter/ext/ext-base.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/ext-all-debug.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/src/locale/ext-lang-zh_CN.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/LockingGridView.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/Ext.ux.tree.TreeCheckNodeUI.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/libs/ext-3.4.0/GroupHeaderPlugin.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/queryReport/charts/FusionCharts.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/portal/Portal.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/portal/PortalColumn.js"></script>
@@ -340,6 +342,7 @@ function createGrid(id,loadInPortal){
 		 var grid = new App.ux.DynamicGridPanelMulti({
 			id: id,
 			columns : [],
+			plugins: [new Ext.ux.plugins.GroupHeaderGrid()],
 			store : new Ext.data.DirectStore({
 				directFn : PortalHandler.queryGeneralDataDynamic,
 				remoteSort: true,

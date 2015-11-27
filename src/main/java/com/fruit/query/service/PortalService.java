@@ -138,6 +138,7 @@ public class PortalService {
 	public Map<String, Object> buildStoreMetaData(Report rpt,Map paraVals) {
 		Map storeMetaData = new HashMap();
 		List columns = new ArrayList();
+		List headRows = null;
 		List fields = new ArrayList();
 		List ttbars = new ArrayList();
 		// 获取报表的列定义
@@ -171,6 +172,10 @@ public class PortalService {
 			column.put("renderer", col.getRenderer());
 			column.put("editor", col.getEditor());
 			columns.add(column);
+		}
+		//复杂表头
+		if(header.getMaxLevel()>1){
+			headRows = getGroupHeaderRows(header);
 		}
 		for (int i = 0; i < header.getHiddenNodes().size(); i++) {
 			Column col = (Column) header.getHiddenNodes().get(i);
@@ -229,6 +234,7 @@ public class PortalService {
 		storeMetaData.put("messageProperty", "message");
 		storeMetaData.put("fields", fields);
 		storeMetaData.put("columns", columns);
+		storeMetaData.put("headRows", headRows);
 		storeMetaData.put("ttbars", ttbars);
 		return storeMetaData;
 	}
@@ -493,5 +499,34 @@ public class PortalService {
 			}
 		}
 		return info;
+	}
+	private List getGroupHeaderRows(RptMultiHeader header){
+		//复杂表头写为二维数组，为方便、动态、用list。除叶子列外，每个level构造列头的一行
+		List hRows=new ArrayList();
+		for(int i=1;i<header.getMaxLevel();i++){
+			List row=new ArrayList();
+			hRows.add(row);
+		}
+		for(int i=0;i<header.getSortedNodes().size();i++){
+			Column col=(Column)header.getSortedNodes().get(i);
+			int lv=col.getLevel();
+			//排序后的节点循环。底级列如果跨行，则在“被跨越”的每一行增加列的占位符{}
+			if(col.getIsleaf()>0){
+				for(int j=header.getMaxLevel()-1;j>=lv;j--){
+					List cRow=(List)hRows.get(j-1);
+					Map<String, Object> column = new HashMap<String, Object>();
+					cRow.add(column);
+				}
+			}else{
+				//非底级的节点，增加到其对应的行中。
+				List cRow=(List)hRows.get(lv-1);
+				Map<String, Object> column = new HashMap<String, Object>();
+				column.put("header", col.getColName());
+				column.put("colspan", header.getColSpan(i+1,lv));
+				column.put("align", "center");
+				cRow.add(column);
+			}
+		}
+		return hRows;
 	}
 }

@@ -1,7 +1,7 @@
 /**********************************************************************
  * 
  * Code generated automatically by DirectJNgine
- * Copyright (c) 2009, Pedro AgullÃ³ Soliveres
+ * Copyright (c) 2009, Pedro Agull¨® Soliveres
  * 
  * DO NOT MODIFY MANUALLY!!
  * 
@@ -35,12 +35,12 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'deletePRulesOfEn'/*(String, String) => String */,
+        name: 'toggleRuleQybj'/*(int, int) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'toggleRuleQybj'/*(int, int) => String */,
+        name: 'deletePRulesOfEn'/*(String, String) => String */,
         len: 2,
         formHandler: false
       },
