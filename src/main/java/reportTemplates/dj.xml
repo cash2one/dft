@@ -58,7 +58,7 @@
 		</sql>
 	</rptData>
 </DataSets>
-<foot left="制表单位:$czfpbm$" cStyle="footC" lStyle="footL" rStyle="footR"/>
+<foot left="制表单位:$czfpbm$" right="右侧" center="中间" cStyle="footC" lStyle="footL" rStyle="footR"/>
 <!-- Multi-MSColumn3D MSCombi3D MSCombi2D-->
 <chart id="colTest" chartType="MSCombi2D" width="300" height="200" dataTemplateName="test" templateFormat="vm">
 	<data sourceType="1" dataFormat="0" isMultiSeries="1" categoryIndex="CZFPBM" dataIndex="CC" seriesIndex="ISMAP">

@@ -62,7 +62,9 @@ public class ExportController {
 		String subject=request.getParameter("subject")==null?"":request.getParameter("subject");
 		String description=request.getParameter("description")==null?"":request.getParameter("description");
 		String subTitle = request.getParameter("subTitle")==null?"":request.getParameter("subTitle");
+		subTitle = subTitle.replace("|", "      ");
 		String foot = request.getParameter("foot")==null?"":request.getParameter("foot");
+		foot = foot.replace("|", "      ");
 		String action=request.getParameter("action")==null?"":request.getParameter("action");
 		String method=request.getParameter("method")==null?"":request.getParameter("method");
 		String params=request.getParameter("params")==null?"":request.getParameter("params");

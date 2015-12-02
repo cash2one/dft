@@ -31,11 +31,11 @@
 				SubTitle st = head.getSubTitle();
 				strHead.append("<table width='100%' border='0' cellspacing='0' cellpadding='0'><tr><td colspan=3 align='center'>");
 				strHead.append("<span id='headTitle' class='").append(head.getStyle()).append("'>").append(rpt.getTitle().getTitleExp());
-				strHead.append("</span></td></tr><tr><td width='33%' align='left><span id='headSLeft' class='").append(st.getlStyle()).append("'>");
+				strHead.append("</span></td></tr><tr><td width='33%' align='left'><span id='headSLeft' class='").append(st.getlStyle()).append("'>");
 				strHead.append(StringUtils.isEmpty(st.getLeftExp())?"":st.getLeftExp());
 				strHead.append("</span></td><td width='33%' align='center'><span id='headSCenter' class='").append(st.getcStyle()).append("'>");
 				strHead.append(StringUtils.isEmpty(st.getCenterExp())?"":st.getCenterExp());
-				strHead.append("</span></td><td width='33%' align='right'><span id='headSRight' class='>").append(st.getrStyle()).append("'>");
+				strHead.append("</span></td><td width='33%' align='right'><span id='headSRight' class='").append(st.getrStyle()).append("'>");
 				strHead.append(StringUtils.isEmpty(st.getRightExp())?"":st.getRightExp()).append("</span></td></tr></table>");
 			}
 		}
@@ -984,12 +984,12 @@ var winFormat = new Ext.Window({
 			}else{
 				opt.title =grid.title;
 			}
-		    var subTitle = document.getElementById('headSLeft')?document.getElementById('headSLeft').innerHTML:"";
-		    subTitle += document.getElementById('headSCenter')?document.getElementById('headSCenter').innerHTML:"";
-		    subTitle += document.getElementById('headSRight')?document.getElementById('headSRight').innerHTML:"";
+		    var subTitle = (document.getElementById('headSLeft')? document.getElementById('headSLeft').innerHTML:"");
+		    subTitle = subTitle+"|"+(document.getElementById('headSCenter')?document.getElementById('headSCenter').innerHTML:"");
+		    subTitle = subTitle+"|"+(document.getElementById('headSRight')?document.getElementById('headSRight').innerHTML:"");
 		    var foot = document.getElementById('footLeft')?document.getElementById('footLeft').innerHTML:"";
-		    foot += document.getElementById('footCenter')?document.getElementById('footCenter').innerHTML:"";
-		    foot += document.getElementById('footRight')?document.getElementById('footRight').innerHTML:"";
+		    foot = foot + "|" + (document.getElementById('footCenter')?document.getElementById('footCenter').innerHTML:"");
+		    foot = foot + "|" + (document.getElementById('footRight')?document.getElementById('footRight').innerHTML:"");
 		    opt.subTitle = subTitle;
 		    opt.foot = foot;
 	        grid.exportExcel(opt);
@@ -1633,8 +1633,8 @@ var linkPopWin = new Ext.Window({
 });
 
 linkPopWin.on("show",function(){
-	linkPopWin.setWidth(linkedWidth);
-	linkPopWin.setHeight(linkedHeight);
+	//linkPopWin.setWidth(linkedWidth);
+	//linkPopWin.setHeight(linkedHeight);
 	var nps = linkTabs.items;
 	for(var i = 0;i<nps.getCount();i++){
 		var np = nps.get(i);
