@@ -5,8 +5,11 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -14,6 +17,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.CallableStatementCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedBeanPropertyRowMapper;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +35,28 @@ public class CheckDao extends BaseDao{
 		this.jdbcTemplate = jdbcTemplate;
 	}
 	public List getEns(String sql, int start, int limit,Class cls) {
-		List rsts = null;
+		final List rsts = new ArrayList();
 		try{
-			rsts = queryForPage(sql,start,limit,cls);
+			//rsts = queryForPage(sql,start,limit,cls);
+			StringBuffer rSql = new StringBuffer("SELECT * FROM (SELECT A.*, rownum r FROM (");
+			rSql.append(sql);
+			rSql.append(") A WHERE rownum<=");
+			rSql.append((start+limit));
+			rSql.append(") B WHERE r>");
+			rSql.append(start);
+			jdbcTemplate.query(rSql.toString(),new RowCallbackHandler() {  
+			    @Override  
+			    public void processRow(ResultSet rs) throws SQLException {
+			    	ResultSetMetaData rsmd=rs.getMetaData();
+			  		int colNum=rsmd.getColumnCount();
+			  		Map row = new HashMap(); 
+			  		for(int i=1;i<=colNum;i++){
+			  			String cn = rsmd.getColumnName(i).toLowerCase();
+			  			row.put(cn, rs.getString(cn)); 
+			  		}
+			        rsts.add(row);  
+			  }});  
+
 		}catch(Throwable e){
 			log.error(e.toString());
 		}
