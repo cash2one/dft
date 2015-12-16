@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="java.util.*"%>
+<%@ page import="org.apache.commons.lang.*"%>
 <%@ page import="com.fruit.query.data.*"%>
 <%@ page import="com.fruit.query.report.*"%>
 <%@ page import="com.fruit.query.service.*"%>
@@ -64,6 +65,36 @@
 	}
 	String defaultValue="";
 	String defaultText="";
+	//有一些参数隐藏，预先有值，可以被构造参数选项时引用。
+	Map paVals=new HashMap();
+	for(int k=0;k<rpt.getParas().size();k++){
+		Parameter tmpPa=(Parameter)rpt.getParas().get(k);
+		if(tmpPa.getIsHidden()==1){
+			String sDesc="",sVal="";
+			if(tmpPa.getBindMode()==0){
+				sDesc=sVal=tmpPa.getBindTo();
+			}else if(tmpPa.getBindMode()==1){
+				sVal=request.getParameter(tmpPa.getBindTo());
+				sDesc=request.getParameter(tmpPa.getBindTo()+"_desc");
+			}else if(tmpPa.getBindMode()==2){
+				sDesc=sVal=(String)request.getSession().getAttribute(tmpPa.getBindTo());
+			}else{
+				String path=tmpPa.getBindTo();
+				try{
+					IParaDataBind pdGetInstance=(IParaDataBind)Class.forName(path).newInstance();
+					ParaValue tpv=pdGetInstance.getParaValue(request, rpt, tmpPa);
+					if(tpv!=null){
+						sVal=tpv.getValue();
+						sDesc=tpv.getDesc();
+					}
+				}catch(Exception e){
+					System.out.println("未能正确加载报表取值类!错误信息:"+path+e.toString());
+				}
+			}
+			ParaValue pv=new ParaValue(sVal,sDesc);
+			paVals.put(tmpPa.getName(),pv);
+		}
+	}
 	Map opItemsMap=new HashMap();
 	//先获取所有下拉框或树参数的选项集合。按参数名称索引对应的选项集合
 	for(int i=0;i<paras.size();i++){
@@ -72,41 +103,12 @@
 		if(para.getAffectedByParas()!=null&&!"".equals(para.getAffectedByParas())){
 			continue;	
 		}
-    	if(para==null||para.getIsHidden()==1||para.getRenderType()==0||para.getRenderType()==3){continue;}
-		List items=null;
+    	//if(para==null||para.getIsHidden()==1||para.getRenderType()==0||para.getRenderType()==3){continue;}
+		if(para==null||para.getIsHidden()==1){continue;}
+    	List items=null;
     	if(para.getSourceType()==0){
 			items=para.getParaOptions();
 		}else{
-			Map paVals=new HashMap();
-			for(int k=0;k<rpt.getParas().size();k++){
-				Parameter tmpPa=(Parameter)rpt.getParas().get(k);
-				//参数待选项取值时只能引用隐藏参数
-				if(tmpPa.getIsHidden()==1){
-					String sDesc="",sVal="";
-					if(tmpPa.getBindMode()==0){
-						sDesc=sVal=tmpPa.getBindTo();
-					}else if(tmpPa.getBindMode()==1){
-						sVal=request.getParameter(tmpPa.getBindTo());
-						sDesc=request.getParameter(tmpPa.getBindTo()+"_desc");
-					}else if(tmpPa.getBindMode()==2){
-						sDesc=sVal=(String)request.getSession().getAttribute(tmpPa.getBindTo());
-					}else{
-						String path=tmpPa.getBindTo();
-						try{
-							IParaDataBind pdGetInstance=(IParaDataBind)Class.forName(path).newInstance();
-							ParaValue tpv=pdGetInstance.getParaValue(request, rpt, tmpPa);
-							if(tpv!=null){
-								sVal=tpv.getValue();
-								sDesc=tpv.getDesc();
-							}
-						}catch(Exception e){
-							System.out.println("未能正确加载报表取值类!错误信息:"+path+e.toString());
-						}
-					}
-					ParaValue pv=new ParaValue(sVal,sDesc);
-					paVals.put(tmpPa.getName(),pv);
-				}
-			}
 			items=ParaOptionsService.getParaOptionsService().getOptions(rpt,para,paVals);
 		}
     	opItemsMap.put(para.getName(),items);
@@ -140,13 +142,31 @@
     	//如果是下拉框
     	if(para.getRenderType()==1){
     		List choices=(List)opItemsMap.get(para.getName());
-			//如果选项集合不空,有多个选项设置了默认（isDefault>0），以最后一个默认选项为准
+			//既定的默认值规则(first)优先于普通动态规则或者选项中自定的isdefault
 			if(choices!=null){
-				for(int j=0;j<choices.size();j++){
-					OptionItem oi=(OptionItem)choices.get(j);
-					if(oi.getIsDefault()>0){
+				if(!StringUtils.isEmpty(para.getDefaultRule())){
+					String dr = para.getDefaultRule();
+					if("_first".equals(dr)){
+						OptionItem oi=(OptionItem)choices.get(0);
 						defaultValue=oi.getBm();
 						defaultText=oi.getName();
+					}
+				}else {
+					if(para.getDefaultRuleDefine()!=null){
+						try{
+							OptionItem oi = ParaDefaultOptionService.getParaDefaultOptionService().getParaDefaultOption(rpt,para,paVals);
+							defaultValue=oi.getBm();
+							defaultText=oi.getName();
+						}catch(Exception e){
+						}
+					}else{
+						for(int j=0;j<choices.size();j++){
+							OptionItem oi=(OptionItem)choices.get(j);
+							if(oi.getIsDefault()>0){
+								defaultValue=oi.getBm();
+								defaultText=oi.getName();
+							}
+						}
 					}
 				}
 				dfDesMap.put(para.getName(),defaultText);
@@ -194,17 +214,35 @@
     		List choices=(List)opItemsMap.get(para.getName());
 			//如果选项集合不空,设置了单选，以最后一个默认选项为准。多选则以逗号分隔
 			if(choices!=null){
-				for(int j=0;j<choices.size();j++){
-					OptionItem oi=(OptionItem)choices.get(j);
-					if(para.getIsMulti()==0){
-						if(oi.getIsDefault()>0){
+				if(!StringUtils.isEmpty(para.getDefaultRule())){
+					String dr = para.getDefaultRule();
+					if("_first".equals(dr)){
+						OptionItem oi=(OptionItem)choices.get(0);
+						defaultValue=oi.getBm();
+						defaultText=oi.getName();
+					}
+				}else{
+					if(para.getDefaultRuleDefine()!=null){
+						try{
+							OptionItem oi = ParaDefaultOptionService.getParaDefaultOptionService().getParaDefaultOption(rpt,para,paVals);
 							defaultValue=oi.getBm();
 							defaultText=oi.getName();
+						}catch(Exception e){
 						}
 					}else{
-						if(oi.getIsDefault()>0){
-							defaultValue+=oi.getBm()+",";
-							defaultText+=oi.getName()+",";
+						for(int j=0;j<choices.size();j++){
+							OptionItem oi=(OptionItem)choices.get(j);
+							if(para.getIsMulti()==0){
+								if(oi.getIsDefault()>0){
+									defaultValue=oi.getBm();
+									defaultText=oi.getName();
+								}
+							}else{
+								if(oi.getIsDefault()>0){
+									defaultValue+=oi.getBm()+",";
+									defaultText+=oi.getName()+",";
+								}
+							}
 						}
 					}
 				}
@@ -392,6 +430,12 @@
 								System.out.println("未能正确加载报表取值类!错误信息:"+path+e.toString());
 							}
 						}
+		        	}else if(pa.getDefaultRuleDefine()!=null){//2015-12 增加动态的默认值
+		        		try{
+							OptionItem op = ParaDefaultOptionService.getParaDefaultOptionService().getParaDefaultOption(rpt,pa,paVals);
+							pdfVal = op.getBm();
+						}catch(Exception e){
+						}
 		        	}
     			%>
 		        {
@@ -422,7 +466,16 @@
 					value:'<%=(String)dfValMap.get(pa.getName())==null?"":(String)dfValMap.get(pa.getName())%>',
 					name: '<%=pa.getName()%>'
 				},<%=pa.getName()%>_tg
-                <%}else if(rType==3){%>
+                <%}else if(rType==3){
+                	String ddfval = pa.getDefaultValue();
+                	if(StringUtils.isEmpty(ddfval)&&pa.getDefaultRuleDefine()!=null){//2015-12 增加动态的默认值
+		        		try{
+							OptionItem op = ParaDefaultOptionService.getParaDefaultOptionService().getParaDefaultOption(rpt,pa,paVals);
+							ddfval = op.getBm();
+						}catch(Exception e){
+						}
+		        	}
+                %>
                 {
 		            x: <%=left+70%>,
 		            y: <%=(top-5)+pCount*30%>,
@@ -430,8 +483,7 @@
 		            format:'<%=pa.getDateFormat()%>',
 		            name: '<%=pa.getName()%>',
 		            id: '<%=pa.getName()%>',
-		            //value:<%=pa.getDefaultValue()==null?"''":"new Date('"+pa.getDefaultValue()+"').format('"+pa.getDateFormat()+"')"%>
-		            value:<%=pa.getDefaultValue()==null?"''":"Date.parseDate('"+pa.getDefaultValue()+"','"+pa.getDateFormat()+"')"%>
+		            value:<%=StringUtils.isEmpty(ddfval)?"''":"Date.parseDate('"+ddfval+"','"+pa.getDateFormat()+"')"%>
 		        }
                 <%}
 		        pCount++;  

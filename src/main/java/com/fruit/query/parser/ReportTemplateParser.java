@@ -457,83 +457,81 @@ public class ReportTemplateParser {
 		}catch(Exception e){}
 		para.setWidth(width);
 		
-		//如果参数输入形式是下拉框或树，检查选项待选数据项如何取数，如果静态文本，则此时取数，否则每次请求时构建
-		if(renderType==1||renderType==2){
-			Element pd=pnode.element("paraDetail");
-			if(pd!=null){
-				int isMulti=0;
-				try{
-					String sm=pd.attributeValue("multi");
-					isMulti=Integer.parseInt(sm);
-				}catch(Exception e){
-					isMulti=0;
-				}
-				para.setIsMulti(isMulti);
-				int leafOnly=1;
-				try{
-					String lo=pd.attributeValue("leafOnly");
-					leafOnly=Integer.parseInt(lo);
-				}catch(Exception e){
-					leafOnly=1;
-				}
-				para.setLeafOnly(leafOnly);
-				int sourceType=0;
-				try{
-					String sSrcType=pd.attributeValue("sourceType");
-					sourceType=Integer.parseInt(sSrcType);
-				}catch(Exception e){
-					sourceType=0;
-				}
-				para.setSourceType(sourceType);
-				//如果是静态数据源，当下就读取待选项数据
-				if(sourceType==0){
-					Element pitems=pd.element("paraItems");
-					if(pitems!=null&&pitems.elementIterator("item")!=null){
-						List paraOptions=new ArrayList();
-						
-						for(Iterator pit=pitems.elementIterator("item");pit.hasNext();){
-							OptionItem oi=new OptionItem();
-							Element pi=(Element)pit.next();
-							oi.setBm(pi.attributeValue("bm"));
-							oi.setName(pi.attributeValue("name"));
-							oi.setPid(pi.attributeValue("pid"));
-							int isleaf=1;
-							try{
-								String sLeaf=pi.attributeValue("isleaf");
-								isleaf=Integer.parseInt(sLeaf);
-							}catch(Exception e){
-								isleaf=1;
-							}
-							oi.setIsleaf(isleaf);
-							//2009-04-30 默认值设置
-							int isDefault=0;
-							try{
-								String sdf=pi.attributeValue("isDefault");
-								isDefault=Integer.parseInt(sdf);
-							}catch(Exception e){}
-							oi.setIsDefault(isDefault);
-							
-							paraOptions.add(oi);
+		//如果参数有选项数据子节点
+		Element pd=pnode.element("paraDetail");
+		if (pd != null) {
+			int isMulti = 0;
+			try {
+				String sm = pd.attributeValue("multi");
+				isMulti = Integer.parseInt(sm);
+			} catch (Exception e) {
+				isMulti = 0;
+			}
+			para.setIsMulti(isMulti);
+			int leafOnly = 1;
+			try {
+				String lo = pd.attributeValue("leafOnly");
+				leafOnly = Integer.parseInt(lo);
+			} catch (Exception e) {
+				leafOnly = 1;
+			}
+			para.setLeafOnly(leafOnly);
+			int sourceType = 0;
+			try {
+				String sSrcType = pd.attributeValue("sourceType");
+				sourceType = Integer.parseInt(sSrcType);
+			} catch (Exception e) {
+				sourceType = 0;
+			}
+			para.setSourceType(sourceType);
+			// 如果是静态数据源，当下就读取待选项数据
+			if (sourceType == 0) {
+				Element pitems = pd.element("paraItems");
+				if (pitems != null && pitems.elementIterator("item") != null) {
+					List paraOptions = new ArrayList();
+					for (Iterator pit = pitems.elementIterator("item"); pit.hasNext();) {
+						OptionItem oi = new OptionItem();
+						Element pi = (Element) pit.next();
+						oi.setBm(pi.attributeValue("bm"));
+						oi.setName(pi.attributeValue("name"));
+						oi.setPid(pi.attributeValue("pid"));
+						int isleaf = 1;
+						try {
+							String sLeaf = pi.attributeValue("isleaf");
+							isleaf = Integer.parseInt(sLeaf);
+						} catch (Exception e) {
+							isleaf = 1;
 						}
-						para.setParaOptions(paraOptions);
+						oi.setIsleaf(isleaf);
+						// 2009-04-30 默认值设置
+						int isDefault = 0;
+						try {
+							String sdf = pi.attributeValue("isDefault");
+							isDefault = Integer.parseInt(sdf);
+						} catch (Exception e) {
+						}
+						oi.setIsDefault(isDefault);
+
+						paraOptions.add(oi);
 					}
-				}else if(sourceType==1){//如果是sql语句取数，读取sql语句配置
-					Element sqlNode=pd.element("sql");
-					if(sqlNode!=null){
-						String sql=sqlNode.getText();
-						para.setSql(sql);
-					}
-				}else if(sourceType==2){//如果是存储过程取数，读取存储过程配置
-					Element proNode=pd.element("procedure");
-					if(proNode!=null){
-						ProcedureBean pro=parseProcedure(proNode);
-						para.setProcedure(pro);
-					}
-				}else{
-					Element clNode=pd.element("class");
-					if(clNode!=null){
-						para.setImplClass(clNode.attributeValue("path"));
-					}
+					para.setParaOptions(paraOptions);
+				}
+			} else if (sourceType == 1) {// 如果是sql语句取数，读取sql语句配置
+				Element sqlNode = pd.element("sql");
+				if (sqlNode != null) {
+					String sql = sqlNode.getText();
+					para.setSql(sql);
+				}
+			} else if (sourceType == 2) {// 如果是存储过程取数，读取存储过程配置
+				Element proNode = pd.element("procedure");
+				if (proNode != null) {
+					ProcedureBean pro = parseProcedure(proNode);
+					para.setProcedure(pro);
+				}
+			} else {
+				Element clNode = pd.element("class");
+				if (clNode != null) {
+					para.setImplClass(clNode.attributeValue("path"));
 				}
 			}
 		}

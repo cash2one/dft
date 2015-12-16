@@ -342,7 +342,9 @@ public class ParaDefaultOptionService implements IParaDefaultOption{
 			}
 			it = new OptionItem();
 			it.setBm(rs.getString("BM"));
-			it.setName(rs.getString("NAME"));
+			try{
+				it.setName(rs.getString("NAME"));
+			}catch(Exception e){}
 			try{
 				it.setPid(rs.getString("PID")==null?"":rs.getString("PID"));
 			}catch(Exception e){}

@@ -235,7 +235,7 @@ public class QueryHandler {
 			}else if(tmpPa.getDefaultValue()!=null&&!"".equals(tmpPa.getDefaultValue())){
 				ParaValue pv=new ParaValue(tmpPa.getDefaultValue(),tmpPa.getDefaultValue());
 				paVals.put(tmpPa.getName(),pv);
-			}else if(tmpPa.getDefaultRule()!=null&&!"".equals(tmpPa.getDefaultRule())){
+			}else if(!StringUtils.isEmpty(tmpPa.getDefaultRule())){
 				String rule = tmpPa.getDefaultRule();
 				if("_first".equals(rule)){
 					try{
@@ -245,12 +245,12 @@ public class QueryHandler {
 						paVals.put(tmpPa.getName(),pv);
 					}catch(Exception e){
 					}
-				}else{
-					defaultParams.add(tmpPa);
 				}
+			}else if(tmpPa.getDefaultRuleDefine()!=null){
+				defaultParams.add(tmpPa);
 			}
 		}
-		//通过交互传递的参数值。如果与之前处理的参数值同（前面处理过默认值），会被本次传递值覆盖。
+		//通过交互传递的参数值。如果与之前处理的参数名同（前面处理过默认值），会被本次传递值覆盖。
 		JSONObject jttParams = null;
 		JSONObject jparams = null;
 		if(tmpPostVals!=null){

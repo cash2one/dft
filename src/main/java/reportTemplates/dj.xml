@@ -9,6 +9,20 @@
 				]]></sql>
 		</paraDetail>
 	</para>
+	<para name ="rq" desc="文本日期" hidden="0" renderType="0">
+		<defaultRule sourceType="1">
+			<sql><![CDATA[
+				SELECT to_char(sysdate,'YYYY-MM-DD')BM from dual
+				]]></sql>
+		</defaultRule>
+	</para>
+	<para name ="rq_date" desc="DP日期" hidden="0" renderType="3" dateFormat='Y-m'>
+		<defaultRule sourceType="1">
+			<sql><![CDATA[
+				SELECT to_char(sysdate,'YYYY-MM')BM from dual
+				]]></sql>
+		</defaultRule>
+	</para>
 	<para name ="qyzt" desc="企业状态" hidden="0" renderType="2" dataType="1" defaultRule="_first">
 		<paraDetail multi="1" sourceType="0">
 			<paraItems>
