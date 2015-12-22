@@ -79,16 +79,18 @@ Ext.extend(Ext.ux.plugins.GroupHeaderGrid, Ext.util.Observable, {
 
 	updateGroupStyles: function(col) {
 		var tables = this.mainHd.query('.x-grid3-header-offset > table'), tw = this.getTotalWidth();
-		for (var i = 0; i < tables.length; i++) {
-			tables[i].style.width = tw;
-			if (i < this.cm.rows.length) {
-				var cells = tables[i].firstChild.firstChild.childNodes;
-				for (var j = 0; j < cells.length; j++) {
-					var c = this.cm.rows[i][j];
-					if ((typeof col != 'number') || (col >= c.col && col < c.col + c.colspan)) {
-						var gs = this.getGroupStyle(c);
-						cells[j].style.width = gs.width;
-						cells[j].style.display = gs.hidden ? 'none' : '';
+		if(this.cm.rows){
+			for (var i = 0; i < tables.length; i++) {
+				tables[i].style.width = tw;
+				if (i < this.cm.rows.length) {
+					var cells = tables[i].firstChild.firstChild.childNodes;
+					for (var j = 0; j < cells.length; j++) {
+						var c = this.cm.rows[i][j];
+						if ((typeof col != 'number') || (col >= c.col && col < c.col + c.colspan)) {
+							var gs = this.getGroupStyle(c);
+							cells[j].style.width = gs.width;
+							cells[j].style.display = gs.hidden ? 'none' : '';
+						}
 					}
 				}
 			}

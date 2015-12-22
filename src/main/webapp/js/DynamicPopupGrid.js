@@ -132,6 +132,7 @@ App.ux.DynamicGridPanelPopup = Ext.extend(App.ux.DynamicGridPanelNoExport, {
 				}else if(columns[_coli].isLink>0){//no renderer,as a link column,it need renderer
 					columns[_coli].renderer=App.rpt.Renders["renderFoo"];
 				}
+				columns[_coli].header="<div style='text-align:center;'>"+columns[_coli].header+"</div>"
 			}
 
 			// 判断初始化多选框列

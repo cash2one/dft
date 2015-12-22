@@ -161,7 +161,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 			
 			var ttbars;
 			var moreParas;
-			if(!this.metaDataLoaded){//如果是重组元数据
+			if(!this.grid.metaDataLoaded){//如果是重组元数据
 				//先删除工具栏项目，保留前4项
 				var tbitems = this.grid.getTopToolbar().items;
 				while(tbitems.length>4){
@@ -190,6 +190,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 				}else if(columns[_coli].isLink>0){//no renderer,as a link column,it need renderer
 					columns[_coli].renderer=App.rpt.Renders["renderFoo"];
 				}
+				columns[_coli].header="<div style='text-align:center;'>"+columns[_coli].header+"</div>"
 			}
 			
 			// 判断初始化多选框列
@@ -210,7 +211,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 					this.plugins = plugins;*/
 				}
 			}
-			if(!this.metaDataLoaded&&ttbars&&ttbars.length>0){
+			if(!this.grid.metaDataLoaded&&ttbars&&ttbars.length>0){
 				for(var i=0;i<ttbars.length;i++){
 					var it = ttbars[i];
 					if(it.xtype=="combo"){
@@ -276,7 +277,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 		            }
 				});
 			}
-			if(!this.metaDataLoaded&&this.ds.reader.jsonData.metaData
+			if(!this.grid.metaDataLoaded&&this.ds.reader.jsonData.metaData
 					&& this.ds.reader.jsonData.metaData.hasComplexParams){
 				if(ttbars&&ttbars.length>0){
 					this.grid.getTopToolbar().addSeparator();
@@ -353,7 +354,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 				paramForm.doLayout();
 				paramWin.add(paramForm);
 			}
-			if(!this.metaDataLoaded&&this.ds.reader.jsonData.metaData
+			if(!this.grid.metaDataLoaded&&this.ds.reader.jsonData.metaData
 					&& this.ds.reader.jsonData.metaData.hasComplexFlt){
 				if(ttbars&&ttbars.length>0){
 					this.grid.getTopToolbar().addSeparator();
@@ -381,7 +382,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 					}
 				}
 			}
-			if(!this.metaDataLoaded&&this.ds.reader.jsonData.metaData
+			if(!this.grid.metaDataLoaded&&this.ds.reader.jsonData.metaData
 					&& this.ds.reader.jsonData.metaData.multiUnit){
 				if(ttbars&&ttbars.length>0){
 					this.grid.getTopToolbar().addSeparator();
@@ -393,7 +394,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 			    });
 				this.grid.getTopToolbar().add(unitsCombo);
 			}
-			if(!this.metaDataLoaded&&this.ds.reader.jsonData.metaData
+			if(!this.grid.metaDataLoaded&&this.ds.reader.jsonData.metaData
 					&& this.ds.reader.jsonData.metaData.zeroCanHide){
 				if(ttbars&&ttbars.length>0){
 					this.grid.getTopToolbar().addSeparator();
@@ -406,7 +407,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 		            handler : zeroHideShow
 				});
 			}
-			this.metaDataLoaded = true;
+			this.grid.metaDataLoaded = true;
 			if(this.ds.reader.jsonData&&this.ds.reader.jsonData.title){
 				if(titleInHead&&document.getElementById('headTitle')){
 					document.getElementById('headTitle').innerHTML=this.ds.reader.jsonData.title;
@@ -434,7 +435,7 @@ App.ux.DynamicGridPanelAuto = Ext.extend(App.ux.DynamicGridPanel, {
 			}
 			this.grid.getTopToolbar().doLayout();
 			this.refresh(true);
-			//this.updateHeaderSortState();
+			this.updateHeaderSortState();
 			this.syncFocusEl(0);
 			//this.grid.getView().renderHeaders();
 		}
