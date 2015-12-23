@@ -87,11 +87,12 @@ var rptID="<%=rptID%>";
 .rptGrid .x-grid3-row {
 	border-bottom : 1px none;
 }
-.x-grid3-cell-inner{
-    border-right:1px none #eceff6;
-}
+
 .rptGrid .x-grid3-row {
 	border-bottom : 1px none;
+}
+.x-grid3-hd-inner{
+	text-align:center;
 }
 </style>
 <script type="text/javascript">

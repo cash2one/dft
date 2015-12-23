@@ -117,7 +117,7 @@ App.ux.DynamicGridPanelPopup = Ext.extend(App.ux.DynamicGridPanelNoExport, {
 				columns = this.ds.reader.jsonData.metaData.columns;
 			}
 			var ttbars;
-			if(!this.metaDataLoaded){
+			if(!this.grid.metaDataLoaded){
 				if (this.ds.reader.jsonData.metaData
 						&& this.ds.reader.jsonData.metaData.ttbars) {
 					ttbars = this.ds.reader.jsonData.metaData.ttbars;
@@ -220,7 +220,7 @@ App.ux.DynamicGridPanelPopup = Ext.extend(App.ux.DynamicGridPanelNoExport, {
 					}
 				});
 			}
-			this.metaDataLoaded = true;
+			this.grid.metaDataLoaded = true;
 			this.grid.getTopToolbar().doLayout();
 			this.refresh(true);
 			//this.updateHeaderSortState();

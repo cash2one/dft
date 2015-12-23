@@ -1,7 +1,7 @@
 /**********************************************************************
  * 
  * Code generated automatically by DirectJNgine
- * Copyright (c) 2009, Pedro AgullÃ³ Soliveres
+ * Copyright (c) 2009, Pedro Agull¨® Soliveres
  * 
  * DO NOT MODIFY MANUALLY!!
  * 
@@ -20,6 +20,11 @@ Ext.query.REMOTING_API = {
   actions: {
     QueryHandler: [
       {
+        name: 'getOptionItemsOfTree'/*(String, String, String, String) => java.util.List */,
+        len: 4,
+        formHandler: false
+      },
+      {
         name: 'deleteQueryPlan'/*(int) => String */,
         len: 1,
         formHandler: false
@@ -27,11 +32,6 @@ Ext.query.REMOTING_API = {
       {
         name: 'getUnits'/*(String) => java.util.List */,
         len: 1,
-        formHandler: false
-      },
-      {
-        name: 'getOptionItemsOfTree'/*(String, String, String, String) => java.util.List */,
-        len: 4,
         formHandler: false
       },
       {
@@ -62,13 +62,13 @@ Ext.query.REMOTING_API = {
     ],
     PortalHandler: [
       {
-        name: 'getUnits'/*(String) => java.util.List */,
-        len: 1,
+        name: 'getOptionItemsOfTree'/*(String, String, String, String) => java.util.List */,
+        len: 4,
         formHandler: false
       },
       {
-        name: 'getOptionItemsOfTree'/*(String, String, String, String) => java.util.List */,
-        len: 4,
+        name: 'getUnits'/*(String) => java.util.List */,
+        len: 1,
         formHandler: false
       },
       {
