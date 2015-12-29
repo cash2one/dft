@@ -17,6 +17,8 @@
 	String rptID = request.getParameter("rptID");
 	Configuration cg = (Configuration)ContextUtil.getBean("config");
 	Report rpt = TemplatesLoader.getTemplatesLoader().getReportTemplate(rptID);
+	int mainPageSize = rpt.getDefaultDataDef()!=null?rpt.getDefaultDataDef().getDefaultPageSize():0;
+	mainPageSize = mainPageSize==0?Integer.parseInt(cg.getString("pageSize","40")):mainPageSize;
 	StringBuffer strHead = new StringBuffer("");
 	StringBuffer strFoot = new StringBuffer("");
 	boolean hasHead = false, hasFoot = false ,titleInHead = false;
@@ -583,7 +585,7 @@ var fltWin = new Ext.Window({
 		text : "载入查询",
 		handler : function() {
 			buildCondition();
-			grid.getStore().load({params:{rptID:'<%=rptID%>',start:0, limit:<%=cg.getString("pageSize","40")%>}});
+			grid.getStore().load({params:{rptID:'<%=rptID%>',start:0, limit:<%=mainPageSize%>}});
 		}
 	},{
 		text: "清空",
@@ -809,7 +811,7 @@ var paramWin = new Ext.Window({
 		text : "载入查询",
 		handler : function() {
 			buildCondition();
-			grid.getStore().load({params:{rptID:'<%=rptID%>',start:0, limit:<%=cg.getString("pageSize","40")%>}});
+			grid.getStore().load({params:{rptID:'<%=rptID%>',start:0, limit:<%=mainPageSize%>}});
 		}
 	},{
 		text : "关闭",
@@ -1155,7 +1157,7 @@ var qplanGrid = new Ext.grid.GridPanel({
 					cLoadDefaultMeata = false;
 					cLoadUserMeata = true;
 					//QueryHandler.loadQueryPlans(pid,function(){
-					grid.getStore().load({params:{rptID:'<%=rptID%>',start:0, limit:<%=cg.getString("pageSize","40")%>}});
+					grid.getStore().load({params:{rptID:'<%=rptID%>',start:0, limit:<%=mainPageSize%>}});
 					//});
 				}
 			});
@@ -1209,7 +1211,7 @@ var qplanGrid = new Ext.grid.GridPanel({
 			cLoadDefaultMeata = true;
 			cLoadUserMeata = false;
 			QPid = -1;
-			grid.getStore().load({params:{rptID:'<%=rptID%>',start:0, limit:<%=cg.getString("pageSize","40")%>}});
+			grid.getStore().load({params:{rptID:'<%=rptID%>',start:0, limit:<%=mainPageSize%>}});
     	}
     }]
 });
@@ -1593,7 +1595,7 @@ function buildConditionByRptID(gridID){
 	dParams.macroParams = mps;
 	//conditions[gridID]=dParams;
 	Ext.apply(conditions[gridID].macroParams,dParams.macroParams);
-	tgrid.getStore().load({params:{rptID: gridID,start:0, limit:<%=cg.getString("pageSize","40")%>}});
+	tgrid.getStore().load({params:{rptID: gridID,start:0, limit:App.ux.defaultPageSize}});
 }
 
 var linkTabs = new Ext.TabPanel({
@@ -1735,7 +1737,7 @@ Ext.onReady(function(){
 		]
         <%}%>
 	});
-	grid.getStore().load({params:{rptID:'<%=rptID%>',start:0, limit:<%=cg.getString("pageSize","40")%>,condition:''}});
+	grid.getStore().load({params:{rptID:'<%=rptID%>',start:0, limit:<%=mainPageSize%>,condition:''}});
 }); 
 var REPORTGRID = grid;
 </script>
