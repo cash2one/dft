@@ -689,20 +689,37 @@ public class CheckHandler {
 			for(int i=0;i<tmpFlds.size();i++){
 				En_field fld = (En_field)tmpFlds.get(i);
 				String fn = fld.getField().toLowerCase();
-				if("header".equals(usage)){//做列头可选字段时，剔除必显示的字段
+				/*if("header".equals(usage)){//做列头可选字段时，剔除必显示的字段
 					if("swdjzh".equals(fn)||"mc".equals(fn)||
 							"czfpbm".equals(fn)||"fddbr".equals(fn)||"dz".equals(fn)){
 						continue;
 					}
-				}
+				}*/
 				flds.add(fld);
 			}
 		}
 		return flds;
 	}
-	@DirectMethod
+/*	@DirectMethod
 	public List getFields2Show(){
+		Map allFlds = cg.getDJDictionary();
+		List tmpFlds = null;
 		List flds = new ArrayList();
+		if(allFlds!=null&&allFlds.containsKey("DJ_CZ")){
+			tmpFlds = (List)allFlds.get("DJ_CZ");
+		}
+		if(tmpFlds!=null){
+			flds = new ArrayList();
+			for(int i=0;i<tmpFlds.size();i++){
+				En_field fld = (En_field)tmpFlds.get(i);
+				String fn = fld.getField().toLowerCase();
+				if("swdjzh".equals(fn)||"mc".equals(fn)||
+							"czfpbm".equals(fn)||"fddbr".equals(fn)||"dz".equals(fn)){
+					flds.add(fld);;
+				}
+			}
+		}
+		
 		En_field fld = new En_field("SWDJZH","税号");
 		flds.add(fld);
 		fld = new En_field("MC","名称");
@@ -714,7 +731,7 @@ public class CheckHandler {
 		fld = new En_field("CZFPBM","财政分片");
 		flds.add(fld);
 		return flds;
-	}
+	}*/
 	@SuppressWarnings("unchecked")
 	@DirectMethod
 	public String rebuildEnGrid(String heads){

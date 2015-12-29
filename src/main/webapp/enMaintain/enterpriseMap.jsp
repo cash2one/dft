@@ -976,18 +976,15 @@ function doConditions(){
 var mappedPanel=new Ext.Panel({
 	layout:'border',
     autoScroll:true,
-	bodyStyle:'padding:0px;background:none;border:0px;',
 	items:[{	
 		region:"north",
         height:400,
-        bodyStyle:'padding:0px;background:none;border:0px;',
         layout: 'fit',
         split: true,
         items:[enGrid]
 	},{	
 		region:"center",
         layout: 'fit',
-        bodyStyle:'padding:0px;background:none;border:0px;',
         items:[dtailTabs]
 	}]
 });	 

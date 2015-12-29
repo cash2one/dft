@@ -753,6 +753,7 @@ var rtkForm = new Ext.FormPanel({
 	    				    	if(checked){
 	    				    		rtkForm.getForm().findField("from").disable();
 	    				    		rtkForm.getForm().findField("to").disable();
+	    				    		rtkForm.getForm().findField("affectMode").disable();
 	    				    	}
 	    					}
 	    				}
@@ -800,6 +801,7 @@ var rtkForm = new Ext.FormPanel({
 						    	if(checked){
 						    		rtkForm.getForm().findField("from").disable();
 						    		rtkForm.getForm().findField("to").disable();
+						    		rtkForm.getForm().findField("affectMode").enable();
 						    	}
 							}
 						} 
@@ -823,6 +825,7 @@ var rtkForm = new Ext.FormPanel({
 						    	if(checked){
 						    		rtkForm.getForm().findField("from").enable();
 						    		rtkForm.getForm().findField("to").enable();
+						    		rtkForm.getForm().findField("affectMode").enable();
 						    	}
 							}
 						}
@@ -914,6 +917,7 @@ var rtkForm = new Ext.FormPanel({
 				id:'taxAffect',
 				name : 'affectMode',
 				hideLabel: true,
+				disabled: true,
 				boxLabel : '仅影响税收',
 				checked  : false
 			})
@@ -976,7 +980,7 @@ var rtkWin = new Ext.Window({
 				}
 			}
 			var ams = document.getElementsByName("affectMode")[0];
-			if(ams.checked){
+			if(!ams.disabled&&ams.checked){
 				cAffectMode = 1;
 			}else{
 				cAffectMode = 0;
@@ -1308,6 +1312,24 @@ var fldfltDs = new Ext.data.Store({
 fldfltDs.on("beforeload",function(){
 	fldfltDs.baseParams.usage="header";
 });
+fldfltDs.on("load",function(){
+	if(showFldDs.getCount()>0){
+		var rds2rm = new Array();
+		for(var i=0;i<fldfltDs.getCount();i++){
+			var fr = fldfltDs.getAt(i);
+			for(var j=0;j<showFldDs.getCount();j++){
+				var sr = showFldDs.getAt(j);
+				if(fr.get("field")==sr.get("field")){
+					rds2rm.push(fr);
+					break;
+				}
+			}
+		}
+		for(var i=0;i<rds2rm.length;i++){
+			fldfltDs.remove(rds2rm[i]);
+		}
+	}
+});
 var fldsfltGrid = new Ext.grid.GridPanel({
 	title : '字段列表',
 	store : fldfltDs,
@@ -1424,8 +1446,10 @@ var fltPanel = new Ext.Panel({
 				if (!records||records.length==0) {
 					return;
 				}
-				var record = records[0];
-				addFieldsToRight(record);
+				for(var i=0;i<records.length;i++){
+					var record = records[i];
+					addFieldsToRight(record);
+				}
 			}
 		}, {
 			iconCls : 'icon-left',
@@ -1435,8 +1459,10 @@ var fltPanel = new Ext.Panel({
 				if (!records||records.length==0) {
 					return;
 				}
-				var record = records[0];
-				addFieldsToLeft(record);
+				for(var i=0;i<records.length;i++){
+					var record = records[i];
+					addFieldsToLeft(record);
+				}
 			}
 		}, {
 			iconCls : 'icon-down',
@@ -1551,7 +1577,7 @@ var cdtCm = new Ext.grid.ColumnModel({
 		id : 'fld',
 		header : "字段",
 		dataIndex : 'fld',
-		width : 80,
+		width : 150,
 		editor : cb_flds2filter,
 		renderer : function(v, p, r) {
 			var index = fltCdtDs.find('field', v);
@@ -1587,20 +1613,11 @@ var cdtCm = new Ext.grid.ColumnModel({
 			maxLength : 200
 		}),
 		renderer: renderFoo
-	}, {
-		id : 'treebt',
-		header : "",
-		dataIndex : 'treebt',
-		width : 80,
-		editor : new Ext.form.Hidden({}),
-		renderer : function(v, p, r) {
-			return '<img src="../images/details.gif">'
-		}
-	}, {
+	},{
 		id : 'connection',
 		header : "条件关系",
 		dataIndex : 'connection',
-		width : 120,
+		width : 70,
 		renderer : function(v, p, r) {
 			var index = cbConnectionStore.find('bm', v);
 			var cbRec = cbConnectionStore.getAt(index);
@@ -1625,7 +1642,6 @@ var cdtRecord = Ext.data.Record.create([
 	{name : 'ops',type : 'string'},
 	{name : 'fldValue', type :'string'},
 	{name : 'connection',type : 'string'},
-	{name : 'treebt',type: "string"},
 	{name : 'hValue',type : 'string'}
 ]);
 var cdtStore = new Ext.data.Store({
@@ -1652,7 +1668,6 @@ var cdtGrid = new Ext.grid.EditorGridPanel({
 	        	fld: 'SWDJZH',
 	        	ops: 'equ',
 	        	fldValue: '',
-	        	treebt:"",
 	        	connection: 'empty',
 	        	hValue :''
 	        });
@@ -1679,74 +1694,67 @@ var cdtGrid = new Ext.grid.EditorGridPanel({
 		}
 	}]
 });
-// cellclick事件==========================================================
-//cdtGrid.on('cellclick', function(grid, rowIndex, columnIndex, e) {
-//	if (columnIndex == 2) {
-//		var cfield = grid.store.getAt(rowIndex).get("field");
-//		var idx = fltCdtDs.indexOfId(cfield);
-//		var valRenderMod = fltCdtDs.getAt(idx).get("var_src");
-//		if (valRenderMod <= 1) {
-//			return;
-//		}else{
-//			//弹出窗体
-//			var tb = fltCdtDs.getAt(idx).get("mapbm");
-//		}
-//	}
-//});
 var fltTreeSingleWin;
 var fltTreeMultiWin;
 var fltTreeWin;
+commonTriggerClick=function(){
+	if(cOperator=='in'){
+		if(!fltTreeMultiWin){
+			fltTreeMultiWin = new App.widget.CodeTreeWindow({
+				directFn:CheckHandler.getBmCodesTree,
+				checkModel : 'multiple',
+				treeId: 'm_'+cMapBm,
+				codeTable: cMapBm,
+				defaultValue: '',
+				canSetNull: false
+			});
+		}
+		fltTreeWin = fltTreeMultiWin;
+	}else{
+		if(!fltTreeSingleWin){
+			fltTreeSingleWin = new App.widget.CodeTreeWindow({
+				directFn:CheckHandler.getBmCodesTree,
+				checkModel : 'single',
+				onlyLeafCheckable: true,
+				treeId: 's_'+ cMapBm,
+				codeTable: cMapBm,
+				defaultValue: '',
+				canSetNull: false
+			});
+		}
+		fltTreeWin = fltTreeSingleWin;
+	}
+	var p = {table: cMapBm,selectedVals: ''};
+	fltTreeWin.onSelect = function(value){
+		if(!value)return;
+		cFltRecord.set("fldValue",value.text); 
+		cFltRecord.set("hValue",value.id);
+	};
+	fltTreeWin.setTreeParams(p);
+	fltTreeWin.refreshTree();
+	fltTreeWin.show();
+};
 cdtGrid.on('beforeedit',function(e){ 
+	cFltRecord = e.record;
 	var editField = e.field;
 	var czd = e.record.get("fld");
 	var idx = fltCdtDs.indexOfId(czd);
 	var valRenderMod = fltCdtDs.getAt(idx).get("val_src");
-	var mapBm = fltCdtDs.getAt(idx).get("mapbm");
-	var cOperator =  e.record.get("ops");
+	cMapBm = fltCdtDs.getAt(idx).get("mapbm");
+	cOperator =  e.record.get("ops");
 	if(editField == "fldValue"){
-		if(valRenderMod>1)	{//不能直接编辑
-			e.cancel = true; 
-		}
-	}
-	if(editField == "treebt"){
-		if(valRenderMod<=1)	{
-			e.cancel = true; 
+		if(valRenderMod >1){
+			var commonTrigger = new Ext.form.TriggerField({
+				fieldLabel:'',
+				editable: false
+			});
+			edtCb =  commonTrigger ;
+			commonTrigger.onTriggerClick = commonTriggerClick;
 		}else{
-			//弹出值框
-			if(cOperator=='in'){
-				if(!fltTreeMultiWin){
-					fltTreeMultiWin = new App.widget.CodeTreeWindow({
-						directFn:CheckHandler.getBmCodesTree,
-						checkModel : 'multiple',
-						treeId: 'm_'+mapBm,
-						codeTable: mapBm,
-						defaultValue: ''
-					});
-				}
-				fltTreeWin = fltTreeMultiWin;
-			}else{
-				if(!fltTreeSingleWin){
-					fltTreeSingleWin = new App.widget.CodeTreeWindow({
-						directFn:CheckHandler.getBmCodesTree,
-						checkModel : 'single',
-						onlyLeafCheckable: true,
-						treeId: 's_'+mapBm,
-						codeTable: mapBm,
-						defaultValue: ''
-					});
-				}
-				fltTreeWin = fltTreeSingleWin;
-			}
-			var p = {table: mapBm,selectedVals: ''};
-			fltTreeWin.onSelect = function(value){
-				if(!value)return;
-				e.record.set("fldValue",value.text); 
-				e.record.set("hValue",value.id);
-			};
-			fltTreeWin.setTreeParams(p);
-			fltTreeWin.refreshTree();
-			fltTreeWin.show();
+			var commonTextFld = new Ext.form.TextField({selectOnFocus : true,maxLength : 200});
+			edtCb = new Ext.grid.GridEditor(commonTextFld);
 		}
+		cdtCm.setEditor(3,edtCb); 
 	}
 });
 // afteredit事件=========================================================
@@ -1782,8 +1790,8 @@ var fltWin = new Ext.Window({
 	}, {
 		text : "取消",
 		handler : function() {
-			cdtGrid.getStore().removeAll();
-			conditions = "";
+			//cdtGrid.getStore().removeAll();
+			//conditions = "";
 			fltWin.hide();
 		}
 	}],
@@ -1919,8 +1927,25 @@ function queryForEns(opType){
 	//}
 }
 fltWin.on("show",function(){
+	showFldDs.removeAll();
+	//根据当前显示的列表字段加载“显示字段”列表记录
+	var cm = enGrid.getColumnModel();
+	for (var i = 0; i < cm.getColumnCount(); i++) {
+	    var hidden = false;
+	    if (cm.getColumnId(i) == 'checker') {
+	    	continue;
+	    }
+	    var sf = new showFldRecord({
+	        field: cm.getDataIndex(i).toUpperCase(),
+	        mc: cm.getColumnHeader(i)
+	    });
+	    showFldsGrid.stopEditing();
+	    showFldDs.insert(showFldDs.getCount(), sf);
+	}
+	fldfltDs.removeAll();
+	fldfltDs.load();
 });
-fldfltDs.load();
+
 fltCdtDs.load();
 /*******************************整体布局*************************************/
 Ext.onReady(function(){

@@ -92,11 +92,6 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getFields2Show'/*() => java.util.List */,
-        len: 0,
-        formHandler: false
-      },
-      {
         name: 'acceptEn'/*(String, int) => String */,
         len: 2,
         formHandler: false

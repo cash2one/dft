@@ -19,6 +19,7 @@
 	Report rpt = TemplatesLoader.getTemplatesLoader().getReportTemplate(rptID);
 	int mainPageSize = rpt.getDefaultDataDef()!=null?rpt.getDefaultDataDef().getDefaultPageSize():0;
 	mainPageSize = mainPageSize==0?Integer.parseInt(cg.getString("pageSize","40")):mainPageSize;
+	int cxfa_show = Integer.parseInt(cg.getString("cxfa_show","0"));
 	StringBuffer strHead = new StringBuffer("");
 	StringBuffer strFoot = new StringBuffer("");
 	boolean hasHead = false, hasFoot = false ,titleInHead = false;
@@ -1253,6 +1254,7 @@ var grid = new App.ux.DynamicGridPanelAuto({
 	}),
 	//view: new Ext.ux.grid.LockingGridView(App.ux.DynamicGridPanelAuto.prototype.viewConfig),
 	tbar: [
+	<%if(cxfa_show>0){%>
 	{
 		iconCls: 'viewMenu',
         text: '查询方案',
@@ -1285,7 +1287,8 @@ var grid = new App.ux.DynamicGridPanelAuto({
 				}
 			}]
         })
-	},new Ext.Toolbar.Separator()]
+	},new Ext.Toolbar.Separator()
+	<%}%>]
 });
 
 grid.getStore().on("beforeload",function(ds,op){

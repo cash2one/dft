@@ -45,7 +45,7 @@
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/TreeWindow.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/CodeTreeWindow.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/dfCommon.js"></script>
-<script type="text/javascript">
+<script type="text/javascript"><!--
 
 /*
  * Ext JS Library 3.4.0
@@ -628,6 +628,7 @@ var rtkForm = new Ext.FormPanel({
 	    				    	if(checked){
 	    				    		rtkForm.getForm().findField("from").disable();
 	    				    		rtkForm.getForm().findField("to").disable();
+	    				    		rtkForm.getForm().findField("affectMode").disable();
 	    				    	}
 	    					}
 	    				}
@@ -675,6 +676,7 @@ var rtkForm = new Ext.FormPanel({
 						    	if(checked){
 						    		rtkForm.getForm().findField("from").disable();
 						    		rtkForm.getForm().findField("to").disable();
+						    		rtkForm.getForm().findField("affectMode").enable();
 						    	}
 							}
 						} 
@@ -698,6 +700,7 @@ var rtkForm = new Ext.FormPanel({
 						    	if(checked){
 						    		rtkForm.getForm().findField("from").enable();
 						    		rtkForm.getForm().findField("to").enable();
+						    		rtkForm.getForm().findField("affectMode").enable();
 						    	}
 							}
 						}
@@ -790,6 +793,7 @@ var rtkForm = new Ext.FormPanel({
 				id:'taxAffect',
 				name : 'affectMode',
 				hideLabel: true,
+				disabled: true,
 				boxLabel : '仅影响税收',
 				checked  : false
 			})
@@ -853,7 +857,7 @@ var rtkWin = new Ext.Window({
 				}
 			}
 			var ams = document.getElementsByName("affectMode")[0];
-			if(ams.checked){
+			if(!ams.disabled&&ams.checked){
 				cAffectMode = 1;
 			}else{
 				cAffectMode = 0;
@@ -1177,7 +1181,7 @@ var excelWin = new Ext.Window({
     }]
 });
 
-/***************************筛选*************************/
+/************************************筛选********************************/
 // 字段选择
 var fltssm = new Ext.grid.CheckboxSelectionModel({singleSelect: false});
 fltssm.handleMouseDown = Ext.emptyFn;
@@ -1215,6 +1219,24 @@ var fldfltDs = new Ext.data.Store({
 });
 fldfltDs.on("beforeload",function(){
 	fldfltDs.baseParams.usage="header";
+});
+fldfltDs.on("load",function(){
+	if(showFldDs.getCount()>0){
+		var rds2rm = new Array();
+		for(var i=0;i<fldfltDs.getCount();i++){
+			var fr = fldfltDs.getAt(i);
+			for(var j=0;j<showFldDs.getCount();j++){
+				var sr = showFldDs.getAt(j);
+				if(fr.get("field")==sr.get("field")){
+					rds2rm.push(fr);
+					break;
+				}
+			}
+		}
+		for(var i=0;i<rds2rm.length;i++){
+			fldfltDs.remove(rds2rm[i]);
+		}
+	}
 });
 var fldsfltGrid = new Ext.grid.GridPanel({
 	title : '字段列表',
@@ -1260,10 +1282,6 @@ var showFldRecord = Ext.data.Record.create([
 	{name : 'mc',type : 'string'}
 ]);
 var showFldDs = new Ext.data.Store({
-	proxy : new Ext.data.DirectProxy({
-		directFn : CheckHandler.getFields2Show,
-		paramsAsHash : false
-	}),
 	reader : new Ext.data.JsonReader({
 		idProperty : 'field'
 	}, showFldRecord)
@@ -1283,10 +1301,6 @@ var showFldsGrid = new Ext.grid.GridPanel({
 });
 showFldsGrid.on("rowdblclick",function(grid,rowIndex,e){
 	var record = grid.getStore().getAt(rowIndex);
-	if(record.data.field=="SWDJZH"||record.data.field=="MC"||record.data.field=="DZ"
-		||record.data.field=="FDDBR"||record.data.field=="CZFPBM"){
-		return;
-	}
 	addFieldsToLeft(record);
 });
 var fltPanel = new Ext.Panel({
@@ -1355,10 +1369,6 @@ var fltPanel = new Ext.Panel({
 				}
 				for(var i=0;i<records.length;i++){
 					var record = records[i];
-					if(record.data.field=="SWDJZH"||record.data.field=="MC"||record.data.field=="DZ"
-						||record.data.field=="FDDBR"||record.data.field=="CZFPBM"){
-						continue;
-					}
 					addFieldsToLeft(record);
 				}
 			}
@@ -1476,7 +1486,7 @@ var cdtCm = new Ext.grid.ColumnModel({
 		id : 'fld',
 		header : "字段",
 		dataIndex : 'fld',
-		width : 80,
+		width : 150,
 		editor : cb_flds2filter,
 		renderer : function(v, p, r) {
 			var index = fltCdtDs.find('field', v);
@@ -1516,7 +1526,7 @@ var cdtCm = new Ext.grid.ColumnModel({
 		id : 'connection',
 		header : "条件关系",
 		dataIndex : 'connection',
-		width : 120,
+		width : 70,
 		renderer : function(v, p, r) {
 			var index = cbConnectionStore.find('bm', v);
 			var cbRec = cbConnectionStore.getAt(index);
@@ -1832,10 +1842,23 @@ function queryForEns(opType){
 	//}
 }
 fltWin.on("show",function(){
-	if(fldfltDs.getCount()<1){
-		fldfltDs.load();
-		showFldDs.load();
+	showFldDs.removeAll();
+	//根据当前显示的列表字段加载“显示字段”列表记录
+	var cm = enGrid.getColumnModel();
+	for (var i = 0; i < cm.getColumnCount(); i++) {
+	    var hidden = false;
+	    if (cm.getColumnId(i) == 'checker') {
+	    	continue;
+	    }
+	    var sf = new showFldRecord({
+	        field: cm.getDataIndex(i).toUpperCase(),
+	        mc: cm.getColumnHeader(i)
+	    });
+	    showFldsGrid.stopEditing();
+	    showFldDs.insert(showFldDs.getCount(), sf);
 	}
+	fldfltDs.removeAll();
+	fldfltDs.load();
 });
 fltCdtDs.load();
 /*******************************整体布局*************************************/

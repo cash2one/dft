@@ -768,6 +768,24 @@ var fldfltDs = new Ext.data.Store({
 fldfltDs.on("beforeload",function(){
 	fldfltDs.baseParams.usage="header";
 });
+fldfltDs.on("load",function(){
+	if(showFldDs.getCount()>0){
+		var rds2rm = new Array();
+		for(var i=0;i<fldfltDs.getCount();i++){
+			var fr = fldfltDs.getAt(i);
+			for(var j=0;j<showFldDs.getCount();j++){
+				var sr = showFldDs.getAt(j);
+				if(fr.get("field")==sr.get("field")){
+					rds2rm.push(fr);
+					break;
+				}
+			}
+		}
+		for(var i=0;i<rds2rm.length;i++){
+			fldfltDs.remove(rds2rm[i]);
+		}
+	}
+});
 var fldsfltGrid = new Ext.grid.GridPanel({
 	title : '字段列表',
 	store : fldfltDs,
@@ -812,10 +830,6 @@ var showFldRecord = Ext.data.Record.create([
 	{name : 'mc',type : 'string'}
 ]);
 var showFldDs = new Ext.data.Store({
-	proxy : new Ext.data.DirectProxy({
-		directFn : CheckHandler.getFields2Show,
-		paramsAsHash : false
-	}),
 	reader : new Ext.data.JsonReader({
 		idProperty : 'field'
 	}, showFldRecord)
@@ -1392,10 +1406,23 @@ function queryForEns(opType){
 	//}
 }
 fltWin.on("show",function(){
-	if(fldfltDs.getCount()<1){
-		fldfltDs.load();
-		showFldDs.load();
+	showFldDs.removeAll();
+	//根据当前显示的列表字段加载“显示字段”列表记录
+	var cm = enGrid.getColumnModel();
+	for (var i = 0; i < cm.getColumnCount(); i++) {
+	    var hidden = false;
+	    if (cm.getColumnId(i) == 'checker') {
+	    	continue;
+	    }
+	    var sf = new showFldRecord({
+	        field: cm.getDataIndex(i).toUpperCase(),
+	        mc: cm.getColumnHeader(i)
+	    });
+	    showFldsGrid.stopEditing();
+	    showFldDs.insert(showFldDs.getCount(), sf);
 	}
+	fldfltDs.removeAll();
+	fldfltDs.load();
 });
 fltCdtDs.load();
 /*******************************整体布局*************************************/
