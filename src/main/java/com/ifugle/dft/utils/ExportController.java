@@ -164,9 +164,9 @@ public class ExportController {
 			for(int i=0;i<jcols.length();i++){
 				JSONObject jc = jcols.getJSONObject(i);
 				if(jc!=null){
-					if(jc.getBoolean("hidden")){
+					/*if(jc.getBoolean("hidden")){
 						continue;
-					}
+					}*/
 					Column col = new Column();
 					col.setHeader(jc.getString("header"));
 					col.setDataIndex(jc.getString("dataIndex"));

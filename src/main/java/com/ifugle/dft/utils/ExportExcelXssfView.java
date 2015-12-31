@@ -102,7 +102,7 @@ public class ExportExcelXssfView extends AbstractExcelXssfView{
 					logger.debug("col:" + col.toString());
 				}
 				if (col.isHidden()) {
-					sheet.setColumnWidth(i, 0);
+					sheet.setColumnWidth(i, 2);
 				} else if (col.getWidth() > 0) {
 					sheet.setColumnWidth(i, col.getWidth() * 35);
 				}
