@@ -140,12 +140,12 @@ Ext.datapro.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'saveTempApps'/*(int, String) => String */,
+        name: 'deleteImportedApps'/*(int, String) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'deleteImportedApps'/*(int, String) => String */,
+        name: 'saveTempApps'/*(int, String) => String */,
         len: 2,
         formHandler: false
       },

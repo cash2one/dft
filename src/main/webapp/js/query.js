@@ -25,12 +25,12 @@ Ext.query.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'deleteQueryPlan'/*(int) => String */,
+        name: 'getUnits'/*(String) => java.util.List */,
         len: 1,
         formHandler: false
       },
       {
-        name: 'getUnits'/*(String) => java.util.List */,
+        name: 'deleteQueryPlan'/*(int) => String */,
         len: 1,
         formHandler: false
       },

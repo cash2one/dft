@@ -60,7 +60,7 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getUserInfo'/*(String) => com.ifugle.dft.system.entity.User */,
+        name: 'deletePost'/*(String) => String */,
         len: 1,
         formHandler: false
       },
@@ -70,7 +70,7 @@ Ext.sys.REMOTING_API = {
         formHandler: true
       },
       {
-        name: 'deletePost'/*(String) => String */,
+        name: 'getUserInfo'/*(String) => com.ifugle.dft.system.entity.User */,
         len: 1,
         formHandler: false
       },
@@ -132,13 +132,13 @@ Ext.sys.REMOTING_API = {
     ],
     CodeHandler: [
       {
-        name: 'delAidItems'/*(String, String) => String */,
-        len: 2,
+        name: 'saveCodeTableMapping'/*(String, String, int) => String */,
+        len: 3,
         formHandler: false
       },
       {
-        name: 'saveCodeTableMapping'/*(String, String, int) => String */,
-        len: 3,
+        name: 'delAidItems'/*(String, String) => String */,
+        len: 2,
         formHandler: false
       },
       {
