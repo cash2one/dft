@@ -17,7 +17,7 @@ import com.fruit.query.service.*;
 import com.fruit.query.view.*;
 import com.fruit.query.parser.*;
 import com.fruit.query.util.*;
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 /**
  * 
  * @author wxh

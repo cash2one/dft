@@ -40,7 +40,6 @@ App.widget.TreeWindow = Ext.extend(Ext.Window, {
 	height : 420,
 	constructor : function(config) {
 		Ext.apply(this, config);
-
 		this.tree = this.createTree();
 		if(this.canSetNull){
 			Ext.applyIf(config, {

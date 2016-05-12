@@ -14,7 +14,7 @@ import org.json.JSONString;
 
 import com.fruit.query.data.SimpleBean;
 import com.fruit.query.util.JSONStringObject;
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import com.google.gson.*;
 
 public class JsonHelper {

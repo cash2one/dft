@@ -29,7 +29,7 @@ import com.fruit.query.report.Report;
 import com.fruit.query.report.ReportBase;
 import com.fruit.query.util.QueryConfig;
 import com.jspsmart.upload.SmartUpload;
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class RptDesignService {
 	private static RptDesignService rptDesignService;

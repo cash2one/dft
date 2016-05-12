@@ -6,7 +6,7 @@ import java.io.*;
 import com.fruit.query.report.*;
 import com.fruit.query.util.*;
 import com.fruit.query.data.*;
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 /**
  * 
  * @author wxh

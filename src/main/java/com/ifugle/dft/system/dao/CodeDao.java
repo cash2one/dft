@@ -13,7 +13,7 @@ import com.ifugle.dft.check.dao.CheckDao;
 import com.ifugle.dft.dao.BaseDao;
 import com.ifugle.dft.system.entity.AidItem;
 import com.ifugle.dft.system.entity.Code;
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 @Transactional
 public class CodeDao extends BaseDao{

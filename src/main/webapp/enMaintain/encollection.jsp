@@ -353,9 +353,9 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 							var pnode = selectedNode.parentNode;
 							selectedNode.remove();
 							if(pnode.childNodes.length<1){
-								pnode.getUI().getIconEl().src='<%=request.getContextPath()%>/js/ext/resources/images/default/tree/folder.gif';
+								pnode.getUI().getIconEl().src='<%=request.getContextPath()%>/libs/ext-3.4.0/resources/images/default/tree/leaf.gif';
 							}else{
-								pnode.getUI().getIconEl().src='<%=request.getContextPath()%>/js/ext/resources/images/default/tree/folder-open.gif';
+								pnode.getUI().getIconEl().src='<%=request.getContextPath()%>/libs/ext-3.4.0/resources/images/default/tree/folder-open.gif';
 							}
 							Ext.getCmp('name').setValue("");
 							Ext.getCmp('remark').setValue("");

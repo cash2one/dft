@@ -45,7 +45,7 @@ import org.springframework.jdbc.core.simple.ParameterizedBeanPropertyRowMapper;
 import com.ifugle.dft.check.entity.En_field;
 import com.ifugle.dft.utils.entity.*;
 import com.ifugle.dft.utils.exception.*;
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class ImpExcelHelper {
 	protected JdbcTemplate jdbcTemplate;

@@ -193,7 +193,7 @@ Ext.ux.grid.GridExporter = Ext.extend(Ext.util.Observable, {
   exportGrid : function(exportCfg) {
     var opt = exportCfg || {};
     var grid = this.grid;
-    if (grid && grid.getStore()&& grid.getStore().getCount() > 0) {
+    if (grid && grid.getStore()) {
         return this.doExport(exportCfg);
     } else {
       Ext.Msg.alert('无法导出', '没有需要导出的数据');

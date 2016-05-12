@@ -71,23 +71,24 @@ public class ExportExcelView extends AbstractExcelView{
 			if(groupRows!=null&&groupRows.size()>0){
 				for(int i=0;i<groupRows.size();i++){
 					List headCols = (List)groupRows.get(i);
-					int skip=0;
+					int prePoint=0,cPoint = 0;
 					for(int j=0;j<headCols.size();j++){
 						Column col=(Column)headCols.get(j);
 						if (col.getColspan() > 1) {
-							skip+=col.getColspan()-1;
-							for (int k = j; k <= j+skip; k++) {
+							cPoint=prePoint + col.getColspan()-1;
+							for (int k = prePoint; k <= cPoint; k++) {
 								cell = getCell(sheet, topRows, k,(short) Style.TABLEHEAD_HEIGHT);
 								cell.setCellStyle(headerStyle);
 								setText(cell, StringEscapeUtils.unescapeHtml(col.getHeader()));
 							}
-							sheet.addMergedRegion(new CellRangeAddress(topRows,topRows, j, j+skip));
+							sheet.addMergedRegion(new CellRangeAddress(topRows,topRows, prePoint, cPoint));
 						} else {
-							cell = getCell(sheet, topRows, j+skip,(short) Style.TABLEHEAD_HEIGHT);
+							cell = getCell(sheet, topRows, cPoint,(short) Style.TABLEHEAD_HEIGHT);
 							cell.setCellStyle(headerStyle);
 							setText(cell, StringEscapeUtils.unescapeHtml(col.getHeader()));
-							rsps[j+skip]++;
+							rsps[cPoint]++;
 						}
+						prePoint = ++cPoint;
 					}
 					topRows++;
 				}
@@ -236,17 +237,20 @@ public class ExportExcelView extends AbstractExcelView{
 	
 			String filename = (String)model.get("filename");
 			filename = filename==null?"export":filename + ".xls";
+			String fn = "";
 			String agent = request.getHeader("USER-AGENT");
-	
-			if (null != agent && -1 != agent.indexOf("MSIE")) {
-				filename = URLEncoder.encode(filename, "UTF8");
-			} else if (null != agent && -1 != agent.indexOf("Mozilla")) {
-				filename = new String(filename.getBytes("UTF-8"), "ISO8859-1");
-			} else {
-				filename = URLEncoder.encode(filename, "UTF8");
+			if (null != agent){
+				if (-1 != agent.indexOf("Firefox")) {
+					fn = "=?UTF-8?B?" + (new String(org.apache.commons.codec.binary.Base64.encodeBase64(filename.getBytes("UTF-8"))))+ "?="; 
+				} else if (-1 != agent.indexOf("Chrome")) {
+					fn = new String(filename.getBytes(), "ISO8859-1");
+				} else {
+					fn = URLEncoder.encode(filename, "UTF-8");    
+					fn = StringUtils.replace(fn, "+", "%20");//替换空格    
+				}
 			}
 			response.setContentType("application/x-download");
-			response.setHeader("Content-Disposition", "attachment;filename="+ filename);
+			response.setHeader("Content-Disposition", "attachment;filename="+ fn);
 			response.setContentType(CONTENT_TYPE);
 			ServletOutputStream out = response.getOutputStream();
 			workbook.write(out);

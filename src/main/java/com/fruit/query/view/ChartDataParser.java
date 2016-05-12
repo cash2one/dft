@@ -28,7 +28,7 @@ import com.fruit.query.data.ChartDataSet;
 import com.fruit.query.parser.TemplatesLoader;
 import com.fruit.query.report.Chart;
 import com.fruit.query.util.QueryConfig;
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class ChartDataParser {
 	private static ChartDataParser parser;

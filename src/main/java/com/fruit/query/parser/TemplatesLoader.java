@@ -4,7 +4,7 @@ import java.util.*;
 import com.fruit.query.util.*;
 import com.fruit.query.report.*;
 import com.fruit.query.data.*;
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
 import java.net.URL;
@@ -55,6 +55,7 @@ public class TemplatesLoader {
 		System.out.println("rptsPath in TemplatesLoader:"+rptsPath);
 		if(rptsPath==null||"".equals(rptsPath)){
 			System.out.print("报表目录未指定或为空，没有要加载的报表模板！");
+			return;
 		}
 		String pre=rptsPath.substring(0,1);
 		String rptPathType = QueryConfig.getConfig().getString("rptPathType", "relative");
@@ -270,6 +271,7 @@ public class TemplatesLoader {
     	String rptsPath=QueryConfig.getConfig().getString("rptRepositoryPath", "");
 		if(rptsPath==null||"".equals(rptsPath)){
 			System.out.print("报表目录未指定或为空，没有要加载的报表模板！");
+			return "";
 		}
 		String pre=rptsPath.substring(0,1);
 		String rptPathType = QueryConfig.getConfig().getString("rptPathType", "relative");

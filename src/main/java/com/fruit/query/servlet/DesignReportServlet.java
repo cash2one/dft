@@ -26,7 +26,7 @@ import com.fruit.query.service.RptDesignService;
 import com.fruit.query.util.JsonHelper;
 import com.fruit.query.view.RptDataJsonParser;
 import com.jspsmart.upload.SmartUpload;
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class DesignReportServlet extends HttpServlet{
 	protected void doGet(HttpServletRequest request, HttpServletResponse respond)throws ServletException, IOException {

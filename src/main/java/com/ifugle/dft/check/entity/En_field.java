@@ -4,7 +4,7 @@ public class En_field {
 	private String tname; //所在表名
 	private String field; //字段名
 	private String mc;    //字段中文名称
-	private int f_type;   //字段属性归类，0：基本属性；1、财政指标；2、财政扩展属性
+	private int f_type;   
 	/*
 	 * 数据库中字段值的来源类型； 0：有少数简单的值，比如门征/非门征 1：值需要用户手工录入，比如地址、电话属性
 	 * 2：值由固定的编码选项提供，由用户选择，比如经济性质属性

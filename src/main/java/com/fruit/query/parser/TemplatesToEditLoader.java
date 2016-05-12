@@ -30,6 +30,7 @@ public class TemplatesToEditLoader {
 		System.out.println("rptsToEditPath in TemplatesToEditLoader:"+rptsPath);
 		if(rptsPath==null||"".equals(rptsPath)){
 			System.out.print("报表编辑目录未指定或为空，没有要加载的报表模板！");
+			return;
 		}
 		String pre=rptsPath.substring(0,1);
 		String rptPathType = QueryConfig.getConfig().getString("rptPathType", "relative");
@@ -177,6 +178,7 @@ public class TemplatesToEditLoader {
     	String rptsPath=QueryConfig.getConfig().getString("rptEditRepositoryPath", "");
 		if(rptsPath==null||"".equals(rptsPath)){
 			System.out.print("报表目录未指定或为空，没有要加载的报表模板！");
+			return "";
 		}
 		String pre=rptsPath.substring(0,1);
 		String rptPathType = QueryConfig.getConfig().getString("rptPathType", "relative");

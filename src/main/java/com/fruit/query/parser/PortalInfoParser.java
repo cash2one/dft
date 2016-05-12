@@ -18,7 +18,7 @@ import org.json.JSONObject;
 
 import com.fruit.query.report.Report;
 import com.fruit.query.util.QueryConfig;
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class PortalInfoParser {
 	private static Logger log = Logger.getLogger(PortalInfoParser.class);
@@ -43,7 +43,7 @@ public class PortalInfoParser {
 			if(!"/".equals(pre)){
 				path="/"+path;
 			}
-			URL rootP=TemplatesLoader.class.getClassLoader().getResource(path); 
+			URL rootP=PortalInfoParser.class.getClassLoader().getResource(path); 
 			if(rootP==null){
 				log.info("root of portalInfo is null!");
 				return;

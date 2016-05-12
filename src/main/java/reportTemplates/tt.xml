@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="tt" name="企" >
+<parameters>
+<para name="NY" renderType="0" dataType="string"/>
+</parameters>
+
+<title>企业信息详情</title>
+<columns complex="1" sourceType="0"> 
+        <column colId="ny" dataIndex="NY" colName="年月" width="100" renderer="tt2link"/> 
+</columns>
+<rptData sourceType="1" canPaging="1" defaultPageSize="40">
+   <sql><![CDATA[
+select {NY} NY from dual
+      ]]>
+   </sql>
+</rptData>
+</report>
+

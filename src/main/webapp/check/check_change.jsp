@@ -220,43 +220,37 @@ enGrid.on("rowclick",function(grid,rIndex,e){
 			var fInfo = obj.finance;
 			var dsInfo = obj.ds;
 			var gsInfo = obj.gs;
-			if(fInfo){
 				var fForm = financeForm.getForm();
 				<%for(int i=0;i<financeFlds.size();i++){
 					En_field fld = (En_field)financeFlds.get(i);%>
 					<%if(fld.getVal_src()==2){%>
-					fForm.findField('<%=fld.getField()%>_fn').setValue(fInfo.<%=fld.getField()+"_MC"%>==null?"未知":fInfo.<%=fld.getField()+"_MC"%>);
-					fForm.findField('<%=fld.getField()%>_fn_bm').setValue(fInfo.<%=fld.getField()%>==null?"":fInfo.<%=fld.getField()%>);
+					fForm.findField('<%=fld.getField()%>_fn').setValue(fInfo?(fInfo.<%=fld.getField()+"_MC"%>==null?"未知":fInfo.<%=fld.getField()+"_MC"%>):"");
+					fForm.findField('<%=fld.getField()%>_fn_bm').setValue(fInfo?(fInfo.<%=fld.getField()%>==null?"":fInfo.<%=fld.getField()%>):"");
 					<%}else{%>
-					fForm.findField('<%=fld.getField()%>_fn').setValue(fInfo.<%=fld.getField()%>);
+					fForm.findField('<%=fld.getField()%>_fn').setValue(fInfo?(fInfo.<%=fld.getField()%>):"");
 				<%}}%>
-			}
-			if(dsInfo){
 				var dForm = dsForm.getForm();
 				<%if(dsFlds!=null){
 					for(int i=0;i<dsFlds.size();i++){
 						En_field fld = (En_field)dsFlds.get(i);%>
 						<%if(fld.getVal_src()==2){%>
-						dForm.findField('<%=fld.getField()%>_ds').setValue(dsInfo.<%=fld.getField()+"_MC"%>==null?"未知":dsInfo.<%=fld.getField()+"_MC"%>);
+						dForm.findField('<%=fld.getField()%>_ds').setValue(dsInfo?(dsInfo.<%=fld.getField()+"_MC"%>==null?"未知":dsInfo.<%=fld.getField()+"_MC"%>):"");
 						<%}else{%>
-						dForm.findField('<%=fld.getField()%>_ds').setValue(dsInfo.<%=fld.getField()%>==null?"":dsInfo.<%=fld.getField()%>);
+						dForm.findField('<%=fld.getField()%>_ds').setValue(dsInfo?(dsInfo.<%=fld.getField()%>==null?"":dsInfo.<%=fld.getField()%>):"");
 				<%		}
 					}
 				}%>
-			}
-			if(gsInfo){
 				var gForm = gsForm.getForm();
 				<%if(gsFlds!=null){
 					for(int i=0;i<gsFlds.size();i++){
 						En_field fld = (En_field)gsFlds.get(i);%>
 						<%if(fld.getVal_src()==2){%>
-						gForm.findField('<%=fld.getField()%>_gs').setValue(gsInfo.<%=fld.getField()+"_MC"%>);
+						gForm.findField('<%=fld.getField()%>_gs').setValue(gsInfo?(gsInfo.<%=fld.getField()+"_MC"%>):"");
 						<%}else{%>
-						gForm.findField('<%=fld.getField()%>_gs').setValue(gsInfo.<%=fld.getField()%>);
+						gForm.findField('<%=fld.getField()%>_gs').setValue(gsInfo?(gsInfo.<%=fld.getField()%>):"");
 				<%		}
 					}
 				}%>
-			}
 		}
 	});
 });
@@ -974,7 +968,7 @@ var rtkWin = new Ext.Window({
 					Ext.Msg.alert("错误","终止时间格式不正确！");
 					return;
 				}
-				if(Number(from)>=Number(to)){
+				if(Number(from)>Number(to)){
 					Ext.Msg.alert("错误","起始时间不应大于终止时间！");
 					return;
 				}
@@ -1243,7 +1237,7 @@ var excelWin = new Ext.Window({
 								msg: obj.infos.msg,
 								buttons: Ext.Msg.OK,
 								icon: Ext.MessageBox.INFO});
-							conditions='{matchExcel:true}';
+							conditions='{matchExcel:true,matchFld:'+d_type+'}';
 				           	enDs.load({params:{start:0, limit:<%=cg.getString("pageSize","40")%>}});
 						}
 		       		},

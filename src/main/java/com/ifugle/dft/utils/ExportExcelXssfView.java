@@ -236,17 +236,20 @@ public class ExportExcelXssfView extends AbstractExcelXssfView{
 
 			String filename = (String)model.get("filename");
 			filename = filename==null?"export":filename + ".xlsx";
+			String fn = "";
 			String agent = request.getHeader("USER-AGENT");
-
-			if (null != agent && -1 != agent.indexOf("MSIE")) {
-				filename = URLEncoder.encode(filename, "UTF8");
-			} else if (null != agent && -1 != agent.indexOf("Mozilla")) {
-				filename = new String(filename.getBytes("UTF-8"), "ISO8859-1");
-			} else {
-				filename = URLEncoder.encode(filename, "UTF8");
+			if (null != agent){
+				if (-1 != agent.indexOf("Firefox")) {
+					fn = "=?UTF-8?B?" + (new String(org.apache.commons.codec.binary.Base64.encodeBase64(filename.getBytes("UTF-8"))))+ "?="; 
+				} else if (-1 != agent.indexOf("Chrome")) {
+					fn = new String(filename.getBytes(), "ISO8859-1");
+				} else {
+					fn = URLEncoder.encode(filename, "UTF-8");    
+					fn = StringUtils.replace(fn, "+", "%20");//替换空格    
+				}
 			}
 			response.setContentType("application/x-download");
-			response.setHeader("Content-Disposition", "attachment;filename="+ filename);
+			response.setHeader("Content-Disposition", "attachment;filename="+ fn);
 			response.setContentType(CONTENT_TYPE_XLSX);
 			ServletOutputStream out = response.getOutputStream();
 			workbook.write(out);

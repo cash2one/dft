@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import com.softwarementors.extjs.djn.servlet.ssm.WebContext;
 import com.softwarementors.extjs.djn.servlet.ssm.WebContextManager;
 import com.ifugle.dft.check.dao.*;
@@ -96,6 +96,7 @@ public class CheckHandler {
 		String[] heads = null,orderFlds=null,descOrAsc = null;
 		String[] flds=null,ops = null,vals = null,rltns = null;
 		boolean matchExcel= false;
+		String matchFld = "sh";
 		int ismap = -1;
 		int qysx = 0;
 		//解析条件
@@ -105,6 +106,9 @@ public class CheckHandler {
 				//对导入Excel匹配的处理
 				if(jcdts.has("matchExcel")){
 					matchExcel = jcdts.getBoolean("matchExcel");
+				}
+				if(jcdts.has("matchFld")){
+					matchFld = jcdts.getString("matchFld");
 				}
 				if(jcdts.has("ismap")){
 					ismap = jcdts.getInt("ismap");
@@ -268,7 +272,12 @@ public class CheckHandler {
 		StringBuffer excel = sql;
 		if(matchExcel){
 			excel = new StringBuffer("SELECT E.* FROM (SELECT * FROM MATCH_ENTERPRISE WHERE S_ID='").append(user.getUserid());
-			excel.append("') M,(").append(sql).append(")E WHERE E.SWDJZH=M.SWDJZH");
+			excel.append("') M,(").append(sql).append(")E WHERE ");
+			if("sh".equals(matchFld)){
+				excel.append("E.SWDJZH=M.SWDJZH");
+			}else{
+				excel.append("E.MC=M.QYMC");
+			}
 		}
 		return excel.toString();
 	}

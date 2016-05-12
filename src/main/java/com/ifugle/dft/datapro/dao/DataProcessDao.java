@@ -24,7 +24,7 @@ import com.ifugle.dft.utils.entity.DestField;
 import com.ifugle.dft.utils.entity.ExcelTable;
 import com.ifugle.dft.utils.entity.ExcelTemplate;
 import com.ifugle.dft.utils.entity.SimpleValue;
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 @Transactional
 public class DataProcessDao extends BaseDao{
 	private static Logger log = Logger.getLogger(DataProcessDao.class);

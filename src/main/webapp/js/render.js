@@ -300,5 +300,12 @@ App.rpt.Renders = {
 			var addr = encodeURI(v);
 			aStr =aStr+url+addr+"'>"+v+"</a>";
 			return aStr;
-		}
+		},
+
+		tt2link: function(v,col,r){
+			var aStr = "<a target='_blank' href='doQuery.query?doType=getReport&rptID=tt_link";
+			aStr +='&NY='+r.get("NY");
+			aStr =aStr+"'>"+v+"</a>";
+			return aStr;	
+                }
 };

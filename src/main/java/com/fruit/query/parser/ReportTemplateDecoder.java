@@ -33,7 +33,7 @@ import com.fruit.query.report.ProParaOut;
 import com.fruit.query.report.Report;
 import com.fruit.query.report.SubTitle;
 import com.fruit.query.report.Title;
-import com.softwarementors.extjs.djn.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class ReportTemplateDecoder {
 	private static Logger log = Logger.getLogger(ReportTemplateDecoder.class);

@@ -123,15 +123,14 @@ public class EnCollectionDao extends BaseDao{
 	public Map getCollectionEns(int start, int limit,String pField,String pValue, String enId,User user) {
 		Map infos = new HashMap();
 		StringBuffer sql = new StringBuffer("select distinct swdjzh,mc,fddbr,dz,a.qybj,nvl(a.showorder,0)showorder from ");
-		sql.append("qyjh_detail a,(select j.* from dj_cz j,(select max(xh)xh from dj_cz group by swdjzh)dj ");
+		sql.append("qyjh_detail a,(select max(xh)xh,swdjzh,max(mc) mc,max(fddbr) fddbr,max(dz) dz from dj_cz ");
 		//检查乡镇权限
 		if(user.getIsManager()!=1){//如果不是管理员，则检查用户能操作哪些乡镇数据
 			List xzs=user.getXzs();
-			sql.append(",(select bm,pid from bm_cont where table_bm='BM_CZFP') bm_czfp_qx where bm_czfp_qx.bm=j.czfpbm ");
 			if(xzs==null||xzs.size()==0){                        //如果不是管理员，且没有对应乡镇，则没有任何乡镇数据可看
-				sql.append(" and 1=2");
+				sql.append(" where 1=2");
 			}else{
-				sql.append(" and bm_czfp_qx.bm in(");
+				sql.append(" where czfpbm in(");
 				for(int i=0;i<xzs.size();i++){
 					sql.append("'");
 					sql.append(((SimpleValue)xzs.get(i)).getBm());
@@ -142,11 +141,8 @@ public class EnCollectionDao extends BaseDao{
 				}
 				sql.append(")");
 			}
-			sql.append(" and ");
-		}else{
-			sql.append(" where ");
 		}
-		sql.append(" dj.xh=j.xh) b where a.eid=b.swdjzh and a.jhid='").append(enId).append("' ");
+		sql.append(" group by swdjzh)b where a.eid=b.swdjzh and a.jhid='").append(enId).append("' ");
 		if(pField != null && !"".equals(pField)){
 			sql.append(" and b. ").append(pField).append(" like '%").append(pValue).append("%'");
 		}	
