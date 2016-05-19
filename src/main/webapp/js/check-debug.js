@@ -35,23 +35,23 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'toggleRuleQybj'/*(int, int) => String */,
-        len: 2,
-        formHandler: false
-      },
-      {
         name: 'deletePRulesOfEn'/*(String, String) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'getPRuleEns'/*(int, int) => java.util.Map */,
+        name: 'toggleRuleQybj'/*(int, int) => String */,
         len: 2,
         formHandler: false
       },
       {
         name: 'getEnsToAddPRules'/*(int, int, String) => java.util.Map */,
         len: 3,
+        formHandler: false
+      },
+      {
+        name: 'getPRuleEns'/*(int, int) => java.util.Map */,
+        len: 2,
         formHandler: false
       }
     ],
@@ -77,13 +77,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getEnDjInfo'/*(int, int) => String */,
-        len: 2,
+        name: 'checkChangeEn'/*(int, String, String) => String */,
+        len: 3,
         formHandler: false
       },
       {
-        name: 'checkChangeEn'/*(int, String, String) => String */,
-        len: 3,
+        name: 'getEnDjInfo'/*(int, int) => String */,
+        len: 2,
         formHandler: false
       },
       {
@@ -102,13 +102,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getComboBms'/*(String) => java.util.List */,
-        len: 1,
+        name: 'getBmCodesTree'/*(String, String, String) => java.util.List */,
+        len: 3,
         formHandler: false
       },
       {
-        name: 'getBmCodesTree'/*(String, String, String) => java.util.List */,
-        len: 3,
+        name: 'getComboBms'/*(String) => java.util.List */,
+        len: 1,
         formHandler: false
       },
       {
@@ -122,27 +122,17 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getBatchCheckFields'/*() => java.util.List */,
-        len: 0,
+        name: 'getEns'/*(int, int, int, String) => java.util.Map */,
+        len: 4,
         formHandler: false
       },
       {
-        name: 'getEns'/*(int, int, int, String) => java.util.Map */,
-        len: 4,
+        name: 'getBatchCheckFields'/*() => java.util.List */,
+        len: 0,
         formHandler: false
       }
     ],
     EnHandler: [
-      {
-        name: 'mapEns'/*(int, int) => String */,
-        len: 2,
-        formHandler: false
-      },
-      {
-        name: 'checkSwdjzh'/*(int, String) => String */,
-        len: 2,
-        formHandler: false
-      },
       {
         name: 'importPzDetail'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
         len: 1,
@@ -154,8 +144,28 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'savePzDetail'/*(String, String, String, String, String) => String */,
-        len: 5,
+        name: 'doAutoMap'/*() => String */,
+        len: 0,
+        formHandler: false
+      },
+      {
+        name: 'getPzDetail'/*(String, String) => java.util.List */,
+        len: 2,
+        formHandler: false
+      },
+      {
+        name: 'mapEns'/*(int, int) => String */,
+        len: 2,
+        formHandler: false
+      },
+      {
+        name: 'checkSwdjzh'/*(int, String) => String */,
+        len: 2,
+        formHandler: false
+      },
+      {
+        name: 'getNewPzDetail'/*() => java.util.List */,
+        len: 0,
         formHandler: false
       },
       {
@@ -164,13 +174,8 @@ Ext.ck.REMOTING_API = {
         formHandler: true
       },
       {
-        name: 'getNewPzDetail'/*() => java.util.List */,
-        len: 0,
-        formHandler: false
-      },
-      {
-        name: 'doAutoMap'/*() => String */,
-        len: 0,
+        name: 'savePzDetail'/*(String, String, String, String, String) => String */,
+        len: 5,
         formHandler: false
       },
       {
@@ -186,11 +191,6 @@ Ext.ck.REMOTING_API = {
       {
         name: 'getEns'/*(int, int, String) => java.util.Map */,
         len: 3,
-        formHandler: false
-      },
-      {
-        name: 'getPzDetail'/*(String, String) => java.util.List */,
-        len: 2,
         formHandler: false
       },
       {

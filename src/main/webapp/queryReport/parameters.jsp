@@ -212,7 +212,6 @@
       <%}
     	if(para.getRenderType()==2){
     		List choices=(List)opItemsMap.get(para.getName());
-			//如果选项集合不空,设置了单选，以最后一个默认选项为准。多选则以逗号分隔
 			if(choices!=null){
 				if(!StringUtils.isEmpty(para.getDefaultRule())){
 					String dr = para.getDefaultRule();
