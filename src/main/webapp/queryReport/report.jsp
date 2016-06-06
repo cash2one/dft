@@ -27,7 +27,7 @@
 		out.print("</body></html>");
 		return;
 	}
-	Map mPavalues=(Map)session.getAttribute("paraVals");
+	Map mPavalues=(Map)session.getAttribute(rpt.getId()+"_paraVals");
 	List paras=rpt.getParas();
 	RptDataService rsvr = RptDataService.getReportDataService();
 	String strTitle = "",stLeft ="",stCenter="",stRight="",fLeft="",fCenter="",fRight="";

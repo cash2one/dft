@@ -307,5 +307,12 @@ App.rpt.Renders = {
 			aStr +='&NY='+r.get("NY");
 			aStr =aStr+"'>"+v+"</a>";
 			return aStr;	
-                }
+        },
+        hypm2link: function(v,p,r){
+			var aStr = "<a target='_blank' href='doQuery.query?doType=getReport&rptID=hypm_link";
+			    aStr +='&NY='+r.get("NY")+'&LXBM='+r.get("LXBM")+'&CZFPBM='+r.get("CZFPBM");
+				aStr +='&HYBM='+r.get("HYBM")
+			    aStr =aStr+"'>"+v+"</a>";
+			return aStr;
+         }
 };

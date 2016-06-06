@@ -102,13 +102,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getBmCodesTree'/*(String, String, String) => java.util.List */,
-        len: 3,
+        name: 'getComboBms'/*(String) => java.util.List */,
+        len: 1,
         formHandler: false
       },
       {
-        name: 'getComboBms'/*(String) => java.util.List */,
-        len: 1,
+        name: 'getBmCodesTree'/*(String, String, String) => java.util.List */,
+        len: 3,
         formHandler: false
       },
       {
@@ -122,13 +122,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getEns'/*(int, int, int, String) => java.util.Map */,
-        len: 4,
+        name: 'getBatchCheckFields'/*() => java.util.List */,
+        len: 0,
         formHandler: false
       },
       {
-        name: 'getBatchCheckFields'/*() => java.util.List */,
-        len: 0,
+        name: 'getEns'/*(int, int, int, String) => java.util.Map */,
+        len: 4,
         formHandler: false
       }
     ],
@@ -169,14 +169,14 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'saveVirtualEn'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
-        len: 1,
-        formHandler: true
-      },
-      {
         name: 'savePzDetail'/*(String, String, String, String, String) => String */,
         len: 5,
         formHandler: false
+      },
+      {
+        name: 'saveVirtualEn'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
+        len: 1,
+        formHandler: true
       },
       {
         name: 'getEnPzhBySwdjzh'/*(String) => java.util.List */,

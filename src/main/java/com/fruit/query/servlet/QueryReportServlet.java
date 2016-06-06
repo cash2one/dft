@@ -90,7 +90,7 @@ public class QueryReportServlet extends HttpServlet{
 				//复杂表头，各个列
 				request.setAttribute("rptHeader", mheader);
 				//用于报表页面的参数引用，比如title的构造
-				request.getSession().setAttribute("paraVals", paraVals);
+				request.getSession().setAttribute(rptID+"_paraVals", paraVals);
 				//报表模板
 				request.setAttribute("cReport", rpt);
 				destination = "/queryReport/report.jsp?rptID="+rptID;
@@ -103,7 +103,7 @@ public class QueryReportServlet extends HttpServlet{
 				if(rptID!=null&&!"".equals(rptID)){
 					rpt=TemplatesLoader.getTemplatesLoader().getReportTemplate(rptID);
 					if(rpt!=null){
-						Map paraVals=(Map)request.getSession().getAttribute("paraVals");
+						Map paraVals=(Map)request.getSession().getAttribute(rptID+"_paraVals");
 						//如果远程排序，还有排序参数
 						if(rpt.getRemoteSort()==1){
 							String sVal=request.getParameter("sort");
@@ -205,10 +205,7 @@ public class QueryReportServlet extends HttpServlet{
 				String unit = request.getParameter("unit");
 				Report rpt=TemplatesLoader.getTemplatesLoader().getReportTemplate(rptID);
 				if(rpt!=null){
-					Map paraVals=(Map)request.getSession().getAttribute("paraVals");
-					if("1".equals(onlyExp)){
-						paraVals = getParaValues(rpt,request);
-					}
+					Map paraVals=(Map)request.getSession().getAttribute(rptID+"_paraVals");
 					int limit = 65530;
 					if("1".equals(excelformat)){
 						limit = 100000;
@@ -281,7 +278,7 @@ public class QueryReportServlet extends HttpServlet{
 				String rptID=request.getParameter("rptID");
 				Report rpt=TemplatesLoader.getTemplatesLoader().getReportTemplate(rptID);
 				if(rpt!=null){
-					Map paraVals=(Map)request.getSession().getAttribute("paraVals");
+					Map paraVals=(Map)request.getSession().getAttribute(rptID+"_paraVals");
 					paraVals.put("start", new ParaValue(String.valueOf(0),String.valueOf(0)));
 					paraVals.put("limit", new ParaValue(String.valueOf(65534),String.valueOf(65534)));//不分页时限制分页的记录数
 					response.reset();
@@ -305,8 +302,8 @@ public class QueryReportServlet extends HttpServlet{
 	    		return;
 			}else if("getReportRemark".equals(action)){
 				String rptID=request.getParameter("rptID");
-				Map paraVals=(Map)request.getSession().getAttribute("paraVals");
 				Report rpt=TemplatesLoader.getTemplatesLoader().getReportTemplate(rptID);
+				Map paraVals=(Map)request.getSession().getAttribute(rptID+"_paraVals");
 				String json = RptDataService.getReportDataService().getReportInfo(rpt,paraVals);
 				response.setContentType("text/json;charset=UTF-8");
 				PrintWriter out=response.getWriter();
@@ -322,7 +319,7 @@ public class QueryReportServlet extends HttpServlet{
 					if(rpt!=null){
 						Chart chart = rpt.getChart();
 						if(chart!=null){
-							Map paraVals=(Map)request.getSession().getAttribute("paraVals");
+							Map paraVals=(Map)request.getSession().getAttribute(rptID+"_paraVals");
 							ChartDataInfo dt = ChartService.getChartService().getChartData(rpt, paraVals);
 							if("vm".equals(chart.getTemplateFormat())){
 								ChartDataParser.getParser().buildXmlDataForVelocity(chart, dt,response);
@@ -353,7 +350,7 @@ public class QueryReportServlet extends HttpServlet{
 						iformat = Integer.parseInt(format);
 					}catch(Exception e){}
 					if(rpt!=null){
-						paraVals=getParaValues(rpt,request);
+						paraVals=(Map)request.getSession().getAttribute(rptID+"_paraVals");
 						response.reset();
 						RptDataExporter exp =new RptDataExporter(rpt,iformat,paraVals);
 						String agent = request.getHeader("USER-AGENT");
