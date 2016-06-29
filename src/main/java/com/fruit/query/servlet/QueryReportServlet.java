@@ -350,7 +350,7 @@ public class QueryReportServlet extends HttpServlet{
 						iformat = Integer.parseInt(format);
 					}catch(Exception e){}
 					if(rpt!=null){
-						paraVals=(Map)request.getSession().getAttribute(rptID+"_paraVals");
+						paraVals=getParaValues(rpt,request);
 						response.reset();
 						RptDataExporter exp =new RptDataExporter(rpt,iformat,paraVals);
 						String agent = request.getHeader("USER-AGENT");

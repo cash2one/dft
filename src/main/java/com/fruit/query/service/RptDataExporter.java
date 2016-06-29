@@ -39,7 +39,6 @@ public class RptDataExporter {
 	private String tmpName ="";
 	private Workbook wbTemplate = null ; 
     private Workbook workbook = null ;
-    private Sheet stTemplate = null ;
     private int format = 0;
     private List dynRowIncrements = new ArrayList();
     private Report report;
@@ -165,7 +164,6 @@ public class RptDataExporter {
 	}
     public void loadTemplate(String path) throws Exception {  
         wbTemplate = WorkbookFactory.create(new File(path)) ;  
-        stTemplate = wbTemplate.getSheetAt(0);
     }
     /**
      * 导出描述在报表模板中的情形。先根据描述获取数据。
@@ -205,64 +203,70 @@ public class RptDataExporter {
     		path = rootP.toURI().getPath();
         	path =path+(path.endsWith("/")?"":"/")+tmpName;
 	    	loadTemplate(path);
-	    	Sheet tsheet = workbook.createSheet();
-	    	int startRow = stTemplate.getFirstRowNum();
-	        int rowNum = stTemplate.getLastRowNum();
-	        int addedRows = 0;
-	        short rowHeight = 0;
-			for(int i = startRow; i <= rowNum; i++) {
-				Row row = stTemplate.getRow(i);
-				if(row==null){
-					continue;
-				}
-				int baseRIndex = addedRows+i;
-				Row newRow = tsheet.createRow(baseRIndex);
-				int colNum = row.getPhysicalNumberOfCells();
-				rowHeight = row.getHeight();
-				newRow.setHeight(rowHeight);
-				//模板中的列复制到目标sheet
-				copyRow(workbook, tsheet,row,newRow,null,null,true);
-				for (int j = 0; j < colNum; j++) {
-					Cell cell = newRow.getCell(j);
-					if(cell==null){
+	    	int sNum = wbTemplate.getNumberOfSheets();
+	    	for(int n=0;n<sNum;n++){
+	    		//模板sheet
+	    	    Sheet stTemplate = wbTemplate.getSheetAt(n);
+	    	    //建导出的sheet
+		    	Sheet tsheet = workbook.createSheet();
+		    	int startRow = stTemplate.getFirstRowNum();
+		        int rowNum = stTemplate.getLastRowNum();
+		        int addedRows = 0;
+		        short rowHeight = 0;
+				for(int i = startRow; i <= rowNum; i++) {
+					Row row = stTemplate.getRow(i);
+					if(row==null){
 						continue;
 					}
-					String result = cell.getStringCellValue();
-					if(!StringUtils.isEmpty(result)){
-						if(result.startsWith("$")){
-							int dotIdx = result.indexOf(".");
-							String strCls = result.substring(1,dotIdx);
-							String pro = result.substring(dotIdx+1);
-							Map md = getMapData(strCls);
-							setValueOfCell(md,pro,cell);
-						}else if(result.startsWith("#")){
-							//遇到#开头的字段，就开始构造动态行，并停止当前行的cell循环，统一在动态行中处理。
-							int dotIdx = result.indexOf(".");
-							String strCls = result.substring(1,dotIdx);
-							List lst = getListData(strCls);
-							List rows = new ArrayList();
-							rows.add(newRow);
-							//构造新的动态行，构造的数量要减去原有的配置 行（一行）
-							if(lst!=null&&lst.size()>1){
-								//把模板行的各个cellStyle、合并单元格区域缓存，动态扩展就不需要反复创建。
-								Map stylesMap = getCellStyleMap(row);
-								List mRegions = getMergeRegions(row);
-								for(int p=1; p<lst.size();p++){
-									Row extraRow = tsheet.createRow(baseRIndex+p);
-									extraRow.setHeight(rowHeight);
-									copyRow(workbook,tsheet,row,extraRow,stylesMap,mRegions,true);
-									addedRows++;
-									rows.add(extraRow);
+					int baseRIndex = addedRows+i;
+					Row newRow = tsheet.createRow(baseRIndex);
+					int colNum = row.getPhysicalNumberOfCells();
+					rowHeight = row.getHeight();
+					newRow.setHeight(rowHeight);
+					//模板中的列复制到目标sheet
+					copyRow(workbook, tsheet,stTemplate,row,newRow,null,null,true);
+					for (int j = 0; j < colNum; j++) {
+						Cell cell = newRow.getCell(j);
+						if(cell==null){
+							continue;
+						}
+						String result = cell.getStringCellValue();
+						if(!StringUtils.isEmpty(result)){
+							if(result.startsWith("$")){
+								int dotIdx = result.indexOf(".");
+								String strCls = result.substring(1,dotIdx);
+								String pro = result.substring(dotIdx+1);
+								Map md = getMapData(strCls);
+								setValueOfCell(md,pro,cell);
+							}else if(result.startsWith("#")){
+								//遇到#开头的字段，就开始构造动态行，并停止当前行的cell循环，统一在动态行中处理。
+								int dotIdx = result.indexOf(".");
+								String strCls = result.substring(1,dotIdx);
+								List lst = getListData(strCls);
+								List rows = new ArrayList();
+								rows.add(newRow);
+								//构造新的动态行，构造的数量要减去原有的配置 行（一行）
+								if(lst!=null&&lst.size()>1){
+									//把模板行的各个cellStyle、合并单元格区域缓存，动态扩展就不需要反复创建。
+									Map stylesMap = getCellStyleMap(row);
+									List mRegions = getMergeRegions(row);
+									for(int p=1; p<lst.size();p++){
+										Row extraRow = tsheet.createRow(baseRIndex+p);
+										extraRow.setHeight(rowHeight);
+										copyRow(workbook,tsheet,stTemplate,row,extraRow,stylesMap,mRegions,true);
+										addedRows++;
+										rows.add(extraRow);
+									}
+									int[] arr = new int[]{i,addedRows};
+									dynRowIncrements.add(arr);
 								}
-								int[] arr = new int[]{i,addedRows};
-								dynRowIncrements.add(arr);
-							}
-							setValueOfDynamicRow(lst,rows);
-							break;
-						}				
+								setValueOfDynamicRow(lst,rows);
+								break;
+							}				
+						}
 					}
 				}
-			}
+	    	}
 			//mergerRegion(stTemplate, tsheet);
 			writeToStream(agent,response);
     	}catch(Exception e){
@@ -450,7 +454,7 @@ public class RptDataExporter {
      * @param fromRow 
      * @param toRow 
      */  
-    public void copyRow(Workbook wb,Sheet tsheet,Row fromRow,Row toRow,Map stylesMap,List mRegions,boolean copyValueFlag){  
+    public void copyRow(Workbook wb,Sheet tsheet,Sheet stTemplate,Row fromRow,Row toRow,Map stylesMap,List mRegions,boolean copyValueFlag){  
         for (Iterator cellIt = fromRow.cellIterator(); cellIt.hasNext();) {  
             Cell tmpCell = (Cell) cellIt.next();  
             int cidx = tmpCell.getColumnIndex();

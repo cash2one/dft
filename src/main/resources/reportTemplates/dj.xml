@@ -51,7 +51,7 @@
 	<column colId="dz" dataIndex="DZ" colName="地址" width="120"  pid="test"/>		
 	<column colId="fddbr" dataIndex="FDDBR" colName="法人代表" width="100" pid="test"/>
 </columns>
-<rptData sourceType="1" canPaging="1" defaultPageSize="30" name="dj">
+<rptData sourceType="1" canPaging="1"  name="dj">
 	<sql><![CDATA[select swdjzh,mc,dz,fddbr, czfpbm from DJ_CZ 
 	where qyzt in ([qyzt])
 	order by czfpbm

@@ -123,7 +123,7 @@ public class EnCollectionDao extends BaseDao{
 	public Map getCollectionEns(int start, int limit,String pField,String pValue, String enId,User user) {
 		Map infos = new HashMap();
 		StringBuffer sql = new StringBuffer("select distinct swdjzh,mc,fddbr,dz,a.qybj,nvl(a.showorder,0)showorder from ");
-		sql.append("qyjh_detail a,(select max(xh)xh,swdjzh,max(mc) mc,max(fddbr) fddbr,max(dz) dz from dj_cz ");
+		sql.append("qyjh_detail a, (select max(xh)xh,swdjzh,max(mc) mc,max(fddbr) fddbr,max(dz) dz from dj_cz ");
 		//检查乡镇权限
 		if(user.getIsManager()!=1){//如果不是管理员，则检查用户能操作哪些乡镇数据
 			List xzs=user.getXzs();
