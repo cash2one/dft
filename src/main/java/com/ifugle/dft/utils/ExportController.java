@@ -309,9 +309,9 @@ public class ExportController {
 				for(int i=0;i<jorder.length;i++){
 					String p = jorder[i];
 					if (p.equals("limit")&&expEnd > 0) {
-						paras.add(new Integer(expEnd-expStart+1));
+						paras.add(new Integer(expEnd-expStart));
 					}else if(p.equals("start")){
-						paras.add(new Integer(expStart-1));
+						paras.add(new Integer(expStart));
 					}else{
 						Object val = jparams.get(p);
 						paras.add(val);
