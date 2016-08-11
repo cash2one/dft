@@ -560,7 +560,7 @@ var RPTROOT="doQuery.query?doType=getReport";
 		{
 			id: 'rptInfo',
 			layout:'fit',
-            title: '口径说明',
+            title: '备注',
             closable: false,
             html: "<p></p>" 
          },{

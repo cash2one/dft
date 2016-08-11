@@ -1040,7 +1040,7 @@ public class RptDataService {
 		}
 		StringBuffer json =new StringBuffer("{desc:'");
 		String desc = rpt.getDescription();
-		json.append(desc).append("',paramVals:");
+		json.append(StringUtils.isEmpty(desc)?"":desc).append("',paramVals:");
 		JSONArray jarr = new JSONArray();
 		List allParams = new ArrayList();
 		try{
