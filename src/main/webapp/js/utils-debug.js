@@ -25,8 +25,8 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getEnCollection'/*(String) => java.util.List */,
-        len: 1,
+        name: 'toggleQybj'/*(String, String, int) => String */,
+        len: 3,
         formHandler: false
       },
       {
@@ -35,19 +35,19 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'toggleQybj'/*(String, String, int) => String */,
-        len: 3,
-        formHandler: false
-      },
-      {
-        name: 'checkCode'/*(String, String) => String */,
-        len: 2,
+        name: 'getEnCollection'/*(String) => java.util.List */,
+        len: 1,
         formHandler: false
       },
       {
         name: 'saveEnCollection'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
         len: 1,
         formHandler: true
+      },
+      {
+        name: 'checkCode'/*(String, String) => String */,
+        len: 2,
+        formHandler: false
       },
       {
         name: 'saveEnOrder'/*(String, String) => String */,

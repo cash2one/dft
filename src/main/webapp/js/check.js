@@ -164,14 +164,14 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getNewPzDetail'/*() => java.util.List */,
-        len: 0,
-        formHandler: false
-      },
-      {
         name: 'saveVirtualEn'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
         len: 1,
         formHandler: true
+      },
+      {
+        name: 'getNewPzDetail'/*() => java.util.List */,
+        len: 0,
+        formHandler: false
       },
       {
         name: 'savePzDetail'/*(String, String, String, String, String) => String */,
