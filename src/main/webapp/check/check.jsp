@@ -1299,7 +1299,7 @@ showFldsGrid.on("rowdblclick",function(grid,rowIndex,e){
 });
 var fltPanel = new Ext.Panel({
 	region: 'north',
-	height : 150,
+	height : 200,
 	layout : 'hbox',
 	layoutConfig : {
 		align : 'stretch',
@@ -1709,8 +1709,9 @@ var sqlForm = new Ext.FormPanel({
 		xtype: 'textarea',
 		name :'sql',
 		id: 'idSql',
-		width : 345,
-		height:190,
+		width : 320,
+		height: 120,
+		autoScroll: true,
 		hideLabel: true
 	}]
 });

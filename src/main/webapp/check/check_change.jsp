@@ -1800,8 +1800,9 @@ var sqlForm = new Ext.FormPanel({
 		xtype: 'textarea',
 		name :'sql',
 		id: 'idSql',
-		width : 345,
-		height:190,
+		width : 320,
+		height: 120,
+		autoScroll: true,
 		hideLabel: true
 	}]
 });

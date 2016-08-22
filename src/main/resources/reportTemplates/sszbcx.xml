@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report id="sszbcx" name="全口径税收情况明细表（累报）">
+	<parameters>
+	    <para name="sessionid" desc="" dataType="string" hidden="1" bindMode="2" bindTo="SESSIONID_DNFT5"/>
+		<para name="start" hidden="1" dataType="int"/>
+		<para name="limit" hidden="1" dataType="int"/>
+		<para name="userid" desc="" hidden="1" bindTo="userid" bindMode="2" dataType="string"/>
+		<para name="pNy" desc="年月" dataType="int" />
+		<para name="plxbm" desc="报表类型" renderType="1" dataType="int" defaultRule="_first">
+			<paraDetail multi="0" leafOnly="1" sourceType="1" >
+				<sql><![CDATA[
+				     select bm,name from
+					    (
+					     select 3 bm, '全区' name from dual union all
+					     select 2 bm, '开发区' name from dual union all
+					     select 1 bm, '乡镇' name from dual
+						)
+					  where bm <=(select USERDESC from USERS where userid={userid})
+				]]></sql>
+			</paraDetail>
+		</para>
+
+		<para name="czfpbm" desc="财政分片" renderType="2" dataType="string">
+			<paraDetail multi="0" leafOnly="1" sourceType="1" >
+				<sql><![CDATA[
+					select distinct bm,mc name,isleaf,pid 
+					  from (select * from bm_cont where table_bm='BM_CZFP') a connect by prior pid=bm 
+                             start with bm in (select czfpbm from user_xz where userid={userid}) order by bm
+                ]]></sql>
+			</paraDetail>
+		</para>
+	</parameters>
+
+	<paraProcesses>
+		<paraPro name="srtz" desc="金融营业税调整数" proMode="1">
+			<sql><![CDATA[select mc from BB_MOD where BB_ID='BM_SRTZ' and BM={pNy} ]]></sql>
+		</paraPro>
+		
+		<paraPro name="ygzdz" desc="地税代征改征增值税" proMode="1">
+			<sql><![CDATA[select mc from BB_MOD where BB_ID='BM_YGZDZ' and BM={pNy} ]]></sql>
+		</paraPro>
+
+		<paraPro name="xzmc" desc="乡镇名称" proMode="1">
+			<sql><![CDATA[select
+    case when {plxbm}=3 then ''
+         when {plxbm}=2 then '开发区' 
+         when {plxbm}=1 and {czfpbm} is not null then (select mc from BM_CZFP where bm={czfpbm})
+         when {plxbm}=1 and {czfpbm} is null then (select name from users where userid={userid} and USERDESC in ('1','2'))
+    else ''
+     end as MC from dual]]></sql>
+		</paraPro>
+	</paraProcesses>
+
+	<title>瓯海区@xzmc@全口径税收征收情况明细表（累报）</title>
+	<head titleInHead="1" style="headTitle" height='60'>
+	<subTitle right="单位：万元" left="时间：$pNy$" cStyle="subTitleC" lStyle="subTitleL" rStyle="subTitleR"/>
+	</head>
+	<columns complex="0" sourceType="0">
+	    <column colId="ny" dataIndex="NY" colName="年月" width="100" hidden="1"/>
+		<column colId="lxbm" dataIndex="LXBM" colName="类型" width="50" dataType="2" hidden="1"/>
+		<column colId="czfpbm" dataIndex="CZFPBM" colName="财政分片" width="100" hidden="1"/>
+		<column colId="szbm" dataIndex="SZBM" colName="税种编码" width="100" hidden="1"/>
+		<column colId="xmmc" dataIndex="XMMC" colName="项　目" width="200"/>
+		<column colId="qkj" dataIndex="QKJ" colName="全口径" dataType="2" width="120" renderer="link2qkj"/>
+		<column colId="zyj" dataIndex="ZYJ" colName="中央级" dataType="2" width="120" renderer="link2zyj"/>
+		<column colId="sj" dataIndex="SJ" colName="市　级" dataType="2" width="120" renderer="link2sj"/>
+		<column colId="x" colName="区　级" dataType="2" width="120" isleaf="0"/>
+		<column pid="x" colId="qxj" dataIndex="QXJ" colName="合　计" dataType="2" width="120" isleaf="1" renderer="link2qxj"/>
+		<column pid="x" colId="xzj" dataIndex="XZJ" colName="其中：镇街道&lt;br/&gt;（开发区）" dataType="2" width="120" isleaf="1" renderer="link2xzj"/>
+    </columns>
+	<rptData sourceType="2" canPaging="1" defaultPageSize="40" maxSize="100">
+		<procedure name="pkg_query.sszbcx" totalIndex="1" datasetIndex="2">
+		    <in referMode="1" referTo="sessionid"/>
+			<in referMode="1" referTo="pNy"/>
+			<in referMode="1" referTo="plxbm"/>
+			<in referMode="1" referTo="czfpbm"/>
+			<in referMode="1" referTo="start"/>
+			<in referMode="1" referTo="limit"/>
+			<in referMode="1" referTo="userid"/>
+			<out dataType="1"/>
+			<out dataType="3"/>
+		</procedure>
+	</rptData>
+  <foot left="区级收入口径含区级金融业营业税入省库60%部分：@srtz@" center="@ygzdz@" cStyle="footC" lStyle="footL" rStyle="footR"/>
+</report>
