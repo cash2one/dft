@@ -212,6 +212,7 @@
       <%}
     	if(para.getRenderType()==2){
     		List choices=(List)opItemsMap.get(para.getName());
+    		int dfCount = 0;
 			if(choices!=null){
 				if(!StringUtils.isEmpty(para.getDefaultRule())){
 					String dr = para.getDefaultRule();
@@ -219,6 +220,7 @@
 						OptionItem oi=(OptionItem)choices.get(0);
 						defaultValue=oi.getBm();
 						defaultText=oi.getName();
+						dfCount++;
 					}
 				}else{
 					if(para.getDefaultRuleDefine()!=null){
@@ -226,6 +228,7 @@
 							OptionItem oi = ParaDefaultOptionService.getParaDefaultOptionService().getParaDefaultOption(rpt,para,paVals);
 							defaultValue=oi.getBm();
 							defaultText=oi.getName();
+							dfCount++;
 						}catch(Exception e){
 						}
 					}else{
@@ -235,21 +238,23 @@
 								if(oi.getIsDefault()>0){
 									defaultValue=oi.getBm();
 									defaultText=oi.getName();
+									dfCount++;
 								}
 							}else{
 								if(oi.getIsDefault()>0){
 									defaultValue+=oi.getBm()+",";
 									defaultText+=oi.getName()+",";
+									dfCount++;
 								}
 							}
 						}
 					}
 				}
-				if(para.getIsMulti()>0&&defaultValue.length()>0){
+				if(para.getIsMulti()>0&&defaultValue.length()>0&&dfCount>1){
 					defaultValue=defaultValue.substring(0,defaultValue.length()-1);
 				}
 				dfValMap.put(para.getName(),defaultValue);
-				if(para.getIsMulti()>0&&defaultText.length()>0){
+				if(para.getIsMulti()>0&&defaultText.length()>0&&dfCount>1){
 					defaultText=defaultText.substring(0,defaultText.length()-1);
 				}			
 			}%>
