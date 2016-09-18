@@ -35,23 +35,23 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'deletePRulesOfEn'/*(String, String) => String */,
-        len: 2,
-        formHandler: false
-      },
-      {
         name: 'toggleRuleQybj'/*(int, int) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'getPRuleEns'/*(int, int) => java.util.Map */,
+        name: 'deletePRulesOfEn'/*(String, String) => String */,
         len: 2,
         formHandler: false
       },
       {
         name: 'getEnsToAddPRules'/*(int, int, String) => java.util.Map */,
         len: 3,
+        formHandler: false
+      },
+      {
+        name: 'getPRuleEns'/*(int, int) => java.util.Map */,
+        len: 2,
         formHandler: false
       }
     ],
@@ -102,13 +102,13 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getComboBms'/*(String) => java.util.List */,
-        len: 1,
+        name: 'getBmCodesTree'/*(String, String, String) => java.util.List */,
+        len: 3,
         formHandler: false
       },
       {
-        name: 'getBmCodesTree'/*(String, String, String) => java.util.List */,
-        len: 3,
+        name: 'getComboBms'/*(String) => java.util.List */,
+        len: 1,
         formHandler: false
       },
       {
@@ -122,37 +122,17 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getEns'/*(int, int, int, String) => java.util.Map */,
-        len: 4,
+        name: 'getBatchCheckFields'/*() => java.util.List */,
+        len: 0,
         formHandler: false
       },
       {
-        name: 'getBatchCheckFields'/*() => java.util.List */,
-        len: 0,
+        name: 'getEns'/*(int, int, int, String) => java.util.Map */,
+        len: 4,
         formHandler: false
       }
     ],
     EnHandler: [
-      {
-        name: 'importPzDetail'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
-        len: 1,
-        formHandler: true
-      },
-      {
-        name: 'deleteVEn'/*(String) => String */,
-        len: 1,
-        formHandler: false
-      },
-      {
-        name: 'doAutoMap'/*() => String */,
-        len: 0,
-        formHandler: false
-      },
-      {
-        name: 'getPzDetail'/*(String, String) => java.util.List */,
-        len: 2,
-        formHandler: false
-      },
       {
         name: 'mapEns'/*(int, int) => String */,
         len: 2,
@@ -164,14 +144,29 @@ Ext.ck.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'saveVirtualEn'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
+        name: 'importPzDetail'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
         len: 1,
         formHandler: true
+      },
+      {
+        name: 'deleteVEn'/*(String) => String */,
+        len: 1,
+        formHandler: false
       },
       {
         name: 'getNewPzDetail'/*() => java.util.List */,
         len: 0,
         formHandler: false
+      },
+      {
+        name: 'doAutoMap'/*() => String */,
+        len: 0,
+        formHandler: false
+      },
+      {
+        name: 'saveVirtualEn'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
+        len: 1,
+        formHandler: true
       },
       {
         name: 'savePzDetail'/*(String, String, String, String, String) => String */,
@@ -186,6 +181,11 @@ Ext.ck.REMOTING_API = {
       {
         name: 'getVirtualEn'/*(String) => String */,
         len: 1,
+        formHandler: false
+      },
+      {
+        name: 'getPzDetail'/*(String, String) => java.util.List */,
+        len: 2,
         formHandler: false
       },
       {

@@ -25,13 +25,13 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'toggleQybj'/*(String, String, int) => String */,
-        len: 3,
+        name: 'getImportedEns'/*(int, int) => java.util.Map */,
+        len: 2,
         formHandler: false
       },
       {
-        name: 'getImportedEns'/*(int, int) => java.util.Map */,
-        len: 2,
+        name: 'toggleQybj'/*(String, String, int) => String */,
+        len: 3,
         formHandler: false
       },
       {
@@ -40,9 +40,9 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'saveEnCollection'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
-        len: 1,
-        formHandler: true
+        name: 'saveEnOrder'/*(String, String) => String */,
+        len: 2,
+        formHandler: false
       },
       {
         name: 'checkCode'/*(String, String) => String */,
@@ -50,9 +50,9 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'saveEnOrder'/*(String, String) => String */,
-        len: 2,
-        formHandler: false
+        name: 'saveEnCollection'/*() => com.ifugle.dft.utils.entity.SubmitResult -- FORM HANDLER */,
+        len: 1,
+        formHandler: true
       },
       {
         name: 'removeEn'/*(String, String) => String */,
@@ -80,13 +80,13 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'addEn'/*(String, String) => String */,
-        len: 2,
+        name: 'getCollectionEns'/*(int, int, String, String, String) => java.util.Map */,
+        len: 5,
         formHandler: false
       },
       {
-        name: 'getCollectionEns'/*(int, int, String, String, String) => java.util.Map */,
-        len: 5,
+        name: 'addEn'/*(String, String) => String */,
+        len: 2,
         formHandler: false
       },
       {

@@ -45,18 +45,18 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'updatePost'/*(String, String, String) => String */,
-        len: 3,
-        formHandler: false
-      },
-      {
         name: 'setPostModules'/*(String, String) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'deletePost'/*(String) => String */,
-        len: 1,
+        name: 'updatePost'/*(String, String, String) => String */,
+        len: 3,
+        formHandler: false
+      },
+      {
+        name: 'getReportsToAudit'/*(int, int) => java.util.Map */,
+        len: 2,
         formHandler: false
       },
       {
@@ -70,18 +70,18 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getReportsToAudit'/*(int, int) => java.util.Map */,
-        len: 2,
-        formHandler: false
-      },
-      {
-        name: 'saveUserPosts'/*(String, String) => String */,
-        len: 2,
+        name: 'deletePost'/*(String) => String */,
+        len: 1,
         formHandler: false
       },
       {
         name: 'publishReports'/*(String) => String */,
         len: 1,
+        formHandler: false
+      },
+      {
+        name: 'saveUserPosts'/*(String, String) => String */,
+        len: 2,
         formHandler: false
       },
       {
@@ -120,25 +120,25 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'addPost'/*(String, String) => String */,
+        name: 'getUsers'/*(int, int) => java.util.Map */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'getUsers'/*(int, int) => java.util.Map */,
+        name: 'addPost'/*(String, String) => String */,
         len: 2,
         formHandler: false
       }
     ],
     CodeHandler: [
       {
-        name: 'saveCodeTableMapping'/*(String, String, int) => String */,
-        len: 3,
+        name: 'delAidItems'/*(String, String) => String */,
+        len: 2,
         formHandler: false
       },
       {
-        name: 'delAidItems'/*(String, String) => String */,
-        len: 2,
+        name: 'saveCodeTableMapping'/*(String, String, int) => String */,
+        len: 3,
         formHandler: false
       },
       {
@@ -172,13 +172,13 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getNotMappedTaxCodes'/*(int, int, int) => java.util.Map */,
-        len: 3,
+        name: 'saveMappingF2T'/*(String, String, String, String, String) => String */,
+        len: 5,
         formHandler: false
       },
       {
-        name: 'saveMappingF2T'/*(String, String, String, String, String) => String */,
-        len: 5,
+        name: 'getNotMappedTaxCodes'/*(int, int, int) => java.util.Map */,
+        len: 3,
         formHandler: false
       },
       {
@@ -197,13 +197,13 @@ Ext.sys.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getNotMappingCount'/*() => String */,
-        len: 0,
+        name: 'getTableMappingInfo'/*(String, int, int) => String */,
+        len: 3,
         formHandler: false
       },
       {
-        name: 'getTableMappingInfo'/*(String, int, int) => String */,
-        len: 3,
+        name: 'getNotMappingCount'/*() => String */,
+        len: 0,
         formHandler: false
       },
       {

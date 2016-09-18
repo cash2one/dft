@@ -190,6 +190,13 @@ function setZwrq(value){
 		zwrq_tree.root.reload();
 	}
 }
+function toggleCZFP(value){
+	if(value=="3"){
+		Ext.getCmp("czfpbm_desc").disable();
+	}else{
+		Ext.getCmp("czfpbm_desc").enable();
+	}
+}
 String.prototype.replaceAll = function(regexp, replacement) {
 	var str = this;
 	if (typeof regexp == 'string') {

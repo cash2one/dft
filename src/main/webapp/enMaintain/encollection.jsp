@@ -1344,6 +1344,7 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 				matchRecord.set("mc",rc.get("mc"));
 				matchRecord.set("fddbr",rc.get("fddbr"));
 				matchRecord.set("dz",rc.get("dz"));
+				matchRecord.set("ismatch",1);
 				enterpriseWin.hide();//双击关闭窗体，自动填写企业信息到界面	
 		    }
 	    },{

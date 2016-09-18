@@ -6,7 +6,7 @@
 		<para name="limit" hidden="1" dataType="int"/>
 		<para name="userid" desc="" hidden="1" bindTo="userid" bindMode="2" dataType="string"/>
 		<para name="pNy" desc="年月" dataType="int" />
-		<para name="plxbm" desc="报表类型" renderType="1" dataType="int" defaultRule="_first">
+		<para name="plxbm" desc="报表类型" renderType="1" dataType="int" defaultRule="_first" affectCallBack="toggleCZFP">
 			<paraDetail multi="0" leafOnly="1" sourceType="1" >
 				<sql><![CDATA[
 				     select bm,name from
