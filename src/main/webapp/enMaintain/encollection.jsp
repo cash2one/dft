@@ -547,6 +547,7 @@ Ext.Direct.addProvider(Ext.ck.REMOTING_API);
 				    				newNode.parentNode.expand(true,false,function(){
 				    					en_tree_node.getSelectionModel().select(newNode);
 				    				});//将上级树形展开
+				    				saveMode='update';
 				    				en_tree_node.render();
 					    		}else{
 					    			Ext.Msg.alert('成功', "企业集合更新成功！");
