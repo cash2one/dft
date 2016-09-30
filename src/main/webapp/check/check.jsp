@@ -1008,14 +1008,6 @@ var batchWin = new Ext.Window({
     }]
 });
 /*********************excel导入***********************/
-function required(para){
-	var obj=document.getElementById(para);
-	if(obj.getAttribute("value")&&obj.getAttribute("value")!=""){
-		return "success";
-	}else{
-		return "不能为空！";
-	}
-}
 var radiogroup= new Ext.form.RadioGroup({   
     fieldLabel : '匹配模式',
 	width:100,  
@@ -1111,11 +1103,11 @@ var excelWin = new Ext.Window({
     {
     	text : "导入",
 	    handler:function(){
-	    	if(required('filepath')!='success'){
+	    	var x=document.getElementById('filepath').value;
+	    	if(!x||x==""){
 	  			Ext.Msg.alert("提示","请选择要导入的文件!");
 	  			return;
 	  		}
-	  		var x=document.getElementById('filepath').value;
 	  		if(x.substr(x.lastIndexOf(".")).toUpperCase()!='.XLS'&&x.substr(x.lastIndexOf(".")).toUpperCase()!="XLSX"){
 	  			Ext.Msg.alert("提示","请选择Excel文件导入！");
 	  			return;

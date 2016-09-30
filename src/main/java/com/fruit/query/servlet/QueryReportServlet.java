@@ -206,6 +206,9 @@ public class QueryReportServlet extends HttpServlet{
 				Report rpt=TemplatesLoader.getTemplatesLoader().getReportTemplate(rptID);
 				if(rpt!=null){
 					Map paraVals=(Map)request.getSession().getAttribute(rptID+"_paraVals");
+					if("1".equals(onlyExp)){
+						paraVals=getParaValues(rpt,request);
+					}
 					int limit = 65530;
 					if("1".equals(excelformat)){
 						limit = 100000;
