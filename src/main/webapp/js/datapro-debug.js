@@ -40,13 +40,13 @@ Ext.datapro.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getFormalAppData'/*(int, int, int) => java.util.Map */,
-        len: 3,
+        name: 'matchEnOfTmpAid'/*(int, String, int, String) => String */,
+        len: 4,
         formHandler: false
       },
       {
-        name: 'matchEnOfTmpAid'/*(int, String, int, String) => String */,
-        len: 4,
+        name: 'getFormalAppData'/*(int, int, int) => java.util.Map */,
+        len: 3,
         formHandler: false
       },
       {
@@ -140,12 +140,12 @@ Ext.datapro.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'saveTempApps'/*(int, String) => String */,
+        name: 'deleteImportedApps'/*(int, String) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'deleteImportedApps'/*(int, String) => String */,
+        name: 'saveTempApps'/*(int, String) => String */,
         len: 2,
         formHandler: false
       },

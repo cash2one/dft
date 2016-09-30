@@ -20,13 +20,13 @@ Ext.query.REMOTING_API = {
   actions: {
     QueryHandler: [
       {
-        name: 'getOptionItemsOfTree'/*(String, String, String, String) => java.util.List */,
-        len: 4,
+        name: 'deleteQueryPlan'/*(int) => String */,
+        len: 1,
         formHandler: false
       },
       {
-        name: 'deleteQueryPlan'/*(int) => String */,
-        len: 1,
+        name: 'getOptionItemsOfTree'/*(String, String, String, String) => java.util.List */,
+        len: 4,
         formHandler: false
       },
       {

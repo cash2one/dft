@@ -25,13 +25,13 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getImportedEns'/*(int, int) => java.util.Map */,
-        len: 2,
+        name: 'toggleQybj'/*(String, String, int) => String */,
+        len: 3,
         formHandler: false
       },
       {
-        name: 'toggleQybj'/*(String, String, int) => String */,
-        len: 3,
+        name: 'getImportedEns'/*(int, int) => java.util.Map */,
+        len: 2,
         formHandler: false
       },
       {
@@ -40,12 +40,12 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'saveEnOrder'/*(String, String) => String */,
+        name: 'checkCode'/*(String, String) => String */,
         len: 2,
         formHandler: false
       },
       {
-        name: 'checkCode'/*(String, String) => String */,
+        name: 'saveEnOrder'/*(String, String) => String */,
         len: 2,
         formHandler: false
       },
