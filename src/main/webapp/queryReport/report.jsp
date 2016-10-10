@@ -75,17 +75,17 @@
 			hasHead = true;
 			Head head = rpt.getHead();
 			titleInHead = head.getTitleInHead()==1;
-			if(head.getSubTitle()==null&&head.getTitleInHead()==1){//无副标题且标题在表头
+			if(head.getSubTitle()==null&&titleInHead){//无副标题且标题在表头--表头只有title
 				strHead.append("<p id='headTitle' class='>").append(head.getStyle()).append("'>").append(strTitle).append("</p>");
-			}else{//有副标题
+			}else if(head.getSubTitle()!=null){//有副标题
 				SubTitle st = head.getSubTitle();
 				strHead.append("<table width='100%' border='0' cellspacing='0' cellpadding='0'><tr><td colspan=3 align='center'>");
-				strHead.append("<span id='headTitle' class='").append(head.getStyle()).append("'>").append(strTitle);
+				strHead.append("<span id='headTitle' class='").append(head.getStyle()).append("'>").append(titleInHead?"":strTitle);
 				strHead.append("</span></td></tr><tr><td width='33%' align='left><span id='headSLeft' class='").append(st.getlStyle()).append("'>");
 				strHead.append(stLeft);
 				strHead.append("</span></td><td width='33%' align='center'><span id='headSCenter' class='").append(st.getcStyle()).append("'>");
 				strHead.append(stCenter);
-				strHead.append("</span></td><td width='33%' align='right'><span id='headSRight' class='").append(st.getrStyle()).append("'>");
+				strHead.append("</span></td><td width='33%' align='right'><span id='headSRight' class='>").append(st.getrStyle()).append("'>");
 				strHead.append(stRight).append("</span></td></tr></table>");
 			}
 		}

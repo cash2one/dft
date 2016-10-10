@@ -25,6 +25,11 @@ Ext.utils.REMOTING_API = {
         formHandler: false
       },
       {
+        name: 'getEnCollection'/*(String) => java.util.List */,
+        len: 1,
+        formHandler: false
+      },
+      {
         name: 'toggleQybj'/*(String, String, int) => String */,
         len: 3,
         formHandler: false
@@ -32,11 +37,6 @@ Ext.utils.REMOTING_API = {
       {
         name: 'getImportedEns'/*(int, int) => java.util.Map */,
         len: 2,
-        formHandler: false
-      },
-      {
-        name: 'getEnCollection'/*(String) => java.util.List */,
-        len: 1,
         formHandler: false
       },
       {

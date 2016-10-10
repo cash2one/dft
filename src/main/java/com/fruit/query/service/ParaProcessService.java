@@ -272,7 +272,7 @@ public class ParaProcessService {
 			conn.setAutoCommit(false);
             cs.execute();
             
-            parsedInfo=cs.getString(oStart-1+pro.getDataSetIndex());
+            parsedInfo=cs.getString(oStart-1+pro.getOutPutInfoIndex());
 
 			conn.commit();
 			cs.close();

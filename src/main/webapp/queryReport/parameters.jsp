@@ -351,7 +351,6 @@
         	var <%=para.getName()%>_tg = new Ext.form.TriggerField({
         		x: <%=left+70%>,
 		        y: <%=(top-5)+pCount*30%>,
-		        width: <%=para.getWidth()%>,
 	            editable :false,
 	            width: <%=para.getWidth()%>,
 		        name: '<%=para.getName()%>_desc',
