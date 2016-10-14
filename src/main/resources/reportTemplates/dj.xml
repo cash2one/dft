@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<report id="dj" name="测试" hasChart="1" directExport="0">
+<report id="dj" name="测试" hasChart="1" directExport="0" remoteSort="1">
 <description><![CDATA[ 登记清单表。</br>第二行的简介<font color="red">这里是~~</font>]]></description>
 <parameters>
 	<para name="czfpbm" desc="乡镇" hidden="0" renderType="2" dataType="string" defaultRule="_first">
@@ -41,8 +41,8 @@
 	<subTitle/>
 </head>
 <columns complex="0" sourceType="0">
-	<column colId="czfpbm" dataIndex="CZFPBM" colName="财政&lt;br/&gt;分片编码" width="90" isGroup="1" dataType="int"/>
-	<column colId="mc" dataIndex="MC" colName="单位名称" width="150" isLink="1" linkTo="link_en" linkParams="SWDJZH,MC" />
+	<column colId="czfpbm" dataIndex="CZFPBM" colName="财政&lt;br/&gt;分片编码" width="90" isGroup="1" dataType="int" isOrder="1"/>
+	<column colId="mc" dataIndex="MC" colName="单位名称" width="150" isLink="1" linkTo="link_en" linkParams="SWDJZH,MC"  isOrder="1"/>
 	<column colId="swdjzh" dataIndex="SWDJZH" colName="税号" width="110" dataType="string" isLink="1" linkAction="popUp" popHeight="400" popWidth="480">
 		<linkTab title="企业收税明细" linkTo="link_en" linkParams="SWDJZH" />
 		<linkTab title="企业登记明细" linkTo="link_en_2" linkParams="MC" />

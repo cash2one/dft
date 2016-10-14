@@ -20,8 +20,8 @@ Ext.query.REMOTING_API = {
   actions: {
     QueryHandler: [
       {
-        name: 'deleteQueryPlan'/*(int) => String */,
-        len: 1,
+        name: 'getOptionItemsOfTree'/*(String, String, String, String) => java.util.List */,
+        len: 4,
         formHandler: false
       },
       {
@@ -30,8 +30,8 @@ Ext.query.REMOTING_API = {
         formHandler: false
       },
       {
-        name: 'getOptionItemsOfTree'/*(String, String, String, String) => java.util.List */,
-        len: 4,
+        name: 'deleteQueryPlan'/*(int) => String */,
+        len: 1,
         formHandler: false
       },
       {
@@ -62,13 +62,13 @@ Ext.query.REMOTING_API = {
     ],
     PortalHandler: [
       {
-        name: 'getUnits'/*(String) => java.util.List */,
-        len: 1,
+        name: 'getOptionItemsOfTree'/*(String, String, String, String) => java.util.List */,
+        len: 4,
         formHandler: false
       },
       {
-        name: 'getOptionItemsOfTree'/*(String, String, String, String) => java.util.List */,
-        len: 4,
+        name: 'getUnits'/*(String) => java.util.List */,
+        len: 1,
         formHandler: false
       },
       {
