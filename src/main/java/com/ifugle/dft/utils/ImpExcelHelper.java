@@ -114,6 +114,9 @@ public class ImpExcelHelper {
 			    		for(int j=0;j<flds.size();j++){
 			    			DestField f = (DestField)flds.get(j);
 			    			int colindex = f.getExcelcol();
+			    			if(colindex<0){
+			    				continue;
+			    			}
 			    			colsMap.put(String.valueOf(colindex), f);
 			    		}
 			    		//保存单个模板的信息，包括模板列的有序集合，以及按excel列序号索引数据库列的散列集合。

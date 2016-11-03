@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -93,9 +94,9 @@ public class DataHandler {
 	@DirectMethod
 	public List getTbCols(String tbname){
 		List cols = null;
-		StringBuffer sql = new StringBuffer("select a.colname,a.coldesc,nvl(a.coltype,0)coltype,nvl(b.excelcolindex,-1)+1 excelcol from ");
-		sql.append("exceltb_columns a,excelmap b where a.tbname=b.tbname(+) and a.colname=b.colname(+) and a.tbname='");
-		sql.append("TMP_").append(tbname.toUpperCase()).append("' and a.rptkey=0 and a.isrindex=0 order by showorder");
+		StringBuffer sql = new StringBuffer("select 1 isold,a.colname o_colname,a.colname,a.coldesc,nvl(a.coltype,0)coltype,");
+		sql.append("nvl(a.showorder,0)showorder from exceltb_columns a,excelmap b where a.tbname=b.tbname(+) and a.colname=b.colname(+) ");
+		sql.append("and a.tbname='TMP_").append(tbname.toUpperCase()).append("' and a.rptkey=0 and a.isrindex=0 order by showorder");
 		cols = dpDao.getTbCols(sql.toString(),DestField.class);
 		return cols;
 	}
@@ -112,7 +113,9 @@ public class DataHandler {
 			}
 			addInfo = dpDao.addExtendTables(parsedtb);
 		}catch(Exception e){
-			return "{result:false}";
+			StringBuffer info = new StringBuffer("{result:false,info:'");
+			info.append(e.toString()).append("'}");
+			return info.toString();
 		}
 		return addInfo;
 	}
@@ -138,45 +141,50 @@ public class DataHandler {
 			tb.setRemark(tbinfo.getString("remark"));
 			tb.setTid(tbinfo.getInt("tid"));
 			tbtmp.setTb(tb);
-			List cols = new ArrayList();
-			JSONArray jcols = tbinfo.getJSONArray("cols");
-			for(int i=0;i<jcols.length();i++){
-				JSONObject col = jcols.getJSONObject(i);
-				DestField fld = new DestField();
-				fld.setColname(col.getString("colname"));
-				fld.setColdesc(col.getString("coldesc"));
-				fld.setColtype(col.getInt("coltype"));
-				try{
-					boolean hasExcelCol = col.has("excelcol");
-					int excelCol = hasExcelCol? col.getInt("excelcol"): 0;
-					fld.setExcelcol(excelCol-1);
-				}catch(Exception e){
-					fld.setExcelcol(-1);
+			if(tbinfo.has("cols")){
+				List cols = new ArrayList();
+				JSONArray jcols = tbinfo.getJSONArray("cols");
+				for(int i=0;i<jcols.length();i++){
+					JSONObject col = jcols.getJSONObject(i);
+					DestField fld = new DestField();
+					fld.setColname(col.getString("colname"));
+					fld.setColdesc(col.getString("coldesc"));
+					fld.setColtype(col.getInt("coltype"));
+					fld.setShoworder(col.getInt("showorder"));
+					cols.add(fld);
 				}
-				cols.add(fld);
+				tbtmp.setColumns(cols);
 			}
-			tbtmp.setColumns(cols);
 		}catch(Exception e){
 			log.error(e.toString());
 		}
 		return tbtmp;
 	}
 	@DirectMethod
-	public String saveExtendTables(String tb){
+	public String saveExtendTables(String tname,String tbinfo,String edtInfo){
 		StringBuffer result = new StringBuffer("{result:");
-		if(tb==null||tb.equals("")){
-			return "{result:true}";
-		}
-		ExcelTemplate parsedtb = parseTable(tb);
-		if(parsedtb==null){
-			return "{result:true}"; 
-		}
 		try{
-			boolean done = dpDao.saveExtendTables(parsedtb);
+			boolean done = dpDao.saveExtendTables(tname,tbinfo,edtInfo);
 			result.append(done).append("}");
 		}catch(Exception e){
 			log.error(e.toString());
-			result.append("false}");
+			result.append("false,info:'").append(e.toString()).append("'}");
+			
+		}
+		return result.toString();
+	}
+	@DirectMethod
+	public String deleteColumn(String tb,String col){
+		StringBuffer result = new StringBuffer("{result:");
+		if(StringUtils.isEmpty(tb)||StringUtils.isEmpty(col)){
+			return "{result:true}";
+		}
+		try{
+			boolean done = dpDao.deleteColumn(tb,col);
+			result.append(done).append("}");
+		}catch(Exception e){
+			log.error(e.toString());
+			result.append("false,info:'").append(e.toString()).append("'}");
 		}
 		return result.toString();
 	}
@@ -298,151 +306,7 @@ public class DataHandler {
 		String agent = request.getHeader("USER-AGENT");
 		excelExp.exportFile(tid, format,agent,response);
 	}
-	/**
-	 * 导入资金申报时，检查相同项目已经存在多少申报记录
-	* @param iid
-	* @return
-	 */
-	@DirectMethod
-	public String checkApplyOfIid(int iid){
-		int count = 0;
-		StringBuffer result = new StringBuffer("{result:");
-		if(iid<0){
-			result.append("true}");
-			return result.toString();
-		}
-		count = dpDao.CheckAppCount(iid);
-		result.append("true,appCount:").append(count).append("}");
-		return result.toString();
-	}
-	/**
-	 * 组织申报的元数据
-	 */
-	@DirectMethod
-	public String getAppTemplate(int iid){
-		String appTb = cg.getString("applyTmpTable");
-		String infos = dpDao.getAppTemplate(iid,appTb);
-		return infos;
-	}
-	/**
-	 * 获取已经录入的正式申报记录
-	 */
-	@DirectMethod
-	public Map getFormalAppData(int iid,int start,int limit){
-		Map infos = new HashMap();
-		String appTb = cg.getString("applyTable");
-		StringBuffer sql = new StringBuffer("select t.id,e.swdjzh,e.mc qymc,p.mc czfp,to_char(inputtime,'YYYY-MM-DD HH24:MI:SS')");
-		sql.append("inputtime,t.item_content itemcont,t.approvaldate,nvl(t.money,0)money,nvl(sszj,0)sszj,nvl(qptzj,0)qptzj,t.remark from ");
-		sql.append(appTb).append(" t,dj_cz e,");
-		sql.append("(select distinct bm,mc from bm_cont where table_bm='BM_CZFP')p where e.czfpbm=p.bm(+) and ");
-		sql.append("t.swdjzh=e.swdjzh(+)");
-		sql.append(" and t.iid=").append(iid).append(" order by t.id");
-		int count = dpDao.queryCount(sql.toString());
-		infos.put("totalCount", new Integer(count));
-		List ens = dpDao.queryForPage(sql.toString(),start,limit,Application.class);
-		infos.put("rows", ens);
-		return infos;
-	}
-	/**
-	 * 删除正式申报记录
-	* @param delType 0：删除部分，1：全部清空
-	* @param iid 要删除关于哪个项目的记录
-	* @param delRows 要删除的行，清空操作时，不需要该参数
-	* @return
-	 */
-	@DirectMethod
-	public String deleteFormalApps(int delType,int iid,String delRows){
-		StringBuffer result = new StringBuffer("{result:");
-		if(delType==0&&(delRows==null||delRows.equals(""))){
-			result.append("true}");
-			return result.toString();
-		}
-		try{
-			String appTb = cg.getString("applyTable");
-			boolean done = dpDao.deleteFormalApps(appTb,delType,iid,delRows);
-			result.append(done).append("}");
-		}catch(Exception e){
-			result.append("false}");
-		}
-		return result.toString();
-	}
-	/**
-	 * 获取导入临时表中的申报信息
-	 */
-	@DirectMethod
-	public Map getImportedAppData(int iid,String matchType,int year,int start,int limit){
-		Map infos = null;
-		WebContext context = WebContextManager.get();
-		HttpServletRequest request = context.getRequest();
-		String userid = (String) request.getSession().getAttribute("userid");
-		String appTmpTb = cg.getString("applyTmpTable");
-		String appTb = cg.getString("applyTable");
-		infos = dpDao.getImportedAppData(userid,appTmpTb,appTb,iid,matchType,year,start,limit);
-		return infos;
-	}
-	//删除导入临时表表中的申报信息
-	@DirectMethod
-	public String deleteImportedApps(int iid,String delRows){
-		StringBuffer result = new StringBuffer("{result:");
-		if(delRows==null||delRows.equals("")){
-			result.append("true}");
-			return result.toString();
-		}
-		try{
-			String appTmpTb = cg.getString("applyTmpTable");
-			WebContext context = WebContextManager.get();
-			HttpServletRequest request = context.getRequest();
-			String userid = (String) request.getSession().getAttribute("userid");
-			boolean done = dpDao.deleteImportedApps(iid,userid,appTmpTb,delRows);
-			result.append(done).append("}");
-		}catch(Exception e){
-			result.append("false}");
-		}
-		return result.toString();
-	}
-	//申报信息保存到临时表，主要是保存匹配后的内容
-	@DirectMethod
-	public String saveTempApps(int iid,String strRows){
-		StringBuffer result = new StringBuffer("{result:");
-		if(strRows==null||strRows.equals("")){
-			result.append("true}");
-			return result.toString();
-		}
-		try{
-			String appTmpTb = cg.getString("applyTmpTable");
-			boolean done = dpDao.saveTempApps(appTmpTb,iid,strRows);
-			result.append(done).append("}");
-		}catch(Exception e){
-			result.append("false}");
-		}
-		return result.toString();
-	}
-	//申报信息向正式库迁移，主要是保存当前页，传递的是序号。调用存储过程来做。
-	@DirectMethod
-	public String saveFormalApps(int iid,String strRows){
-		StringBuffer result = new StringBuffer("{result:");
-		if(strRows==null||strRows.equals("")){
-			result.append("true}");
-			return result.toString();
-		}
-		try{
-			String proName = cg.getString("pro_importApply");
-			WebContext context = WebContextManager.get();
-			HttpServletRequest request = context.getRequest();
-			String userid = (String) request.getSession().getAttribute("userid");
-			String[] infos = dpDao.saveFormalApps(userid,proName,iid,strRows);
-			if(infos==null||infos.length<1){
-				result.append("true}");
-			}else{
-				boolean done = "1".equals(infos[0]);
-				result.append(done);
-				result.append(",info:'").append(infos[1]).append("'}");
-			}
-		}catch(Exception e){
-			result.append("false}");
-		}
-		return result.toString();
-	}
+
 	//获取单位列表，按名称税号匹配查找
 	@DirectMethod
 	public Map getEns(int start,int limit,String pField,String pValue){
@@ -451,203 +315,6 @@ public class DataHandler {
 		HttpServletRequest request = context.getRequest();
 		User user=(User)request.getSession().getAttribute("user");
 		infos = dpDao.getEns(user,start,limit,pField,pValue);
-		return infos;
-	}
-	@DirectMethod
-	public String queryContributeOfEn(String year,String swdjzh){
-		StringBuffer result = new StringBuffer("{result:");
-		if(swdjzh==null||swdjzh.equals("")){
-			result.append("false}");
-			return result.toString();
-		}
-		try{
-			Map info = dpDao.queryContributeOfEn(year,swdjzh);
-			String contribute = "0",contribute_lst="0";
-			if(info!=null){
-				contribute = ((BigDecimal)info.get("QGX")).toString();
-				contribute_lst = ((BigDecimal)info.get("SNQGX")).toString();
-			}
-			result.append("true,contribute:").append(contribute).append(",contribute_lst:").append(contribute_lst).append("}");
-		}catch(Exception e){
-			result.append("false}");
-		}
-		return result.toString();
-	}
-	//将匹配信息回写到临时表
-	@DirectMethod
-	public String matchEn(int iid,int xh,String swdjzh){
-		StringBuffer result = new StringBuffer("{result:");
-		if(swdjzh==null||swdjzh.equals("")){
-			result.append("true}");
-			return result.toString();
-		}
-		try{
-			String appTmpTb = cg.getString("applyTmpTable");
-			WebContext context = WebContextManager.get();
-			HttpServletRequest request = context.getRequest();
-			String userid=(String)request.getSession().getAttribute("userid");
-			boolean done = dpDao.matchEn(appTmpTb,xh,iid,userid,swdjzh);
-			result.append(done).append("}");
-		}catch(Exception e){
-			result.append("false}");
-		}
-		return result.toString();
-	}
-	//获取相同企业相同项目的已申报信息
-	@DirectMethod
-	public String getSameAppCount(int iid,String swdjzh){
-		StringBuffer result = new StringBuffer("{count:");
-		int count =0;
-		if(swdjzh==null||swdjzh.equals("")){
-			result.append("0}");
-			return result.toString();
-		}
-		try{
-			String appTb = cg.getString("applyTable");
-			count = dpDao.getSameAppCount(appTb,iid,swdjzh);
-			result.append(count).append("}");
-		}catch(Exception e){
-			result.append("0}");
-		}
-		return result.toString();
-	}
-	//获取指定项目、支付依据的已资助记录数
-	@DirectMethod
-	public String checkDoneAid(int iid, String pfileno){
-		StringBuffer result = new StringBuffer("{result:");
-		if(iid<0){
-			result.append("true}");
-			return result.toString();
-		}
-		Map info = dpDao.CheckDoneAidInfo(iid,pfileno);
-		String scount = "0",shj="0";
-		if(info!=null){
-			scount = ((BigDecimal)info.get("CC")).toString();
-			shj = ((BigDecimal)info.get("HJ")).toString();
-		}
-		result.append("true,aidCount:").append(scount).append(",hj:").append(shj).append("}");
-		return result.toString();
-	}
-	@DirectMethod
-	public Map getFormalAidData(int iid,String pfileno,int start,int limit){
-		Map infos = new HashMap();
-		String appTb = cg.getString("aidTable");
-		infos = dpDao.getFormalAidData(appTb,iid,pfileno,start,limit);
-		return infos;
-	}
-	@DirectMethod
-	public String deleteFormalAids(int delType,int iid,String fileno,String delRows){
-		StringBuffer result = new StringBuffer("{result:");
-		if(delType==0&&(delRows==null||delRows.equals(""))){
-			result.append("true}");
-			return result.toString();
-		}
-		try{
-			String aidTb = cg.getString("aidTable");
-			boolean done = dpDao.deleteFormalAids(aidTb,delType,iid,fileno,delRows);
-			result.append(done).append("}");
-		}catch(Exception e){
-			result.append("false}");
-		}
-		return result.toString();
-	}
-	@DirectMethod
-	public Map getImportedAidData(int iid,String matchType,String pfileno,int start,int limit){
-		Map infos = null;
-		WebContext context = WebContextManager.get();
-		HttpServletRequest request = context.getRequest();
-		String userid = (String) request.getSession().getAttribute("userid");
-		String aidTmpTb = cg.getString("aidTmpTable");
-		String aidTb = cg.getString("aidTable");
-		infos = dpDao.getImportedAidData(userid,aidTmpTb,aidTb,pfileno,iid,matchType,start,limit);
-		return infos;
-	}
-	@DirectMethod
-	public String deleteImportedAids(int iid,String pfileno,String delRows){
-		StringBuffer result = new StringBuffer("{result:");
-		if(delRows==null||delRows.equals("")){
-			result.append("true}");
-			return result.toString();
-		}
-		try{
-			String aidTmpTb = cg.getString("aidTmpTable");
-			WebContext context = WebContextManager.get();
-			HttpServletRequest request = context.getRequest();
-			String userid = (String) request.getSession().getAttribute("userid");
-			boolean done = dpDao.deleteImportedAids(userid,iid,pfileno,aidTmpTb,delRows);
-			result.append(done).append("}");
-		}catch(Exception e){
-			result.append("false}");
-		}
-		return result.toString();
-	}
-	@DirectMethod
-	public String saveTempAids(String aidInfo,String strRows){
-		StringBuffer result = new StringBuffer("{result:");
-		if(strRows==null||strRows.equals("")){
-			result.append("true}");
-			return result.toString();
-		}
-		try{
-			String aidTmpTb = cg.getString("aidTmpTable");
-			boolean done = dpDao.saveTempAids(aidTmpTb,aidInfo,strRows);
-			result.append(done).append("}");
-		}catch(Exception e){
-			result.append("false}");
-		}
-		return result.toString();
-	}
-	@DirectMethod
-	public String saveFormalAids(String aidInfo,String strRows){
-		StringBuffer result = new StringBuffer("{result:");
-		if(strRows==null||strRows.equals("")){
-			result.append("true}");
-			return result.toString();
-		}
-		try{
-			String proName = cg.getString("pro_importAid");
-			WebContext context = WebContextManager.get();
-			HttpServletRequest request = context.getRequest();
-			String userid = (String) request.getSession().getAttribute("userid");
-			String[] infos = dpDao.saveFormalAids(userid,proName,aidInfo,strRows);
-			if(infos==null||infos.length<1){
-				result.append("true}");
-			}else{
-				boolean done = "1".equals(infos[0]);
-				result.append(done);
-				result.append(",info:'").append(infos[1]).append("'}");
-			}
-		}catch(Exception e){
-			result.append("false}");
-		}
-		return result.toString();
-	}
-	//将客户手工匹配的结果及时更新到临时表中
-	@DirectMethod
-	public String matchEnOfTmpAid(int iid,String fileno,int xh,String swdjzh){
-		StringBuffer result = new StringBuffer("{result:");
-		if(swdjzh==null||swdjzh.equals("")){
-			result.append("true}");
-			return result.toString();
-		}
-		try{
-			String aidTmpTb = cg.getString("aidTmpTable");
-			WebContext context = WebContextManager.get();
-			HttpServletRequest request = context.getRequest();
-			String userid=(String)request.getSession().getAttribute("userid");
-			boolean done = dpDao.matchEnOfTmpAid(aidTmpTb,fileno,iid,xh,userid,swdjzh);
-			result.append(done).append("}");
-		}catch(Exception e){
-			result.append("false}");
-		}
-		return result.toString();
-	}
-	//查询企业历年的申报和贡献情况
-	@DirectMethod
-	public List getEnHistoryData(String swdjzh){
-		List infos = null;
-		String proName = cg.getString("pro_enHistoryTaxApply");
-		infos = dpDao.getEnHistoryData(proName,swdjzh);
 		return infos;
 	}
 }

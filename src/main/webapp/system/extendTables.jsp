@@ -38,6 +38,7 @@ Ext.BLANK_IMAGE_URL = '../libs/ext-3.4.0/resources/images/default/s.gif';
 Ext.datapro.REMOTING_API.enableBuffer = 0;  
 Ext.Direct.addProvider(Ext.datapro.REMOTING_API);
 var cTb = {};
+var edtCol=new Array(),edtDesc=new Array(),edtType=new Array(),newCols=new Array();
 var cMode="add";
 var ssm = new Ext.grid.CheckboxSelectionModel({singleSelect: true});
 ssm.handleMouseDown = Ext.emptyFn;
@@ -136,6 +137,10 @@ var grid = new Ext.grid.GridPanel({
 				return;
 			}
 			cTb = records[0];
+			edtCol=new Array();
+			edtDesc=new Array();
+			edtType=new Array();
+			newCols=new Array();
             tbWin.show();
 		}
 	},{
@@ -278,7 +283,7 @@ var tcm = new Ext.grid.ColumnModel({
 	    },{
 	        header: "列中文名",
 	        dataIndex: 'coldesc',
-	        width: 120,
+	        width: 180,
 	        align: 'left',
 	        editor: new Ext.form.TextField({allowBlank: false,selectOnFocus:true,maxLength:30}) 
 	    },{
@@ -317,28 +322,17 @@ var tcm = new Ext.grid.ColumnModel({
 				    return "";
 				}
 			}
-	    },{
-	    	header: "匹配列序号",
-	        dataIndex: 'excelcol',
-	        width: 110,
-	        align: 'left',
-	        renderer: function(v,p,r){
-	        	if(v<0){
-		        	return ""
-	        	}else{
-		        	return v;
-	        	}
-	        },
-	        editor: new Ext.form.NumberField({allowBlank: true,selectOnFocus:true,maxLength:2}) 
-		}
+	    }
 	],
 	defaultSortable: false
 });
-var tbRecord = Ext.data.Record.create([  
+var tbRecord = Ext.data.Record.create([ 
+    {name: 'isold',type:'int'},
+    {name: 'o_colname', type: 'string'},
 	{name: 'colname', type: 'string'},
 	{name: 'coldesc', type: 'string'},
 	{name: 'coltype', type: 'int'},
-	{name: 'excelcol', type: 'int'}
+	{name: 'showorder',type:'int'}
 ]);
 var tbds = new Ext.data.Store({
 	proxy: new Ext.data.DirectProxy({
@@ -364,22 +358,19 @@ var tbInfoGrid = new Ext.grid.EditorGridPanel({
 	stripeRows: true,
 	tbar: [
     {
-		text: '增加行',
+		text: '增加',
 		id: 'addColumn',
 		iconCls: 'add',
         handler : function(){
-        	var er = 1;
-        	if(tbds.getCount()>0){
-            	var preEr = tbds.getAt(tbds.getCount()-1).get("excelcol");
-            	er = (preEr!==""?Number(preEr)+1:1);
-        	}
+        	var btindex = tbds.getCount();
 	    	var col = new tbRecord({
+	    		isOld: 0,
 	    		colname: '',
+	    		o_colname :'',
 	    		coldesc: '',
 	    		coltype: '0',
-	    		excelcol: er
+	    		showorder: btindex
 	        });
-	        var btindex = tbds.getCount();
 	    	tbInfoGrid.stopEditing();
 	    	tbds.insert(btindex, col);
 	    	tbInfoGrid.startEditing(btindex, 0);
@@ -391,20 +382,31 @@ var tbInfoGrid = new Ext.grid.EditorGridPanel({
         handler : function(){
 			var records = tbInfoGrid.getSelectionModel().getSelections();
 	        if(!records||records.length<1){
-				Ext.Msg.alert("提示","请先选择要删除的记录!");
+				Ext.Msg.alert("提示","请先选择要删除的列!");
 				return;
 			}	
 			if(records){
-				Ext.MessageBox.confirm('确认删除', '你真的要删除所选记录吗?', 
-	    	    	function(btn){
-			    	    if(btn == 'yes') {// 选中了是按钮							    	    										 
-					    	for(var rc=0;rc<records.length;rc++){						    	    	
-				    	    	tbds.getModifiedRecords().remove(records[rc]);
-				    	    	tbds.remove(records[rc]);
-						    }
+				if(cMode=="add"){
+					for(var rc=0;rc<records.length;rc++){						    	    	
+		    	    	tbds.getModifiedRecords().remove(records[rc]);
+		    	    	tbds.remove(records[rc]);
+				    }
+				}else{
+					Ext.MessageBox.confirm('确认删除', '确定要从表中删除这个列吗?', function(btn){
+						if(btn == 'yes') {// 选中了是按钮
+							var c = records[0].colname;
+							DataHandler.deleteColumn(cTb.get("tbname"),c,function(data){
+								var obj = Ext.decode(data);
+								if(obj&&obj.result){
+									Ext.Msg.alert("提示","指定的列已删除!");
+									tbds.reload();
+								}else if(obj&&obj.info){
+									Ext.Msg.alert("错误","删除列过程中发生错误。"+obj.info);
+								}
+							}); 	
 						}
-					}
-				);
+					});
+				}
 			}
 		}
 	},{
@@ -416,12 +418,22 @@ var tbInfoGrid = new Ext.grid.EditorGridPanel({
 		}
 	}]
 });
-tbInfoGrid.on('beforeedit',function(e){ 
-	var fld = e.field;
-	if(cMode !="add"&&fld!=="excelcol"){
-		e.cancel = true; 
-	}
-    return;   
+tbInfoGrid.on('afteredit',function(e){ 
+	var r = e.record;
+	//如果是编辑模式。记录下非新增的，即修改的信息
+ 	if(cMode !="add"&&r.isold==1){
+ 		var edtInfo = {
+ 			col: r.o_colname,
+ 			newVal: e.value	
+ 		};
+ 		if(e.field=="colname"){
+ 			edtCol.push(edtInfo) ;
+ 		}else if(e.field=="coldesc"){
+ 			edtDesc.push(edtInfo) ;
+ 		}else if(e.field=="coltype"){
+ 			edtType.push(edtInfo);
+ 		}
+ 	}
 });
 var tbWin= new Ext.Window({
 	id : 'tbWin',
@@ -461,8 +473,6 @@ tbWin.on("show",function(){
 		//启用所有可编辑部分
 		tbForm.getForm().findField("tbname").setDisabled(false);
 		tbForm.getForm().findField("tbtype").setDisabled(false);
-		Ext.getCmp("delColumn").setDisabled(false);
-		Ext.getCmp("addColumn").setDisabled(false);
 		tbForm.getForm().findField("tbname").setValue("");
 		tbForm.getForm().findField("tbdesc").setValue("");
 		tbForm.getForm().findField("tbtype").setValue("0");
@@ -474,8 +484,6 @@ tbWin.on("show",function(){
 		//加载扩展表信息，禁用除对应excel列外的所有内容
 		tbForm.getForm().findField("tbname").setDisabled(true);
 		tbForm.getForm().findField("tbtype").setDisabled(true);
-		Ext.getCmp("delColumn").setDisabled(true);
-		Ext.getCmp("addColumn").setDisabled(true);
 		tbForm.getForm().findField("tbname").setValue(cTb.get("tbname"));
 		tbForm.getForm().findField("tbdesc").setValue(cTb.get("tbdesc"));
 		tbForm.getForm().findField("tbtype").setValue(cTb.get("ttype"));
@@ -527,23 +535,6 @@ function saveTbInfos(){
 			Ext.Msg.alert("提示","第"+(i+1)+"行的列中文名不能为空!");
 			return;
 		}
-		if(cl.excelcol===0){
-			Ext.Msg.alert("提示","第"+(i+1)+"行的匹配列号不应为0!");
-			return;
-		}
-		for(var j=0;j<tb.cols.length;j++){
-			if(i==j)continue;
-			var tmpCl = tb.cols[j];
-			if(tmpCl.excelcol=="")continue;
-			if(tmpCl.excelcol==cl.excelcol){
-				Ext.Msg.alert("提示","第"+(i+1)+"行的匹配列号与第"+(j+1)+"行的匹配列号重复!");
-				return;
-			}
-			if(tmpCl.colname==cl.colname){
-				Ext.Msg.alert("提示","第"+(i+1)+"行的列名与第"+(j+1)+"行的列名重复!");
-				return;
-			}
-		}
 	}
 	if(cMode=="add"){
 		Ext.MessageBox.confirm('确认', '你真的要在数据库中增加一个表吗?', function(btn){
@@ -563,6 +554,10 @@ function saveTbInfos(){
 							}else{
 								Ext.Msg.alert("错误","新增表过程中发生错误:"+obj.info);
 							}
+							edtCol=new Array();
+							edtDesc=new Array();
+							edtType=new Array();
+							newCols=new Array();
 						});
 					}else if(obj.duplicate){
 						Ext.Msg.alert("错误","表名已存在!");
@@ -574,13 +569,23 @@ function saveTbInfos(){
 		});
 	}else{
 		Ext.Msg.wait("正在保存...");
-		DataHandler.saveExtendTables(Ext.encode(tb),function(data){
+		var edtInfo = {
+			edtCol:edtCol,
+			edtDesc:edtDesc,
+			edtType:edtType,
+			newCols:newCols
+		};
+		DataHandler.saveExtendTables(tn,Ext.encode(tb),Ext.encode(edtInfo),function(data){
 			var obj = Ext.decode(data);
 			Ext.Msg.hide();
 			if(obj&&obj.result){
 				Ext.Msg.alert("提示","表信息保存成功!");
 				tbds.commitChanges();
 				tbWin.hide();
+				edtCol=new Array();
+				edtDesc=new Array();
+				edtType=new Array();
+				newCols=new Array();
 				ds.load({params:{start:0,limit:<%=cg.getString("pageSize","40")%>}});
 			}else{
 				Ext.Msg.alert("错误","保存表信息过程中发生错误!");
@@ -599,9 +604,13 @@ function buildTb(){
 			colname: rd.get("colname"),
 			coldesc: rd.get("coldesc"),
 			coltype: rd.get("coltype"),
-			excelcol: rd.get("excelcol")
+			showorder: rd.get("showorder")
 		};
 		cols.push(col);
+		//保存新增列，主要用于编辑模式下，对新增列的特殊处理
+		if(rd.get("isold")==0){
+			newCols.push(col);
+		}
 	}
 	tb.tbname = tbForm.getForm().findField("tbname").getValue(); 
 	tb.tbdesc = tbForm.getForm().findField("tbdesc").getValue();
